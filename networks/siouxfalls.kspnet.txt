@@ -1,0 +1,100 @@
+node A
+node B
+node C
+node D
+node E
+node F
+node G
+node H
+node I
+node J
+node K
+node L
+node M
+node N
+node O
+node P
+node Q
+node R
+node S
+node T
+node U
+node V
+node W
+node X
+arc A B 6
+arc A C 4
+arc B A 6
+arc B F 5
+arc C A 4
+arc C D 4
+arc C L 4
+arc D C 4
+arc D E 2
+arc D K 6
+arc E D 2
+arc E F 4
+arc E I 5
+arc F B 5
+arc F E 4
+arc F H 2
+arc G H 3
+arc G R 2
+arc H F 2
+arc H G 3
+arc H I 10
+arc H P 5
+arc I E 5
+arc I H 10
+arc I J 3
+arc J I 3
+arc J K 5
+arc J O 6
+arc J P 4
+arc J Q 8
+arc K D 6
+arc K J 5
+arc K L 6
+arc K N 4
+arc L C 4
+arc L K 6
+arc L M 3
+arc M L 3
+arc M X 4
+arc N K 4
+arc N O 5
+arc N W 4
+arc O J 6
+arc O N 5
+arc O S 3
+arc O V 3
+arc P H 5
+arc P J 4
+arc P Q 2
+arc P R 3
+arc Q J 8
+arc Q P 2
+arc Q S 2
+arc R G 2
+arc R P 3
+arc R T 4
+arc S O 3
+arc S Q 2
+arc S T 4
+arc T R 4
+arc T S 4
+arc T U 6
+arc T V 5
+arc U T 6
+arc U V 2
+arc U X 3
+arc V O 3
+arc V T 5
+arc V U 2
+arc V W 4
+arc W N 4
+arc W V 4
+arc W X 2
+arc X M 4
+arc X U 3
+arc X W 2
