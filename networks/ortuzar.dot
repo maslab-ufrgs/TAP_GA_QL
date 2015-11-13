@@ -1,0 +1,26 @@
+graph ortuzar {
+ A -- B
+ A -- C
+ A -- D
+ B -- D
+ B -- E
+ C -- D
+ C -- F
+ C -- G
+ D -- E
+ D -- G
+ D -- H
+ E -- H
+ F -- G
+ F -- I
+ G -- H
+ G -- J
+ G -- K
+ H -- K
+ I -- J
+ I -- L
+ J -- K
+ J -- L
+ J -- M
+ K -- M
+}
