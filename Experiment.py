@@ -13,7 +13,6 @@ from GA import GA
 from QL import QL
 from time import localtime
 import KSP
-import numpy as np
 
 class Driver():
     #od:OD = instance of OD class
@@ -43,11 +42,71 @@ class Experiment:
         self.printDriversPerLink = printDriversPerLink
         self.printLinkCosts = printLinkCosts
         self.networkSet = False
+        self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
         self.outputtype= outputtype
 
-    def calculateAverageTravelTime(self,stringOfActions):
-        return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
+    def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
+
+        self.networkSet = True
+        self.networkName ="Ortuzar"
+        self.k = k
+        self.groupsize = groupSize
+        odInput = self.parseODfile(odFile)
+        self.ODlist = []
+
+        for tupOD in odInput:
+            if(tupOD[2]%self.groupsize!=0):
+                print(tupOD[2])
+                raise Exception("Error: number of travels is not a multiple of the group size \
+                        origin: "+str(tupOD[0])+" destination: "+ str(tupOD[1]))
+            else:
+                                #Origin,destination,number of paths, number of travels
+                self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
+
+        #calculating k shortest routes for each OD pair
+        for od in self.ODlist:
+            od.paths = KSP.getKRoutes(networkFile,od.o, od.d, od.numPaths)
+
+        ##get the value of each link - free flow travel time
+        V,E = KSP.generateGraph(networkFile)
+        self.freeFlow={}
+        for edge in E:
+            self.freeFlow[edge.start+edge.end]=edge.length
+
+        self.edgeNames = sorted(self.freeFlow.keys())
+
+        print(networkFile)
+        self.edges = self.parseCapacityFile(networkFile)
+
+        #creates different drivers according to the number of travels of each OD
+        #instance
+        self.drivers=[]
+        for od in self.ODlist:
+            for travel in range(od.numTravels):
+                self.drivers.append(Driver(od))
+
+    def parseODfile(self,path):
+        with open(path) as odFILE:
+            lines = odFILE.readlines()
+        odList = []
+        for line in lines:
+            line = line.replace(' ', '').replace('\n','')
+            items = line.split(',')
+            if(len(items) == 3):
+                odList.append((items[0],items[1],int(items[2])))
+        return odList
+
+    def parseCapacityFile(self, path):
+        links = {}
+        with open(path) as capFILE:
+            lines = capFILE.readlines()
+            for line in lines:
+                line = line.replace('\n','')
+                items = line.split(' ')
+                if(len(items) == 4):
+                    links[items[1]+items[2]] = float(items[3])
+        return links
 
     def genCallBack(self,ga_engine):
         population = ga_engine.getPopulation()
@@ -92,6 +151,37 @@ class Experiment:
 
         self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
+    def buildODPairData(self):
+        """
+        returns the string of OD pair data
+        """
+        op_pair_data = ''
+        for driver_ix, driver in enumerate(self.drivers):
+            dri = driver_ix
+            ori = driver.od.o
+            des = driver.od.d
+            tti = self.ttlist[driver_ix][0]
+            op_pair_data += "%s,%s,%s,%s\n" % (dri, ori, des, tti)
+        return op_pair_data
+
+    def printODPairs(self, filename):
+        finalPath ="%s.odc.txt" % filename
+        try:
+            self.removeFileIfExists(finalPath)
+
+            if self.outputtype != "pairOD":
+                return
+
+            print("Printing travel time costs.. to %s" % finalPath)
+
+            header = "driver_ix;origin;destination;traveltime\n"
+            with open(finalPath, 'w') as f:
+                f.write(header)
+                f.write(self.buildODPairData())
+
+        except Exception as e:
+            print(e)
+
     def __print_step(self,stepNumber,stepSolution,avgTT=None,qlTT=None):
         if(self.useGA):
             if(self.useQL):
@@ -118,6 +208,9 @@ class Experiment:
                 drivers += str(edges[edge]) + " "
             self.outputFile.write(drivers.strip())
 
+        if(self.outputtype == "pairOD"):
+            pass
+
         self.outputFile.write("\n")
 
     def nodesString(self):
@@ -133,7 +226,7 @@ class Experiment:
         return nodesString
 
     def nd(self):
-        return len(self.drivers)
+        return len(self.drivers)*self.groupsize
 
     def appendTag(self, filenamewithtag):
         #tests if there isn't already a file with the desired name
@@ -147,25 +240,106 @@ class Experiment:
         filenamewithtag += append_number + ".txt"
         return filenamewithtag
 
-    def createStringArgumentsQL(self):
+    def createStringArgumentsQL(self, nd):
+        """
+        nd: number of drivers without groupsize
+        """
 
         path2simulationfiles = './results_gaql_grouped/QL/' +'_net_'+self.networkName  \
-                + '/nd'+ str(self.nd()*self.groupsize) +'_groupsize'+ str(self.groupsize)\
+                + '/nd'+ str(nd) +'_groupsize'+ str(self.groupsize)\
                 + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
 
         filename = path2simulationfiles +  '/'+self.networkName \
                 + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                + '_nd'+ str(self.nd()*self.groupsize) + '_groupsize'+ str(self.groupsize) \
+                + '_nd'+ str(nd) + '_groupsize'+ str(self.groupsize) \
                 + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
                 + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
                 + str(localtime()[0])
 
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
-                + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()*self.groupsize) \
+                + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
                 + ' groupsize= '+ str(self.groupsize)\
                 + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
 
         return filename, path2simulationfiles, headerstr
+
+    def createStringArguments(self, useQL, useInt):
+        if(useQL and useInt):
+            path2simulationfiles = './results_gaql_grouped/GA<->QL/' +'_net_'+self.networkName  \
+                    + '/pm' + "%4.4f" % self.mutation \
+                    + '/nd'+ str(self.nd()) +'_groupsize'+ str(self.groupsize)\
+                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha + '/QL<-GA_Interval' + str(self.interval)
+
+            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
+                    + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
+                    + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_interval'+ str(self.interval) + '_' + str(localtime()[3])+'h'+ str(localtime()[4]) \
+                    +'m'+ str(localtime()[5])+'s-'\
+                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
+                    + str(localtime()[0])
+
+            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
+                    + str(self.population) + ' self.mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
+                    + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
+                    + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
+                    + ' groupsize= '+ str(self.groupsize) + ' GA->QL interval=' + str(self.interval)\
+                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+
+        elif(useQL):
+            path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+ self.networkName  \
+                    + '/pm' + "%4.4f" % self.mutation \
+                    + '/nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize)\
+                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
+
+            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
+                    + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
+                    + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
+                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
+                    + str(localtime()[0])
+
+            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
+                    + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
+                    + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
+                    + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
+                    + ' groupsize= '+ str(self.groupsize) \
+                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+        else:
+            path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
+                    + '/pm' + "%4.4f" % self.mutation + '/nd'+ str(self.nd()) \
+                    +'_groupsize' + str(self.groupsize)
+
+            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
+                    + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
+                    + '_k' + str(self.k) \
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
+                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
+                    + str(localtime()[0])
+
+            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
+                    + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
+                    + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
+                    + '\n#generation avg_tt ' +  self.nodesString()
+
+        headerstr = self.appendExtraODPairTimes(headerstr)
+
+        return filenamewithtag, path2simulationfiles, headerstr
+
+    def appendExtraODPairTimes(self, baseHeader):
+        """
+        Appends the list of OD pairs and the list of edges to the header
+        """
+        baseHeader += " #od_pairs"
+        for od in self.ODlist:
+            baseHeader += " %s%s" % (od.o, od.d)
+
+        baseHeader += " #edges "
+        baseHeader += ' '.join(sorted(self.edges.keys()))
+
+        return baseHeader
 
     def run_ql(self, numEpisodes, alpha, decay):
         self.useGA = False
@@ -174,7 +348,7 @@ class Experiment:
         self.decay = decay
         self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha)
 
-        filename, path2simulationfiles, headerstr = self.createStringArgumentsQL()
+        filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
 
         if os.path.isdir(path2simulationfiles) == False:
@@ -188,107 +362,6 @@ class Experiment:
             self.__print_step(episode,instance,qlTT=value)
 
         self.outputFile.close()
-        self.printODPairs(filename)
-
-    def createStringArguments(self, useQL, useInt):
-        if(useQL and useInt):
-            path2simulationfiles = './results_gaql_grouped/GA<->QL/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation \
-                    + '/nd'+ str(self.nd()*self.groupsize) +'_groupsize'+ str(self.groupsize)\
-                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha + '/QL<-GA_Interval' + str(self.interval)
-
-            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
-                    + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
-                    + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                    + '_nd'+ str(self.nd()*self.groupsize) + '_groupsize'+ str(self.groupsize) \
-                    + '_interval'+ str(self.interval) + '_' + str(localtime()[3])+'h'+ str(localtime()[4]) \
-                    +'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
-
-            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
-                    + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
-                    + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
-                    + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()*self.groupsize) \
-                    + ' groupsize= '+ str(self.groupsize) + ' GA->QL interval=' + str(self.interval)\
-                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
-
-        elif(useQL):
-            path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation \
-                    + '/nd'+ str(self.nd()*self.groupsize) +'_groupsize'+ str(self.groupsize)\
-                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
-
-            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
-                    + str(mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
-                    + '_k' + str(self.k) + '_a' + str(alpha) + '_d' + str(decay)\
-                    + '_nd'+ str(nd*self.groupsize) + '_groupsize'+ str(self.groupsize) \
-                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
-
-            headerstr = '#parameters: generations=' + str(generations) + ' pop.size='\
-                    + str(population) + ' mutation=' + str(mutation) + ' crossover=' + str(crossover) \
-                    + ' elit=' + str(elite) + ' k=' + str(self.k) + ' alpha=' + str(alpha) \
-                    + ' decay=' + str(decay) + ' number of drivers=' + str(nd*self.groupsize) \
-                    + ' groupsize= '+ str(self.groupsize) \
-                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
-        else:
-            path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % mutation \
-                    + '/nd'+ str(nd*self.groupsize) +'_groupsize'+ str(self.groupsize)
-
-            filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
-                    + str(mutation) + '_c' + str(crossover) + '_e' + str(elite) \
-                    + '_k' + str(self.k) \
-                    + '_nd'+ str(nd*self.groupsize) + '_groupsize'+ str(self.groupsize) \
-                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
-
-            headerstr = '#parameters: generations=' + str(generations) + ' pop.size='\
-                    + str(population) + ' mutation=' + str(mutation) + ' crossover=' + str(crossover) \
-                    + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
-                    + '\n#generation avg_tt ' +  self.nodesString()
-
-        return filenamewithtag, path2simulationfiles, headerstr
-
-    def removeFileIfExists(self, path):
-        try:
-            os.remove(path)
-        except Exception as e:
-            print(e)
-
-    def buildODPairData(self):
-        """
-        returns the string of OD pair data
-        """
-        op_pair_data = ''
-        for driver_ix, driver in enumerate(self.drivers):
-            dri = driver_ix
-            ori = driver.od.o
-            des = driver.od.d
-            tti = self.ttlist[driver_ix, 0]
-            op_pair_data += "%s,%s,%s,%s\n" % (dri, ori, des, tti)
-        return op_pair_data
-
-    def printODPairs(self, filename):
-        finalPath ="%s.odc.txt" % filename
-        try:
-            self.removeFileIfExists(finalPath)
-
-            if self.outputtype != "pairOD":
-                return
-
-            print("Printing travel time costs.. to %s" % finalPath)
-
-            header = "driver_ix;origin;destination;traveltime\n"
-            with open(finalPath, 'w') as f:
-                f.write(header)
-                f.write(self.buildODPairData())
-
-        except Exception as e:
-            print(e)
 
     def run_ga_ql(self,useQL,useInt,generations, population, crossover, mutation, elite, alpha, decay,interval):
         self.useGA = True
@@ -306,7 +379,7 @@ class Experiment:
             self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
-        filenamewithtag = appendTag(filename)
+        filenamewithtag = self.appendTag(filename)
 
         ##creates file
         if os.path.isdir(path2simulationfiles)==False:
@@ -320,72 +393,6 @@ class Experiment:
         self.ga.evolve()
 
         self.outputFile.close()
-
-        self.print_OD_pairs(filename)
-
-    def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
-
-        self.networkSet = True
-        self.networkName ="Ortuzar"
-        self.k = k
-        self.groupsize = groupSize
-        odInput = self.parseODfile(odFile)
-        self.ODlist = []
-
-        for tupOD in odInput:
-            if(tupOD[2]%self.groupsize!=0):
-                print(tupOD[2])
-                raise Exception("Error: number of travels is not a multiple of the group size \
-                        origin: "+str(tupOD[0])+" destination: "+ str(tupOD[1]))
-            else:
-                                #Origin,destination,number of paths, number of travels
-                self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
-
-        #calculating k shortest routes for each OD pair
-        for od in self.ODlist:
-            od.paths = KSP.getKRoutes(networkFile,od.o, od.d, od.numPaths)
-
-        ##get the value of each link - free flow travel time
-        V,E = KSP.generateGraph(networkFile)
-        self.freeFlow={}
-        for edge in E:
-            self.freeFlow[edge.start+edge.end]=edge.length
-
-        self.edgeNames = sorted(self.freeFlow.keys())
-
-        #creates different drivers according to the number of travels of each OD
-        #instance
-        self.drivers=[]
-        for od in self.ODlist:
-            for travel in range(od.numTravels):
-                self.drivers.append(Driver(od))
-
-        self.initializeTravelTimeCache(len(self.drivers), k)
-
-    def parseODfile(self,path):
-        with open(path) as odFILE:
-            lines = odFILE.readlines()
-        odList = []
-        for line in lines:
-            line = line.replace(' ', '').replace('\n','')
-            items = line.split(',')
-            if(len(items) == 3):
-                odList.append((items[0],items[1],int(items[2])))
-        return odList
-
-    def initializeTravelTimeCache(self, numDrivers, numActions):
-        self.ttlist = np.zeros((numDrivers, numActions))
-
-    def parseCapacityFile(self,path):
-        links = {}
-        with open(path) as capFILE:
-            lines = capFILE.readlines()
-        for line in lines:
-            line = line.replace('\n','')
-            items = line.split(' ')
-            if(len(items) == 4):
-                links[items[1]+items[2]] = float(items[3])
-        return links
 
     def driversPerLink(self,driverString):
         """
@@ -419,13 +426,12 @@ class Experiment:
         path = self.drivers[driverIndex].od.paths[action][0]##list of nodes of path
         for edge in path:
             traveltime += edgesCosts[edge]
-            self.ttlist[driverIndex, action] = traveltime
+            self.ttlist[driverIndex][action] = traveltime
         return traveltime
 
     def calculateIndividualTravelTime(self,stringOfActions):
         #returns list of travel times for each driver
         edgesCosts = self.calculateEdgesCosts(stringOfActions)
-        print(len(stringOfActions))
         results = []
         for driverIdx, action in enumerate(stringOfActions):
             costs = self.evaluateActionCost(driverIdx, action, edgesCosts)
@@ -447,3 +453,6 @@ class Experiment:
             edgesCosts[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
         ##edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
         return edgesCosts
+
+    def calculateAverageTravelTime(self,stringOfActions):
+        return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)

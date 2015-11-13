@@ -5,18 +5,15 @@ import os
 
 NET_CAPACITY = None
 
-def test_it_does_not_print_unless_flag_supplied():
+def test_append_header_function():
     e = Experiment(8, ExperimentConfig.network, NET_CAPACITY,
                    ExperimentConfig.network_od, 1)
-    e.printODPairs('test.txt')
-    assert not os.path.exists('test.txt.odc')
+    ed1 = 'AB AC AD BD BE CD CF CG DE DG DH EH FG FI'
+    ed2 = ' GH GJ GK HK IJ IL JK JL JM KM'
+    r = e.appendExtraODPairTimes('basehader')
+    assert r == 'basehader #od_pairs AL AM BL BM #edges ' + ed1 + ed2
 
-    e = Experiment(8, ExperimentConfig.network, NET_CAPACITY,
-                   ExperimentConfig.network_od, 1, outputtype="pairOD")
-    e.printODPairs('test.txt')
-    assert os.path.exists('test.txt.odc')
+def test_outputtype_pair_OD():
+    pass
 
-def test_experimento_1():
-    e = ExperimentConfig(ks=[8], alphas=[0.9], outputype="pairOD")
-    e.run()
 

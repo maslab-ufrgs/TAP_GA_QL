@@ -35,7 +35,7 @@ class ExperimentConfig:
     def __init__(self, printLinkCosts=False, printDriversPerLink=True,
                  generations=10, population=100, repetitions=1,
                  experimentType=1, elite_size=5, group_sizes=[1], alphas=[.9],
-                 decays=[.99], crossovers=[None], mutations=[None], ks=[8],
+                 decays=[.99], crossovers=[0.2], mutations=[0.001], ks=[8],
                  interval=[None], outputtype="normal"):
 
         self.network_capacity = None
@@ -63,25 +63,30 @@ class ExperimentConfig:
         self.ks = ks
         self.GA_QL_Interval = interval #intervalo para GA->QL
 
-    def runByType(self, experimentType,k, network, network_capacity, network_od,
-              group_size,printLinkCosts, printDriversPerLink, generations,
-              alpha, decay, crossover,mutation,elite,population,interval):
+    def runByType(self, experimentType, k, network, network_capacity, network_od,
+              group_size, printLinkCosts, printDriversPerLink, generations,
+              alpha, decay, crossover, mutation, elite, population, interval):
 
-        ex = Experiment(k,network, network_capacity, network_od, group_size,
+        ex = Experiment(k, network, network_capacity, network_od, group_size,
         printLinkCosts=printLinkCosts, printDriversPerLink=printDriversPerLink,
         outputtype=self.outputtype)
 
         if(experimentType==2): #GA only
+            print("Running GA Only")
+            print(mutation)
             ex.run_ga_ql(False,False,generations, population, crossover,
                          mutation, elite, None, None,None)
         elif(experimentType==3):#GA<-QL
+            print("Running GA<-QL ")
             ex.run_ga_ql(True,False,generations, population, crossover,
                          mutation, elite, alpha, decay,None)
         elif(experimentType==4):#GA<->QL
+            print("Running GA<->QL ")
             ex.run_ga_ql(True,True,generations, population, crossover,
                          mutation, elite, alpha, decay,interval)
         ##FOR QL only use this method:
         elif(experimentType==1): # QL only
+            print("Running QL Only ")
             ex.run_ql(generations,alpha, decay)
 
     def runConfig(self, r, g, a, d, c, m ,k, i):
