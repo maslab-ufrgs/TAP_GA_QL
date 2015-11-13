@@ -160,7 +160,6 @@ class Experiment:
             dri = driver_ix
             ori = driver.od.o
             des = driver.od.d
-            tti = self.ttlist[driver_ix][0]
             op_pair_data += "%s,%s,%s,%s\n" % (dri, ori, des, tti)
         return op_pair_data
 
@@ -426,7 +425,6 @@ class Experiment:
         path = self.drivers[driverIndex].od.paths[action][0]##list of nodes of path
         for edge in path:
             traveltime += edgesCosts[edge]
-            self.ttlist[driverIndex][action] = traveltime
         return traveltime
 
     def calculateIndividualTravelTime(self,stringOfActions):

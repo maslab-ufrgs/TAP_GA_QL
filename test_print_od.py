@@ -13,6 +13,12 @@ def test_append_header_function():
     r = e.appendExtraODPairTimes('basehader')
     assert r == 'basehader #od_pairs AL AM BL BM #edges ' + ed1 + ed2
 
+def test_all_experiment_config():
+    e = ExperimentConfig(generations=1000, population=100,
+                         mutations=[0.001], crossovers=[0.2],
+                         group_sizes=[1], ks=[8])
+    e.run()
+
 def test_outputtype_pair_OD():
     pass
 
