@@ -13,11 +13,3 @@ def test_append_header_function():
     r = e.appendExtraODPairTimes('basehader')
     assert r == 'basehader #od_pairs AL AM BL BM #edges ' + ed1 + ed2
 
-def test_outputtype_pair_OD():
-    e = Experiment(8, ExperimentConfig.ORTUZAR_NETWORK, NET_CAPACITY,
-                   ExperimentConfig.ORTUZAR_NETWORK_OD, 1)
-    r = e.buildODPairData()
-    assert r == ""
-
-
-

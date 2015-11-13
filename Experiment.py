@@ -19,6 +19,9 @@ class Driver():
     def __init__(self,OD):
         self.od = OD
 
+    def od_s(self):
+        return "%s%s" % (self.od.o, self.od.d)
+
 class OD():
     #O:string = origin node
     #D:string = destination node
@@ -31,10 +34,10 @@ class OD():
         self.numTravels = numTravels
         self.paths = None
 
-        def __str__(self):
-            return "origin: " + str(self.o) + " destination: "+str(self.d) + \
-            "number of travels: " + str(self.numTravels) + " number of shortest paths: " \
-            + str(self.numPaths)
+    def __str__(self):
+        return "origin: " + str(self.o) + " destination: "+str(self.d) + \
+                "number of travels: " + str(self.numTravels) + " number of shortest paths: " \
+                + str(self.numPaths)
 
 class Experiment:
 
@@ -125,10 +128,8 @@ class Experiment:
             #check if we are running the GA<->QL or GA<-QL experiment.
             if((self.useInterval) and (isGeneration == 0) and (generation != 0)):
                 (qlind,avg_tt) = self.ql.runEpisodeWithAction(ga_engine.bestIndividual().getInternalList()) #GA<-QL
-                print("Hello GA->QL")
             else:
                 (qlind,avg_tt) = self.ql.runEpisode() #GA<-QL
-                print("Hello QL")
                 #qlind is a array of paths taken by each driver
 
             #for each driver
@@ -151,19 +152,26 @@ class Experiment:
 
         self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
-    def buildODPairData(self):
+    def buildODPairData(self, ttByOD, ttByEdge):
         """
         returns the string of OD pair data
         """
-        op_pair_data = ''
-        for driver_ix, driver in enumerate(self.drivers):
-            dri = driver_ix
-            ori = driver.od.o
-            des = driver.od.d
-            op_pair_data += "%s,%s,%s,%s\n" % (dri, ori, des, tti)
-        return op_pair_data
+        str_od = ''
 
-    def __print_step(self,stepNumber,stepSolution,avgTT=None,qlTT=None):
+        for k in ttByOD.keys():
+            str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
+
+        str_edge = ''
+
+        for k in ttByEdge.keys():
+            if len(ttByEdge[k]) > 0:
+                str_edge += " %4.4f" % (sum(ttByEdge[k])/len(ttByEdge[k]))
+            else:
+                str_edge += " %4.4f" % 0.0
+
+        return str_od + str_edge
+
+    def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if(self.useGA):
             if(self.useQL):
                 self.outputFile.write(str(stepNumber)+": "+str(avgTT) +" "+ str(qlTT))
@@ -190,7 +198,8 @@ class Experiment:
             self.outputFile.write(drivers.strip())
 
         if(self.outputtype == "pairOD"):
-            self.outputFile.write(buildODPairData())
+            ttByOD, ttByEdge = self.travelTimeByEdgeAndOD(stepSolution)
+            self.outputFile.write(self.buildODPairData(ttByOD, ttByEdge))
 
         self.outputFile.write("\n")
 
@@ -404,10 +413,36 @@ class Experiment:
     def evaluateActionCost(self, driverIndex, action, edgesCosts):
         ##calculates cost for a driver
         traveltime = 0.0
-        path = self.drivers[driverIndex].od.paths[action][0]##list of nodes of path
+        path = self.drivers[driverIndex].od.paths[action][0] ##list of nodes of path
         for edge in path:
             traveltime += edgesCosts[edge]
         return traveltime
+
+    def initTravelTimeByODDict(self):
+        d = {}
+        for od in self.ODlist:
+            d["%s%s" % (od.o, od.d)] = []
+        return d
+
+    def initTravelTimeByEdgeDict(self):
+        d = {}
+        for edges in self.edges.keys():
+            d[edges[0]] = []
+        return d
+
+    def travelTimeByEdgeAndOD(self, stringOfActions):
+        edgesCosts = self.calculateEdgesCosts(stringOfActions)
+        odTravelTimeDict = self.initTravelTimeByODDict()
+        edgeTravelTimeDict = self.initTravelTimeByEdgeDict()
+
+        for driverIdx, action in enumerate(stringOfActions):
+            path = self.drivers[driverIdx].od.paths[action][0]
+            for edge in path:
+                odTravelTimeDict[self.drivers[driverIdx].od_s()].append(edgesCosts[edge])
+                if edge in edgeTravelTimeDict.keys():
+                    edgeTravelTimeDict[edge].append(edgesCosts[edge])
+
+        return odTravelTimeDict, edgeTravelTimeDict
 
     def calculateIndividualTravelTime(self,stringOfActions):
         #returns list of travel times for each driver
