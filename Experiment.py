@@ -442,7 +442,7 @@ class Experiment:
                 traveltime += edgesCosts[edge]
                 if edge in edgeTravelTimeDict.keys():
                     edgeTravelTimeDict[edge].append(edgesCosts[edge])
-            odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime/len(path))
+            odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
 
         return odTravelTimeDict, edgeTravelTimeDict
 
