@@ -351,6 +351,8 @@ class Experiment:
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode,instance,qlTT=value)
 
+        print("file://%s" % filenamewithtag)
+
         self.outputFile.close()
 
     def run_ga_ql(self,useQL,useInt,generations, population, crossover, mutation, elite, alpha, decay,interval):
@@ -426,8 +428,8 @@ class Experiment:
 
     def initTravelTimeByEdgeDict(self):
         d = {}
-        for edges in self.edges.keys():
-            d[edges[0]] = []
+        for edges in sorted(self.edges.keys()):
+            d[edges] = []
         return d
 
     def travelTimeByEdgeAndOD(self, stringOfActions):
@@ -440,13 +442,16 @@ class Experiment:
             traveltime = 0.0
             for edge in path:
                 traveltime += edgesCosts[edge]
-                if edge in edgeTravelTimeDict.keys():
-                    edgeTravelTimeDict[edge].append(edgesCosts[edge])
             odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
+            for edge in path:
+                if edge in edgeTravelTimeDict:
+                    edgeTravelTimeDict[edge].append(traveltime)
+                elif reversed(edge) in edgeTravelTimeDict:
+                    edgeTravelTimeDict[reversed(edge)].append(traveltime)
 
         return odTravelTimeDict, edgeTravelTimeDict
 
-    def calculateIndividualTravelTime(self,stringOfActions):
+    def calculateIndividualTravelTime(self, stringOfActions):
         #returns list of travel times for each driver
         edgesCosts = self.calculateEdgesCosts(stringOfActions)
         results = []
@@ -455,7 +460,7 @@ class Experiment:
             results.append(costs)
         return results
 
-    def calculateEdgesCosts(self,stringOfActions):
+    def calculateEdgesCosts(self, stringOfActions):
         ###############################
         # COST FUNCTION               #
         ###############################
