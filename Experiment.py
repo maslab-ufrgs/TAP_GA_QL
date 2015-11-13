@@ -163,24 +163,6 @@ class Experiment:
             op_pair_data += "%s,%s,%s,%s\n" % (dri, ori, des, tti)
         return op_pair_data
 
-    def printODPairs(self, filename):
-        finalPath ="%s.odc.txt" % filename
-        try:
-            self.removeFileIfExists(finalPath)
-
-            if self.outputtype != "pairOD":
-                return
-
-            print("Printing travel time costs.. to %s" % finalPath)
-
-            header = "driver_ix;origin;destination;traveltime\n"
-            with open(finalPath, 'w') as f:
-                f.write(header)
-                f.write(self.buildODPairData())
-
-        except Exception as e:
-            print(e)
-
     def __print_step(self,stepNumber,stepSolution,avgTT=None,qlTT=None):
         if(self.useGA):
             if(self.useQL):
@@ -208,7 +190,7 @@ class Experiment:
             self.outputFile.write(drivers.strip())
 
         if(self.outputtype == "pairOD"):
-            pass
+            self.outputFile.write(buildODPairData())
 
         self.outputFile.write("\n")
 
