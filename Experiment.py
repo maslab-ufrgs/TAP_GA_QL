@@ -437,10 +437,12 @@ class Experiment:
 
         for driverIdx, action in enumerate(stringOfActions):
             path = self.drivers[driverIdx].od.paths[action][0]
+            traveltime = 0.0
             for edge in path:
-                odTravelTimeDict[self.drivers[driverIdx].od_s()].append(edgesCosts[edge])
+                traveltime += edgesCosts[edge]
                 if edge in edgeTravelTimeDict.keys():
                     edgeTravelTimeDict[edge].append(edgesCosts[edge])
+            odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime/len(path))
 
         return odTravelTimeDict, edgeTravelTimeDict
 
