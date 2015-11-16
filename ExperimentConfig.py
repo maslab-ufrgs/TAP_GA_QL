@@ -34,17 +34,18 @@ class ExperimentConfig:
     SIOUXFALLS_NETWORK = "networks/siouxfalss.kspnet.txt"
     SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls.txt"
 
-    def __init__(self, printLinkCosts=False, printDriversPerLink=True,
+    def __init__(self, printLinkCosts=False, printDriversPerLink=False,
+                 printPairODAndEdges=False,
                  generations=10, population=100, repetitions=1,
                  experimentType=1, elite_size=5, group_sizes=[1], alphas=[.9],
                  decays=[.99], crossovers=[0.2], mutations=[0.001], ks=[8],
-                 interval=[None], outputtype="normal", network = ORTUZAR_NETWORK,
+                 interval=[None], network = ORTUZAR_NETWORK,
 		 network_od = ORTUZAR_NETWORK_OD):
 
         self.network_capacity = None
         self.printLinkCosts = printLinkCosts
         self.printDriversPerLink = printDriversPerLink
-        self.outputtype = outputtype
+        self.printPairODAndEdges = printPairODAndEdges
         self.network = network
         self.network_od = network_od
 
@@ -68,13 +69,13 @@ class ExperimentConfig:
         self.ks = ks
         self.GA_QL_Interval = interval #intervalo para GA->QL
 
-    def runByType(self, experimentType, k, network_capacity,
-              group_size, printLinkCosts, printDriversPerLink, generations,
-              alpha, decay, crossover, mutation, elite, population, interval):
+    def runByType(self, experimentType, k, network_capacity, group_size,
+                  generations, alpha, decay, crossover, mutation, elite,
+                  population, interval):
 
         ex = Experiment(k, self.network, network_capacity, self.network_od, group_size,
-        printLinkCosts=printLinkCosts, printDriversPerLink=printDriversPerLink,
-        outputtype=self.outputtype)
+        printLinkCosts=self.printLinkCosts, printDriversPerLink=self.printDriversPerLink,
+        printPairODAndEdges=self.printPairODAndEdges)
 
         if(experimentType==2): #GA only
             print("Running GA Only")
@@ -96,8 +97,8 @@ class ExperimentConfig:
 
     def runConfig(self, r, g, a, d, c, m ,k, i):
         self.runByType(self.experimentType, k, self.network_capacity, g,
-                       self.printLinkCosts, self.printDriversPerLink, self.generations, a,
-                       d, c, m, self.elite_size, self.population, i)
+                       self.generations, a, d, c, m, self.elite_size,
+                       self.population, i)
 
     def run(self):
         for r in range(self.repetitions):

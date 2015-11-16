@@ -41,13 +41,13 @@ class OD():
 
 class Experiment:
 
-    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize, printLinkCosts=False, printDriversPerLink=False,outputtype="normal"):
+    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize, printLinkCosts=False, printDriversPerLink=False,printPairODAndEdges=False):
         self.printDriversPerLink = printDriversPerLink
         self.printLinkCosts = printLinkCosts
+        self.printPairODAndEdges= printPairODAndEdges
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
-        self.outputtype= outputtype
 
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
@@ -174,9 +174,9 @@ class Experiment:
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if(self.useGA):
             if(self.useQL):
-                self.outputFile.write(str(stepNumber)+": "+str(avgTT) +" "+ str(qlTT))
+                self.outputFile.write(str(stepNumber)+" "+str(avgTT) +" "+ str(qlTT))
             else:
-                self.outputFile.write(str(stepNumber)+": "+str(avgTT))
+                self.outputFile.write(str(stepNumber)+" "+str(avgTT))
         else:
             ##using ql
             self.outputFile.write(str(stepNumber)+": "+ str(qlTT))
@@ -197,7 +197,7 @@ class Experiment:
                 drivers += str(edges[edge]) + " "
             self.outputFile.write(drivers.strip())
 
-        if(self.outputtype == "pairOD"):
+        if(self.printPairODAndEdges):
             ttByOD, ttByEdge = self.travelTimeByEdgeAndOD(stepSolution)
             self.outputFile.write(self.buildODPairData(ttByOD, ttByEdge))
 
@@ -250,6 +250,8 @@ class Experiment:
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
                 + ' groupsize= '+ str(self.groupsize)\
                 + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+
+        headerstr = self.appendExtraODPairTimes(headerstr)
 
         return filename, path2simulationfiles, headerstr
 
@@ -322,12 +324,11 @@ class Experiment:
         """
         Appends the list of OD pairs and the list of edges to the header
         """
-        baseHeader += " #od_pairs"
         for od in self.ODlist:
-            baseHeader += " %s%s" % (od.o, od.d)
+            baseHeader += " tt_%s%s" % (od.o, od.d)
 
-        baseHeader += " #edges "
-        baseHeader += ' '.join(sorted(self.edges.keys()))
+        for edge in sorted(self.edges.keys()):
+            baseHeader += " tt_%s" % edge
 
         return baseHeader
 
@@ -351,7 +352,7 @@ class Experiment:
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode,instance,qlTT=value)
 
-        print("file://%s" % filenamewithtag)
+        print(filenamewithtag)
 
         self.outputFile.close()
 
@@ -384,6 +385,7 @@ class Experiment:
                      self.genCallBack, self.calculateAverageTravelTime,self.drivers)
         self.ga.evolve()
 
+        print(filenamewithtag)
         self.outputFile.close()
 
     def driversPerLink(self,driverString):
