@@ -211,7 +211,7 @@ class Experiment:
                 nodesString += 'cost_'+edgeN+' '
         if(self.printDriversPerLink):
             for edgeN in self.edgeNames:
-                nodesString += "nDrv_"+edgeN+' '
+                nodesString += "nd_"+edgeN+' '
         nodesString = nodesString.strip()
         return nodesString
 
