@@ -41,10 +41,10 @@ class OD():
 
 class Experiment:
 
-    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize, printLinkCosts=False, printDriversPerLink=False,printPairODAndEdges=False):
+    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize, printLinkCosts=False, printDriversPerLink=False,printPairOD=False):
         self.printDriversPerLink = printDriversPerLink
         self.printLinkCosts = printLinkCosts
-        self.printPairODAndEdges= printPairODAndEdges
+        self.printPairOD= printPairOD
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
@@ -161,15 +161,7 @@ class Experiment:
         for k in ttByOD.keys():
             str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
 
-        str_edge = ''
-
-        for k in ttByEdge.keys():
-            if len(ttByEdge[k]) > 0:
-                str_edge += " %4.4f" % (sum(ttByEdge[k])/len(ttByEdge[k]))
-            else:
-                str_edge += " %4.4f" % 0.0
-
-        return str_od + str_edge
+        return str_od
 
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if(self.useGA):
@@ -197,9 +189,9 @@ class Experiment:
                 drivers += str(edges[edge]) + " "
             self.outputFile.write(drivers.strip())
 
-        if(self.printPairODAndEdges):
-            ttByOD, ttByEdge = self.travelTimeByEdgeAndOD(stepSolution)
-            self.outputFile.write(self.buildODPairData(ttByOD, ttByEdge))
+        if(self.printPairOD):
+            ttByOD = self.travelTimeByOD(stepSolution)
+            self.outputFile.write(self.buildODPairData(ttByOD))
 
         self.outputFile.write("\n")
 
@@ -327,9 +319,6 @@ class Experiment:
         for od in self.ODlist:
             baseHeader += " tt_%s%s" % (od.o, od.d)
 
-        for edge in sorted(self.edges.keys()):
-            baseHeader += " tt_%s" % edge
-
         return baseHeader
 
     def run_ql(self, numEpisodes, alpha, decay):
@@ -428,16 +417,9 @@ class Experiment:
             d["%s%s" % (od.o, od.d)] = []
         return d
 
-    def initTravelTimeByEdgeDict(self):
-        d = {}
-        for edges in sorted(self.edges.keys()):
-            d[edges] = []
-        return d
-
-    def travelTimeByEdgeAndOD(self, stringOfActions):
+    def travelTimeByOD(self, stringOfActions):
         edgesCosts = self.calculateEdgesCosts(stringOfActions)
         odTravelTimeDict = self.initTravelTimeByODDict()
-        edgeTravelTimeDict = self.initTravelTimeByEdgeDict()
 
         for driverIdx, action in enumerate(stringOfActions):
             path = self.drivers[driverIdx].od.paths[action][0]
@@ -445,13 +427,7 @@ class Experiment:
             for edge in path:
                 traveltime += edgesCosts[edge]
             odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
-            for edge in path:
-                if edge in edgeTravelTimeDict:
-                    edgeTravelTimeDict[edge].append(traveltime)
-                elif reversed(edge) in edgeTravelTimeDict:
-                    edgeTravelTimeDict[reversed(edge)].append(traveltime)
-
-        return odTravelTimeDict, edgeTravelTimeDict
+        return odTravelTimeDict
 
     def calculateIndividualTravelTime(self, stringOfActions):
         #returns list of travel times for each driver

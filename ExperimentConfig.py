@@ -35,7 +35,7 @@ class ExperimentConfig:
     SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls.txt"
 
     def __init__(self, printLinkCosts=False, printDriversPerLink=False,
-                 printPairODAndEdges=False,
+                 printPairOD=False,
                  generations=10, population=100, repetitions=1,
                  experimentType=1, elite_size=5, group_sizes=[1], alphas=[.9],
                  decays=[.99], crossovers=[0.2], mutations=[0.001], ks=[8],
@@ -45,7 +45,7 @@ class ExperimentConfig:
         self.network_capacity = None
         self.printLinkCosts = printLinkCosts
         self.printDriversPerLink = printDriversPerLink
-        self.printPairODAndEdges = printPairODAndEdges
+        self.printPairOD = printPairOD
         self.network = network
         self.network_od = network_od
 
@@ -75,7 +75,7 @@ class ExperimentConfig:
 
         ex = Experiment(k, self.network, network_capacity, self.network_od, group_size,
         printLinkCosts=self.printLinkCosts, printDriversPerLink=self.printDriversPerLink,
-        printPairODAndEdges=self.printPairODAndEdges)
+        printPairOD=self.printPairOD)
 
         if(experimentType==2): #GA only
             print("Running GA Only")
