@@ -152,7 +152,7 @@ class Experiment:
 
         self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
-    def buildODPairData(self, ttByOD, ttByEdge):
+    def buildODPairData(self, ttByOD):
         """
         returns the string of OD pair data
         """
