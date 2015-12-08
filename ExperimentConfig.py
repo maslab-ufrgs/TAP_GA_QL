@@ -31,21 +31,23 @@ class ExperimentConfig:
 
     ORTUZAR_NETWORK = "networks/ortuzar.kspnet.txt"
     ORTUZAR_NETWORK_OD = "networks/ortuzar_od.txt"
-    SIOUXFALLS_NETWORK = "networks/siouxfalss.kspnet.txt"
-    SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls.txt"
+    SIOUXFALLS_NETWORK = "networks/siouxfalls.kspnet.txt"
+    SIOUXFALLS_CAPACITY = "networks/siouxfalls.capacity.txt"
+    SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls_alfa.txt"
 
     def __init__(self, printLinkCosts=False, printDriversPerLink=False,
                  printPairOD=False,
                  generations=10, population=100, repetitions=1,
-                 experimentType=1, elite_size=5, group_sizes=[1], alphas=[.9],
+                 experimentType=1, elite_size=5, group_sizes=[100], alphas=[.9],
                  decays=[.99], crossovers=[0.2], mutations=[0.001], ks=[8],
                  interval=[None], network = ORTUZAR_NETWORK,
-		 network_od = ORTUZAR_NETWORK_OD):
+								 network_od = ORTUZAR_NETWORK_OD, printInterval=1):
 
         self.network_capacity = None
         self.printLinkCosts = printLinkCosts
         self.printDriversPerLink = printDriversPerLink
         self.printPairOD = printPairOD
+        self.printInterval = printInterval
         self.network = network
         self.network_od = network_od
 
@@ -75,7 +77,7 @@ class ExperimentConfig:
 
         ex = Experiment(k, self.network, network_capacity, self.network_od, group_size,
         printLinkCosts=self.printLinkCosts, printDriversPerLink=self.printDriversPerLink,
-        printPairOD=self.printPairOD)
+        printPairOD=self.printPairOD, printInterval=self.printInterval)
 
         if(experimentType==2): #GA only
             print("Running GA Only")
@@ -90,6 +92,7 @@ class ExperimentConfig:
             print("Running GA<->QL ")
             ex.run_ga_ql(True,True,generations, population, crossover,
                          mutation, elite, alpha, decay,interval)
+
         ##FOR QL only use this method:
         elif(experimentType==1): # QL only
             print("Running QL Only ")

@@ -41,10 +41,13 @@ class OD():
 
 class Experiment:
 
-    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize, printLinkCosts=False, printDriversPerLink=False,printPairOD=False):
+    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize,
+                 printLinkCosts=False, printDriversPerLink=False,
+                 printPairOD=False, printInterval=1):
         self.printDriversPerLink = printDriversPerLink
         self.printLinkCosts = printLinkCosts
         self.printPairOD= printPairOD
+        self.printInterval = printInterval
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
@@ -164,36 +167,37 @@ class Experiment:
         return str_od
 
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
-        if(self.useGA):
-            if(self.useQL):
-                self.outputFile.write(str(stepNumber)+" "+str(avgTT) +" "+ str(qlTT))
+        if stepNumber % self.printInterval == 0:
+            if(self.useGA):
+                if(self.useQL):
+                    self.outputFile.write(str(stepNumber)+" "+str(avgTT) +" "+ str(qlTT))
+                else:
+                    self.outputFile.write(str(stepNumber)+" "+str(avgTT))
             else:
-                self.outputFile.write(str(stepNumber)+" "+str(avgTT))
-        else:
-            ##using ql
-            self.outputFile.write(str(stepNumber)+": "+ str(qlTT))
+                ##using ql
+                self.outputFile.write(str(stepNumber)+": "+ str(qlTT))
 
-        if(self.printLinkCosts):
-            #print edges cost
-            costs = ''
-            ##calculates cost of each link
-            edges = self.calculateEdgesCosts(stepSolution)
-            for edge in self.edgeNames:
-                costs += str(edges[edge]) + " "
-            self.outputFile.write(costs.strip())
-        if(self.printDriversPerLink):
-            ##prints number of drivers at each link
-            drivers = ''
-            edges = self.driversPerLink(stepSolution)
-            for edge in self.edgeNames:
-                drivers += str(edges[edge]) + " "
-            self.outputFile.write(drivers.strip())
+            if(self.printLinkCosts):
+                #print edges cost
+                costs = ''
+                ##calculates cost of each link
+                edges = self.calculateEdgesCosts(stepSolution)
+                for edge in self.edgeNames:
+                    costs += str(edges[edge]) + " "
+                self.outputFile.write(costs.strip())
+            if(self.printDriversPerLink):
+                ##prints number of drivers at each link
+                drivers = ''
+                edges = self.driversPerLink(stepSolution)
+                for edge in self.edgeNames:
+                    drivers += str(edges[edge]) + " "
+                self.outputFile.write(drivers.strip())
 
-        if(self.printPairOD):
-            ttByOD = self.travelTimeByOD(stepSolution)
-            self.outputFile.write(self.buildODPairData(ttByOD))
+            if(self.printPairOD):
+                ttByOD = self.travelTimeByOD(stepSolution)
+                self.outputFile.write(self.buildODPairData(ttByOD))
 
-        self.outputFile.write("\n")
+            self.outputFile.write("\n")
 
     def nodesString(self):
         ##string of edges in graph that will be printed
