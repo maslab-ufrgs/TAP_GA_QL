@@ -4,7 +4,7 @@ ortuzar and siouxfalls networks
 Dependencies
 ============
  * python 2.7
- * pyevolve (pip install pyevolve)
+ * [pyevolve](https://sourceforge.net/projects/pyevolve/) (pip install pyevolve)
 
 Usage
 =====
