@@ -32,6 +32,23 @@ should be created.
 The name of the file will contain the parameters used to run the experiment
 and the local time when it happened.
 
+Examples
+--------
+
+* Run an experiment with the *siouxfalls* network and prints the travel time
+  for the each pair of Origin and Destination
+
+```sh
+python traffic_simulation.py --network "siouxfalls" --printPairOD
+```
+
+* Run an experiment with the *ortuzar* network printing the link costs at every
+100 generations with the mutations of 0.003 and 0.03
+
+```sh
+python traffic_simulation --printLinkCosts --printInterval 100 --mutations 0.003 0.03
+```
+
 Options
 =======
 
