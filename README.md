@@ -1,6 +1,19 @@
 Script to run the simulation of drivers going from different points in the
 ortuzar and siouxfalls networks
 
+Neworks
+=======
+
+Ortuzar
+-------
+
+![Ortuzar Network](networks/ortuzar.png)
+
+Sioux Falls
+-----------
+
+![Sioux Falls Network](networks/siouxfalls.png)
+
 Dependencies
 ============
  * python 2.7
