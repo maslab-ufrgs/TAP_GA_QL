@@ -34,7 +34,7 @@ SIOUXFALLS_NETWORK = "networks/siouxfalls.kspnet.txt"
 SIOUXFALLS_CAPACITY = "networks/siouxfalls.capacity.txt"
 SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls_alfa.txt"
 
-DEBUG = False
+DEBUG = True
 
 def echo(msg):
   if DEBUG:
