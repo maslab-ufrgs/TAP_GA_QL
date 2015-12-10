@@ -28,16 +28,16 @@ p.add_argument("--population", type=int, default=100,
 p.add_argument("--group_sizes", nargs="+", type=int, default=[100],
                help="List of group sizes for drivers in each configuration")
 
-p.add_argument("--alphas", nargs="+", type=int, default=[.9],
+p.add_argument("--alphas", nargs="+", type=float, default=[.9],
                help="List of learning in each configuration")
 
-p.add_argument("--decays", nargs="+", type=int, default=[.99],
+p.add_argument("--decays", nargs="+", type=float, default=[.99],
                help="List of decays in each configuration")
 
-p.add_argument("--crossovers", nargs="+", type=int, default=[0.2],
+p.add_argument("--crossovers", nargs="+", type=float, default=[0.2],
                help="List of rate of crossover in the population in each configuration")
 
-p.add_argument("--mutations", nargs="+", type=int, default=[0.001],
+p.add_argument("--mutations", nargs="+", type=float, default=[0.001],
                help="List of rate of mutations in each configuration")
 
 p.add_argument("--ks", nargs="+", type=int, default=[8],
