@@ -21,7 +21,16 @@ Use:
 python traffic_simulation.py -h
 ```
 
-To list all the options
+To list all the options.
+
+Checking the results
+--------------------
+
+After the execution is complete, a new file in the "results_gaql_grouped" folder
+should be created.
+
+The name of the file will contain the parameters used to run the experiment
+and the local time when it happened.
 
 Options
 =======
