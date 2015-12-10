@@ -26,7 +26,7 @@ To list all the options
 Options
 =======
 
-```bash
+```
 optional arguments:
   -h, --help            show this help message and exit
   -c, --printLinkCosts  Print link's costs at each iteration in the output
