@@ -41,7 +41,7 @@ class OD():
 
 class Experiment:
 
-    def __init__(self,k,networkFile, capacitiesFile, odFile, groupSize,
+    def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,
                  printLinkCosts=False, printDriversPerLink=False,
                  printPairOD=False, printInterval=1):
         self.printDriversPerLink = printDriversPerLink
@@ -55,7 +55,7 @@ class Experiment:
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
         self.networkSet = True
-        self.networkName ="Ortuzar"
+        self.networkName = "ortuzar_ow" if "ortuzar" in networkFile else "sioux_falls"
         self.k = k
         self.groupsize = groupSize
         odInput = self.parseODfile(odFile)
@@ -71,11 +71,11 @@ class Experiment:
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
 
         #calculating k shortest routes for each OD pair
+        V,E = KSP.generateGraph(networkFile)
         for od in self.ODlist:
-            od.paths = KSP.getKRoutes(networkFile,od.o, od.d, od.numPaths)
+            od.paths = KSP.getKRoutes(V, E, od.o, od.d, od.numPaths)
 
         ##get the value of each link - free flow travel time
-        V,E = KSP.generateGraph(networkFile)
         self.freeFlow={}
         for edge in E:
             self.freeFlow[edge.start+edge.end]=edge.length
