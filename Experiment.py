@@ -48,6 +48,7 @@ class Experiment:
         self.printLinkCosts = printLinkCosts
         self.printPairOD= printPairOD
         self.printInterval = printInterval
+        self.networkName = "Ortuzar_OW" if "ortuzar" in networkFile else "Sioux_Falls"
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
@@ -55,7 +56,6 @@ class Experiment:
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
         self.networkSet = True
-        self.networkName = "ortuzar_ow" if "ortuzar" in networkFile else "sioux_falls"
         self.k = k
         self.groupsize = groupSize
         odInput = self.parseODfile(odFile)
@@ -70,6 +70,10 @@ class Experiment:
                                 #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
 
+        if self.networkName == "Sioux_Falls":
+            print("Parsing capacity file: %s" % capacitiesFile)
+            self.capacities = self.parseCapacityFile(capacitiesFile)
+
         #calculating k shortest routes for each OD pair
         V,E = KSP.generateGraph(networkFile)
         for od in self.ODlist:
@@ -78,7 +82,7 @@ class Experiment:
         ##get the value of each link - free flow travel time
         self.freeFlow={}
         for edge in E:
-            self.freeFlow[edge.start+edge.end]=edge.length
+            self.freeFlow[edge.start+"|"+edge.end]=edge.length
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
@@ -111,7 +115,7 @@ class Experiment:
                 line = line.replace('\n','')
                 items = line.split(' ')
                 if(len(items) == 4):
-                    links[items[1]+items[2]] = float(items[3])
+                    links[items[1]+"|"+items[2]] = float(items[3])
         return links
 
     def genCallBack(self,ga_engine):
@@ -447,15 +451,17 @@ class Experiment:
         # COST FUNCTION               #
         ###############################
         ##VDF COST FUNCTION
-        ##vdfAlpha = 0.15
-        ##vdfBeta = 4
+        vdfAlpha = 0.15
+        vdfBeta = 4
         #calculates cost of each edge
         edgesCosts = {}
         ##flow
         linkOccupancy = self.driversPerLink(stringOfActions)
         for edge in self.freeFlow.keys():
+          if self.networkName == "Sioux_Falls":
+            edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
+          else:
             edgesCosts[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
-        ##edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
         return edgesCosts
 
     def calculateAverageTravelTime(self,stringOfActions):
