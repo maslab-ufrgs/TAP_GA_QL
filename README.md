@@ -59,7 +59,7 @@ python traffic_simulation.py --network "siouxfalls" --printPairOD
 100 generations with the mutations of 0.003 and 0.03
 
 ```sh
-python traffic_simulation --printLinkCosts --printInterval 100 --mutations 0.003 0.03
+python traffic_simulation.py --printLinkCosts --printInterval 100 --mutations 0.003 0.03
 ```
 
 Options
