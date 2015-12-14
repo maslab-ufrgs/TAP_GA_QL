@@ -1,18 +1,10 @@
 Script to run the simulation of drivers going from different points in the
 ortuzar and siouxfalls networks
 
-Neworks
+Warning
 =======
 
-Ortuzar
--------
-
-![Ortuzar Network](networks/ortuzar.png)
-
-Sioux Falls
------------
-
-![Sioux Falls Network](networks/siouxfalls.png)
+The cost functions used for edge cost avaliation is tied to the network being run (Sioux Falls or Ortuzar/OW). If you are going to use other networks, you most likely want to edit the calculateEdgeCosts function in the Experiment.py file.
 
 Dependencies
 ============
