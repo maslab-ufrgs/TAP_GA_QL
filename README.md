@@ -4,7 +4,9 @@ ortuzar and siouxfalls networks
 Warning
 =======
 
-The cost functions used for edge cost avaliation is tied to the network being run (Sioux Falls or Ortuzar/OW). If you are going to use other networks, you most likely want to edit the calculateEdgeCosts function in the Experiment.py file.
+```
+The cost functions used for edge cost avaliation are tied to the network being run (Sioux Falls or Ortuzar/OW). If you are going to use other networks, you most likely want to edit the calculateEdgeCosts function in the Experiment.py file.
+```
 
 Dependencies
 ============
