@@ -136,13 +136,12 @@ class ExperimentConfig:
                      interval)
     echo("Arg ran.")
 
-
-  def run(self):
+  def run(self, number_of_processes=4):
     """
     Typicaly the execution starts through here
     """
-    echo("Running experiment with 4 processors..")
-    pool = Pool(processes=4)
+    echo("Running experiment with %s processors.." % number_of_processes)
+    pool = Pool(processes=number_of_processes)
     args = self.buildParameters()
     for arg in args:
       self.runArg(arg)

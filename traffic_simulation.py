@@ -64,6 +64,9 @@ p.add_argument("--experimentType", type=int, choices=[1,2,3,4], default=1,
 p.add_argument("--elite_size", type=int, default=5,
                help="How many elite individuals should be kept after each generation")
 
+p.add_argument("--number-of-processes", type=int, default=4,
+               help="How many parallel processes should be used to run the experiment configurations")
+
 a = p.parse_args()
 
 networks = {
@@ -80,5 +83,5 @@ configuration = cfg(printLinkCosts=a.printLinkCosts, printDriversPerLink=a.print
              interval=a.intervals, network_od=networks[a.network][1],
              network=networks[a.network][0])
 
-configuration.run()
+configuration.run(number_of_processes=a.number_of_processes)
 
