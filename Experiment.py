@@ -250,7 +250,7 @@ class Experiment:
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
                 + ' groupsize= '+ str(self.groupsize)\
-                + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+                + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
 
         headerstr = self.appendExtraODPairTimes(headerstr)
 
@@ -277,7 +277,7 @@ class Experiment:
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
                     + ' groupsize= '+ str(self.groupsize) + ' GA->QL interval=' + str(self.interval)\
-                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+                    + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
 
         elif(useQL):
             path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+ self.networkName  \
@@ -298,7 +298,7 @@ class Experiment:
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
                     + ' groupsize= '+ str(self.groupsize) \
-                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+                    + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
         else:
             path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
                     + '/pm' + "%4.4f" % self.mutation + '/nd'+ str(self.nd()) \
@@ -315,7 +315,7 @@ class Experiment:
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
                     + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
-                    + '\n#generation avg_tt ' +  self.nodesString()
+                    + '\n#generation avg_cost ' +  self.nodesString()
 
         headerstr = self.appendExtraODPairTimes(headerstr)
 
@@ -325,8 +325,9 @@ class Experiment:
         """
         Appends the list of OD pairs and the list of edges to the header
         """
-        for od in self.ODlist:
-            baseHeader += " tt_%s%s" % (od.o, od.d)
+        if self.printPairOD:
+          for od in self.ODlist:
+            baseHeader += " cost_%s%s" % (od.o, od.d)
 
         return baseHeader
 
