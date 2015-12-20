@@ -102,4 +102,8 @@ optional arguments:
   --elite_size ELITE_SIZE
                         How many elite individuals should be kept after each
                         generation
+  --number-of-processes NUMBER_OF_PROCESSES
+                        How many parallel processes should be used to run the
+                        experiment configurations (default: 4)
+
 ```
