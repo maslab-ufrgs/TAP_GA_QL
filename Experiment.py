@@ -181,6 +181,10 @@ class Experiment:
                 ##using ql
                 self.outputFile.write(str(stepNumber)+": "+ str(qlTT))
 
+            if(self.printPairOD):
+                ttByOD = self.travelTimeByOD(stepSolution)
+                self.outputFile.write(self.buildODPairData(ttByOD))
+
             if(self.printLinkCosts):
                 #print edges cost
                 costs = ''
@@ -189,6 +193,7 @@ class Experiment:
                 for edge in self.edgeNames:
                     costs += str(edges[edge]) + " "
                 self.outputFile.write(costs.strip())
+
             if(self.printDriversPerLink):
                 ##prints number of drivers at each link
                 drivers = ''
@@ -196,10 +201,6 @@ class Experiment:
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
-
-            if(self.printPairOD):
-                ttByOD = self.travelTimeByOD(stepSolution)
-                self.outputFile.write(self.buildODPairData(ttByOD))
 
             self.outputFile.write("\n")
 
