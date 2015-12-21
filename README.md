@@ -61,49 +61,52 @@ Options
 ```
 optional arguments:
   -h, --help            show this help message and exit
-  -c, --printLinkCosts  Print link's costs at each iteration in the output
-                        file
+  --printTravelTime     Print link's travel time at each iteration in the
+                        output file (default: False)
   -d, --printDriversPerLink
-                        Print the number of drivers in at each iteration in
-                        the output file
-  -p, --printPairOD     Print the average travel time for in the header in the
-                        output file
+                        Print the number of drivers in each link in the output
+                        file (default: False)
+  -o, --printPairOD     Print the average travel time for in the header in the
+                        output file (default: False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
-                        output file
-  --generations GENERATIONS
+                        output file (default: 1)
+  -g GENERATIONS, --generations GENERATIONS
                         Maximum mumber of generations in each configuration
-  --population POPULATION
-                        Size of population for the genetic algorithm
-  --group_sizes GROUP_SIZES [GROUP_SIZES ...]
+                        (default: 400)
+  -p POPULATION, --population POPULATION
+                        Size of population for the genetic algorithm (default:
+                        100)
+  --grouping GROUPING [GROUPING ...]
                         List of group sizes for drivers in each configuration
-  --alphas ALPHAS [ALPHAS ...]
-                        List of learning in each configuration
+                        (default: [100])
+  -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
+                        List of learning rates in each configuration (default:
+                        [0.9])
   --decays DECAYS [DECAYS ...]
-                        List of decays in each configuration
-  --crossovers CROSSOVERS [CROSSOVERS ...]
+                        List of decays in each configuration (default: [0.99])
+  -c CROSSOVERS [CROSSOVERS ...], --crossovers CROSSOVERS [CROSSOVERS ...]
                         List of rate of crossover in the population in each
-                        configuration
-  --mutations MUTATIONS [MUTATIONS ...]
+                        configuration (default: [0.2])
+  -m MUTATIONS [MUTATIONS ...], --mutations MUTATIONS [MUTATIONS ...]
                         List of rate of mutations in each configuration
-  --ks KS [KS ...]      <TODO WRITE HELP MESSAGE FOR THIS OPTION>
+                        (default: [0.001])
+  --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
+                        (K-ShortestPath) Algorithm (default: [8])
   --intervals INTERVALS [INTERVALS ...]
-                        <TODO WRITE HELP MESSAGE FOR THIS OPTION>
+                        List of intervals that signal the frequency the QL
+                        values are supposed to be fed into GA (default:
+                        [None])
   --repetitions REPETITIONS
-                        How many times it should be repeated
-  --network {ortuzar,siouxfalls}
-                        Which network should be used
+                        How many times it should be repeated (default: 1)
+  --net {OW10_1,SF}     Which network should be used (default: OW10_1)
   --experimentType {1,2,3,4}
-                        How many repetition for each configuration. 1 - Use
-                        Q-Learn Only 2 - Use Genetic Algorithm 3 - The Genetic
-                        Algorithm receives information from the Q-learn
-                        algorithm 4 - The Genetic Algorithm receives and
-                        updates information from the Q-learn algorithm
-  --elite_size ELITE_SIZE
+                        1 - QL only 2 - GA only 3 - QL builds solution for GA
+                        4 - GA and QL exchange solutions (default: 1)
+  -e ELITE_SIZE, --elite_size ELITE_SIZE
                         How many elite individuals should be kept after each
-                        generation
+                        generation (default: 5)
   --number-of-processes NUMBER_OF_PROCESSES
                         How many parallel processes should be used to run the
-                        experiment configurations (default: 4)
-
+                        experiment configurations (default: 1)
 ```
