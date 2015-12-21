@@ -4,11 +4,11 @@ Module containing the ExperimentConfig class and some definitions
 from Experiment import Experiment
 from multiprocessing import Pool
 
-ORTUZAR_NETWORK = "networks/ortuzar.kspnet.txt"
-ORTUZAR_NETWORK_OD = "networks/ortuzar_od.txt"
-SIOUXFALLS_NETWORK = "networks/siouxfalls.kspnet.txt"
-SIOUXFALLS_CAPACITY = "networks/siouxfalls.capacity.txt"
-SIOUXFALLS_NETWORK_OD = "networks/od_sioux_falls_alfa.txt"
+OW10_1_NETWORK = "networks/OW10_1.kspnet.txt"
+OW10_1_NETWORK_OD = "networks/OW10_1.od.txt"
+SF_NETWORK = "networks/SF.kspnet.txt"
+SF_CAPACITY = "networks/SF.capacity.txt"
+SF_NETWORK_OD = "networks/OW10_1_SF_alpha.txt"
 
 DEBUG = True
 
@@ -23,10 +23,10 @@ class ExperimentConfig:
                repetitions=1, experimentType=1, elite_size=5,
                group_sizes=[100], alphas=[.9], decays=[.99], crossovers=[0.2],
                mutations=[0.001], ks=[8], interval=[None],
-               network=ORTUZAR_NETWORK, network_od=ORTUZAR_NETWORK_OD,
+               network=OW10_1_NETWORK, network_od=OW10_1_NETWORK_OD,
                printInterval=1):
 
-      self.network_capacity = SIOUXFALLS_CAPACITY
+      self.network_capacity = SF_CAPACITY
       self.printTravelTime = printTravelTime
       self.printDriversPerLink = printDriversPerLink
       self.printPairOD = printPairOD

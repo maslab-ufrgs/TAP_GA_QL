@@ -69,18 +69,18 @@ p.add_argument("--number-of-processes", type=int, default=1,
 a = p.parse_args()
 
 networks = {
-  'OW10_1': (config.ORTUZAR_NETWORK, config.ORTUZAR_NETWORK_OD),
-  'SF': (config.SIOUXFALLS_NETWORK, config.SIOUXFALLS_NETWORK_OD)
+  'OW10_1': (config.OW10_1_NETWORK, config.OW10_1_NETWORK_OD),
+  'SF': (config.SF_NETWORK, config.SF_NETWORK_OD)
 }
 
 configuration = cfg(printTravelTime=a.printTravelTime, printDriversPerLink=a.printDriversPerLink,
              printPairOD=a.printPairOD, generations=a.generations,
              population=a.population, repetitions=a.repetitions,
              experimentType=a.experimentType, elite_size=a.elite_size,
-             group_sizes=a.group_sizes, alphas=a.alphas, decays=a.decays,
+             group_sizes=a.grouping, alphas=a.alphas, decays=a.decays,
              crossovers=a.crossovers, mutations=a.mutations, ks=a.ks,
-             interval=a.intervals, network_od=networks[a.network][1],
-             network=networks[a.network][0], printInterval=a.printInterval)
+             interval=a.intervals, network_od=networks[a.net][1],
+             network=networks[a.net][0], printInterval=a.printInterval)
 
 configuration.run(number_of_processes=a.number_of_processes)
 

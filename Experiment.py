@@ -14,6 +14,8 @@ from QL import QL
 from time import localtime
 import KSP
 
+SF_NETWORK_NAME = "SF"
+
 class Driver():
     #od:OD = instance of OD class
     def __init__(self,OD):
@@ -48,7 +50,7 @@ class Experiment:
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
         self.printInterval = printInterval
-        self.networkName = "Ortuzar_OW" if "ortuzar" in networkFile else "Sioux_Falls"
+        self.networkName = "OW10_1" if "OW10_1" in networkFile else SF_NETWORK_NAME
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
@@ -70,7 +72,7 @@ class Experiment:
                                 #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
 
-        if self.networkName == "Sioux_Falls":
+        if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
             self.capacities = self.parseCapacityFile(capacitiesFile)
 
@@ -460,10 +462,10 @@ class Experiment:
         ##flow
         linkOccupancy = self.driversPerLink(stringOfActions)
         for edge in self.freeFlow.keys():
-          if self.networkName == "Sioux_Falls":
-            edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
+          if self.networkName == SF_NETWORK_NAME:
+              edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
           else:
-            edgesCosts[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
+              edgesCosts[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
         return edgesCosts
 
     def calculateAverageTravelTime(self,stringOfActions):
