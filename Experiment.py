@@ -42,10 +42,10 @@ class OD():
 class Experiment:
 
     def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,
-                 printLinkCosts=False, printDriversPerLink=False,
+                 printTravelTime=False, printDriversPerLink=False,
                  printPairOD=False, printInterval=1):
         self.printDriversPerLink = printDriversPerLink
-        self.printLinkCosts = printLinkCosts
+        self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
         self.printInterval = printInterval
         self.networkName = "Ortuzar_OW" if "ortuzar" in networkFile else "Sioux_Falls"
@@ -185,7 +185,7 @@ class Experiment:
                 ttByOD = self.travelTimeByOD(stepSolution)
                 self.outputFile.write(self.buildODPairData(ttByOD))
 
-            if(self.printLinkCosts):
+            if(self.printTravelTime):
                 #print edges cost
                 costs = ''
                 ##calculates cost of each link
@@ -207,7 +207,7 @@ class Experiment:
     def nodesString(self):
         ##string of edges in graph that will be printed
         nodesString = ''
-        if(self.printLinkCosts):
+        if(self.printTravelTime):
             for edgeN in self.edgeNames:
                 nodesString += 'cost_'+edgeN+' '
         if(self.printDriversPerLink):

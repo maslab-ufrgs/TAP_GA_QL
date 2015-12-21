@@ -1,29 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-whith the following parameters
-network file
-link capacity file
-od matrix file
-size of groups. group size must be a integer divisor of every OD pair
-printLinkCosts = whether to print the cost of each link in the output file
-printDriversPerLink = whether to print the number of drivers in each link
-
-you can run the experiment with GA+QL, GA only or GA only
-
-FOR GA or GA+QL:
-you must use the method:
-run_ga_ql(useQL,generations,population,crossover,elite_size,alpha,decay)
-
-where
- useQL = indicates whether to use QL or not with the GA
- generations = number of generations
- population = size of population
- k = number of k shortest paths
- crossover = crossover probability [0.0,1.0]
- elite_size = size of elite
- alpha = value of alpha
- decay = value of decay
-in case of not using QL you can input any value in alpha and decay.
+Module containing the ExperimentConfig class and some definitions
 """
 from Experiment import Experiment
 from multiprocessing import Pool
@@ -42,7 +18,7 @@ def echo(msg):
 
 class ExperimentConfig:
 
-  def __init__(self, printLinkCosts=False, printDriversPerLink=False,
+  def __init__(self, printTravelTime=False, printDriversPerLink=False,
                printPairOD=False, generations=10, population=100,
                repetitions=1, experimentType=1, elite_size=5,
                group_sizes=[100], alphas=[.9], decays=[.99], crossovers=[0.2],
@@ -51,7 +27,7 @@ class ExperimentConfig:
                printInterval=1):
 
       self.network_capacity = SIOUXFALLS_CAPACITY
-      self.printLinkCosts = printLinkCosts
+      self.printTravelTime = printTravelTime
       self.printDriversPerLink = printDriversPerLink
       self.printPairOD = printPairOD
       self.printInterval = printInterval
@@ -85,7 +61,7 @@ class ExperimentConfig:
     """
 
     ex = Experiment(k, self.network, self.network_capacity, self.network_od, group_size,
-    printLinkCosts=self.printLinkCosts, printDriversPerLink=self.printDriversPerLink,
+    printTravelTime=self.printTravelTime, printDriversPerLink=self.printDriversPerLink,
     printPairOD=self.printPairOD, printInterval=self.printInterval)
 
     if(self.experimentType==2): #GA only
