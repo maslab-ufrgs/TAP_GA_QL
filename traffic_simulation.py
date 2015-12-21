@@ -81,7 +81,7 @@ configuration = cfg(printLinkCosts=a.printLinkCosts, printDriversPerLink=a.print
              group_sizes=a.group_sizes, alphas=a.alphas, decays=a.decays,
              crossovers=a.crossovers, mutations=a.mutations, ks=a.ks,
              interval=a.intervals, network_od=networks[a.network][1],
-             network=networks[a.network][0])
+             network=networks[a.network][0], printInterval=a.printInterval)
 
 configuration.run(number_of_processes=a.number_of_processes)
 
