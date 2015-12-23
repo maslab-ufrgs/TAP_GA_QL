@@ -1,11 +1,11 @@
 Script to run the simulation of drivers going from different points in the
-ortuzar and siouxfalls networks
+OW10_1 and SF networks
 
 Warning
 =======
 
-> The cost functions used for edge cost avaliation are tied to the network being run (Sioux Falls or Ortuzar/OW). If you are 
-> going to use other networks, you most likely want to edit the calculateEdgeCosts function in the Experiment.py file.
+> The cost functions used for edge cost avaliation are tied to the network being run (SF or OW10_1). If you are 
+> going to use other networks, you most likely want to edit the calculateTravelTime function in the Experiment.py file.
 
 Dependencies
 ============
@@ -41,18 +41,18 @@ and the local time when it happened.
 Examples
 --------
 
-* Run an experiment with the *siouxfalls* network and prints the travel time
+* Run an experiment with the *SF* network and prints the travel time
   for the each pair of Origin and Destination
 
 ```sh
-python traffic_simulation.py --network "siouxfalls" --printPairOD
+python traffic_simulation.py --network "SF" --printPairOD
 ```
 
-* Run an experiment with the *ortuzar* network printing the link costs at every
+* Run an experiment with the *OW10_1* network printing the link's travel time at every
 100 generations with the mutations of 0.003 and 0.03
 
 ```sh
-python traffic_simulation.py --printLinkCosts --printInterval 100 --mutations 0.003 0.03
+python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0.003 0.03
 ```
 
 Options

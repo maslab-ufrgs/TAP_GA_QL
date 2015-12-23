@@ -188,13 +188,12 @@ class Experiment:
                 self.outputFile.write(self.buildODPairData(ttByOD))
 
             if(self.printTravelTime):
-                #print edges cost
-                costs = ''
-                ##calculates cost of each link
-                edges = self.calculateEdgesCosts(stepSolution)
+                #print edges travel times
+                travel_times = ''
+                edges = self.calculateEdgesTravelTimes(stepSolution)
                 for edge in self.edgeNames:
-                    costs += str(edges[edge]) + " "
-                self.outputFile.write(costs.strip())
+                    travel_times += str(edges[edge]) + " "
+                self.outputFile.write(travel_times.strip())
 
             if(self.printDriversPerLink):
                 ##prints number of drivers at each link
@@ -204,14 +203,14 @@ class Experiment:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
 
-            self.outputFile.write("\n")
+                self.outputFile.write("\n")
 
     def nodesString(self):
         ##string of edges in graph that will be printed
         nodesString = ''
         if(self.printTravelTime):
             for edgeN in self.edgeNames:
-                nodesString += 'cost_'+edgeN+' '
+                nodesString += 'tt_'+edgeN+' '
         if(self.printDriversPerLink):
             for edgeN in self.edgeNames:
                 nodesString += "nd_"+edgeN+' '
@@ -252,7 +251,7 @@ class Experiment:
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
                 + ' groupsize= '+ str(self.groupsize)\
-                + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
+                + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
 
         headerstr = self.appendExtraODPairTimes(headerstr)
 
@@ -279,7 +278,7 @@ class Experiment:
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
                     + ' groupsize= '+ str(self.groupsize) + ' GA->QL interval=' + str(self.interval)\
-                    + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
+                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
 
         elif(useQL):
             path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+ self.networkName  \
@@ -300,7 +299,7 @@ class Experiment:
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
                     + ' groupsize= '+ str(self.groupsize) \
-                    + '\n#generation avg_cost ql_avg_cost ' + self.nodesString()
+                    + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
         else:
             path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
                     + '/pm' + "%4.4f" % self.mutation + '/nd'+ str(self.nd()) \
@@ -317,7 +316,7 @@ class Experiment:
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
                     + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
-                    + '\n#generation avg_cost ' +  self.nodesString()
+                    + '\n#generation avg_tt ' +  self.nodesString()
 
         headerstr = self.appendExtraODPairTimes(headerstr)
 
@@ -329,7 +328,7 @@ class Experiment:
         """
         if self.printPairOD:
           for od in self.ODlist:
-            baseHeader += " cost_%s%s" % (od.o, od.d)
+            baseHeader += " tt_%s%s" % (od.o, od.d)
 
         return baseHeader
 
@@ -415,12 +414,12 @@ class Experiment:
                 dicti[link]=0
         return dicti
 
-    def evaluateActionCost(self, driverIndex, action, edgesCosts):
-        ##calculates cost for a driver
+    def evaluateActionTravelTime(self, driverIndex, action, edgesTravelTimes):
+        #calculates travel times for a driver
         traveltime = 0.0
         path = self.drivers[driverIndex].od.paths[action][0] ##list of nodes of path
         for edge in path:
-            traveltime += edgesCosts[edge]
+            traveltime += edgesTravelTimes[edge]
         return traveltime
 
     def initTravelTimeByODDict(self):
@@ -430,43 +429,43 @@ class Experiment:
         return d
 
     def travelTimeByOD(self, stringOfActions):
-        edgesCosts = self.calculateEdgesCosts(stringOfActions)
+        edgesTravelTimes = self.calculateEdgesTravelTimes(stringOfActions)
         odTravelTimeDict = self.initTravelTimeByODDict()
 
         for driverIdx, action in enumerate(stringOfActions):
             path = self.drivers[driverIdx].od.paths[action][0]
             traveltime = 0.0
             for edge in path:
-                traveltime += edgesCosts[edge]
+                traveltime += edgesTravelTimes[edge]
             odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
         return odTravelTimeDict
 
     def calculateIndividualTravelTime(self, stringOfActions):
         #returns list of travel times for each driver
-        edgesCosts = self.calculateEdgesCosts(stringOfActions)
+        edgesTravelTimes = self.calculateEdgesTravelTimes(stringOfActions)
         results = []
         for driverIdx, action in enumerate(stringOfActions):
-            costs = self.evaluateActionCost(driverIdx, action, edgesCosts)
-            results.append(costs)
+            travel_times = self.evaluateActionTravelTime(driverIdx, action, edgesTravelTimes)
+            results.append(travel_times)
         return results
 
-    def calculateEdgesCosts(self, stringOfActions):
+    def calculateEdgesTravelTimes(self, stringOfActions):
         ###############################
-        # COST FUNCTION               #
+        # TRAVEL TIME FUNCTION               #
         ###############################
-        ##VDF COST FUNCTION
+        ##VDF TRAVEL TIME FUNCTION
         vdfAlpha = 0.15
         vdfBeta = 4
-        #calculates cost of each edge
-        edgesCosts = {}
+        #calculates travel time each edge
+        edges_travel_times = {}
         ##flow
         linkOccupancy = self.driversPerLink(stringOfActions)
         for edge in self.freeFlow.keys():
           if self.networkName == SF_NETWORK_NAME:
-              edgesCosts[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
+              edges_travel_times[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
           else:
-              edgesCosts[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
-        return edgesCosts
+              edges_travel_times[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
+        return edges_travel_times
 
     def calculateAverageTravelTime(self,stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
