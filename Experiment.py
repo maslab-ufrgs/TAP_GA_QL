@@ -243,9 +243,7 @@ class Experiment:
         filename = path2simulationfiles +  '/'+self.networkName \
                 + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
                 + '_nd'+ str(nd) + '_groupsize'+ str(self.groupsize) \
-                + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
-                + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                + str(localtime()[0])
+                + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
@@ -268,9 +266,7 @@ class Experiment:
                     + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
                     + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
                     + '_interval'+ str(self.interval) + '_' + str(localtime()[3])+'h'+ str(localtime()[4]) \
-                    +'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
+                    +'m'+ str(localtime()[5])+'s'
 
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' self.mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
@@ -289,9 +285,7 @@ class Experiment:
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
                     + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
                     + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
-                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
+                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
@@ -308,9 +302,7 @@ class Experiment:
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
                     + '_k' + str(self.k) \
                     + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
-                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s-'\
-                    + str(localtime()[2])+"-"+str(localtime()[1]) +"-"\
-                    + str(localtime()[0])
+                    + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
