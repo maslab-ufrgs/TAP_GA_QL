@@ -1,4 +1,3 @@
-from config import ExperimentConfig as cfg
 import config
 import argparse
 
@@ -73,14 +72,27 @@ networks = {
   'SF': (config.SF_NETWORK, config.SF_NETWORK_OD)
 }
 
-configuration = cfg(printTravelTime=a.printTravelTime, printDriversPerLink=a.printDriversPerLink,
-             printPairOD=a.printPairOD, generations=a.generations,
-             population=a.population, repetitions=a.repetitions,
-             experimentType=a.experimentType, elite_size=a.elite_size,
-             group_sizes=a.grouping, alphas=a.alphas, decays=a.decays,
-             crossovers=a.crossovers, mutations=a.mutations, ks=a.ks,
-             interval=a.intervals, network_od=networks[a.net][1],
-             network=networks[a.net][0], printInterval=a.printInterval)
+config.printTravelTime = a.printTravelTime
+config.printDriversPerLink = a.printDriversPerLink
+config.printPairOD = a.printPairOD
+config.printInterval = a.printInterval
 
-configuration.run(number_of_processes=a.number_of_processes)
+config.network = networks[a.net][0]
+config.network_od = networks[a.net][1]
+
+config.generations = a.generations
+config.population = a.population
+config.repetitions = a.repetitions
+
+config.experimentType = a.experimentType
+config.elite_size = a.elite_size
+config.group_sizes = a.grouping
+config.alphas = a.alphas
+config.decays = a.decays
+config.crossovers = a.crossovers
+config.mutations = a.mutations
+config.ks = a.ks
+config.GA_QL_Interval = a.intervals
+
+config.run(number_of_processes=a.number_of_processes)
 

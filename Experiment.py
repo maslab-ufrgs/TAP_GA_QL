@@ -88,7 +88,6 @@ class Experiment:
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
-        print(networkFile)
         self.edges = self.parseCapacityFile(networkFile)
 
         #creates different drivers according to the number of travels of each OD
@@ -352,7 +351,7 @@ class Experiment:
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode,instance,qlTT=value)
 
-        print(filenamewithtag)
+        print("Output file location: %s" % filenamewithtag)
 
         self.outputFile.close()
 
@@ -385,7 +384,7 @@ class Experiment:
                      self.genCallBack, self.calculateAverageTravelTime,self.drivers)
         self.ga.evolve()
 
-        print(filenamewithtag)
+        print("Output file location: %s" % filenamewithtag)
         self.outputFile.close()
 
     def driversPerLink(self,driverString):

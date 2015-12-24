@@ -1,6 +1,3 @@
-"""
-Module containing the ExperimentConfig class and some definitions
-"""
 from Experiment import Experiment
 from multiprocessing import Pool
 
@@ -16,113 +13,96 @@ def echo(msg):
   if DEBUG:
     print(msg)
 
-class ExperimentConfig:
+network_capacity = SF_CAPACITY
+printTravelTime = False
+printDriversPerLink = False
+printPairOD = False
+printInterval = 1
+network = OW10_1_NETWORK
+network_od = OW10_1_NETWORK_OD
 
-  def __init__(self, printTravelTime=False, printDriversPerLink=False,
-               printPairOD=False, generations=10, population=100,
-               repetitions=1, experimentType=1, elite_size=5,
-               group_sizes=[100], alphas=[.9], decays=[.99], crossovers=[0.2],
-               mutations=[0.001], ks=[8], interval=[None],
-               network=OW10_1_NETWORK, network_od=OW10_1_NETWORK_OD,
-               printInterval=1):
+generations = 10
+population = 100
+repetitions = 1
 
-      self.network_capacity = SF_CAPACITY
-      self.printTravelTime = printTravelTime
-      self.printDriversPerLink = printDriversPerLink
-      self.printPairOD = printPairOD
-      self.printInterval = printInterval
-      self.network = network
-      self.network_od = network_od
+##ExperimentType
+#1: QL only
+#2: GA only
+#3: GA<-QL
+#4: GA<->QL
 
-      self.generations = generations
-      self.population = population
-      self.repetitions = repetitions
+experimentType = 1
+elite_size = 5
+group_sizes = [100]
+alphas = [.9]
+decays = [.99]
+crossovers = [.2]
+mutations = [.001]
+ks = [8]
+GA_QL_Interval = [None] #intervalo para GA->QL
 
-      ##ExperimentType
-      #1: QL only
-      #2: GA only
-      #3: GA<-QL
-      #4: GA<->QL
-
-      self.experimentType = experimentType
-      self.elite_size = elite_size
-      self.group_sizes = group_sizes
-      self.alphas = alphas
-      self.decays = decays
-      self.crossovers = crossovers
-      self.mutations = mutations
-      self.ks = ks
-      self.GA_QL_Interval = interval #intervalo para GA->QL
-
-  def runByType(self, k, group_size, alpha, decay, crossover, mutation,
-                interval):
+def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
 
-    ex = Experiment(k, self.network, self.network_capacity, self.network_od, group_size,
-    printTravelTime=self.printTravelTime, printDriversPerLink=self.printDriversPerLink,
-    printPairOD=self.printPairOD, printInterval=self.printInterval)
+    ex = Experiment(k, network, network_capacity, network_od, group_size,
+    printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
+    printPairOD=printPairOD, printInterval=printInterval)
 
-    if(self.experimentType==2): #GA only
+    if(experimentType==2): #GA only
         print("Running GA Only")
         print(mutation)
-        ex.run_ga_ql(False,False, self.generations, self.population, crossover,
-                      mutation, self.elite_size, None, None,None)
-    elif(self.experimentType==3):#GA<-QL
+        ex.run_ga_ql(False,False, generations, population, crossover,
+                      mutation, elite_size, None, None,None)
+    elif(experimentType==3):#GA<-QL
         print("Running GA<-QL ")
-        ex.run_ga_ql(True,False, self.generations, self.population, crossover,
-                      mutation, self.elite_size, alpha, decay,None)
-    elif(self.experimentType==4):#GA<->QL
+        ex.run_ga_ql(True,False, generations, population, crossover,
+                      mutation, elite_size, alpha, decay,None)
+    elif(experimentType==4):#GA<->QL
         print("Running GA<->QL ")
-        ex.run_ga_ql(True,True, self.generations, self.population, crossover,
-                      mutation, self.elite_size, alpha, decay, interval)
+        ex.run_ga_ql(True,True, generations, population, crossover,
+                      mutation, elite_size, alpha, decay, interval)
 
     ##FOR QL only use this method:
-    elif(self.experimentType==1): # QL only
+    elif(experimentType==1): # QL only
         print("Running QL Only ")
-        ex.run_ql(self.generations, alpha, decay)
+        ex.run_ql(generations, alpha, decay)
 
-  def buildParameters(self):
+def buildArgs():
     """
     returns: list with all the possible parameter configuration.
     each parameter configuration is a list on itself
     """
-    echo("Building arg list..")
+    echo("Building the experiment configurations list..")
     args = []
-    for g in self.group_sizes:
-        for a in self.alphas:
-            for d in self.decays:
-                for c in self.crossovers:
-                    for m in self.mutations:
-                        for k in self.ks:
-                            for i in self.GA_QL_Interval:
+    for g in group_sizes:
+        for a in alphas:
+            for d in decays:
+                for c in crossovers:
+                    for m in mutations:
+                        for k in ks:
+                            for i in GA_QL_Interval:
                                 args.append([g,a,d,c,m,k,i])
     return args
 
-  def runArg(self, a):
+def runArg(a):
     """
     a: list of arguments
     """
     assert len(a) == 7
     group_size, alpha, decay, crossover, mutation, k, interval = a
-    echo("Running an arg %s" % a)
-    for _ in range(self.repetitions):
-      self.runByType(k, group_size, alpha, decay, crossover, mutation,
-                     interval)
-    echo("Arg ran.")
+    echo("Running the configuration: group_size: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
+    for _ in range(repetitions):
+      runByType(k, group_size, alpha, decay, crossover, mutation, interval)
+    echo("Configuration complete: group_size: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
 
-  def run(self, number_of_processes=4):
+def run(number_of_processes=4):
     """
     Typicaly the execution starts through here
     """
     echo("Running experiment with %s processors.." % number_of_processes)
     pool = Pool(processes=number_of_processes)
-    args = self.buildParameters()
-    for arg in args:
-      self.runArg(arg)
-    echo("All args ran.")
+    args = buildArgs()
+    pool.map(runArg, args)
 
-if __name__ == "__main__":
-  e = ExperimentConfig(ks=[1,2,3,4])
-  e.run()
