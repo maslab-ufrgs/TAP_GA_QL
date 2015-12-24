@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Implements GA+QL for traffic assignement problem
-More information about use in runExperiment.py
-
-Files GA.py and QL.py implements operations specific to each
-algorithm
-
-The genetic algorithm segment is implemented using pyevolve
-"""
 import os
 from GA import GA
 from QL import QL
@@ -69,7 +59,7 @@ class Experiment:
                 raise Exception("Error: number of travels is not a multiple of the group size \
                         origin: "+str(tupOD[0])+" destination: "+ str(tupOD[1]))
             else:
-                                #Origin,destination,number of paths, number of travels
+                #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
 
         if self.networkName == SF_NETWORK_NAME:
@@ -237,12 +227,10 @@ class Experiment:
         """
 
         path2simulationfiles = './results_gaql_grouped/QL/' +'_net_'+self.networkName  \
-                + '/nd'+ str(nd) +'_groupsize'+ str(self.groupsize)\
                 + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
 
         filename = path2simulationfiles +  '/'+self.networkName \
                 + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                + '_nd'+ str(nd) + '_groupsize'+ str(self.groupsize) \
                 + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
@@ -258,7 +246,6 @@ class Experiment:
         if(useQL and useInt):
             path2simulationfiles = './results_gaql_grouped/GA<->QL/' +'_net_'+self.networkName  \
                     + '/pm' + "%4.4f" % self.mutation \
-                    + '/nd'+ str(self.nd()) +'_groupsize'+ str(self.groupsize)\
                     + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha + '/QL<-GA_Interval' + str(self.interval)
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
@@ -278,7 +265,6 @@ class Experiment:
         elif(useQL):
             path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+ self.networkName  \
                     + '/pm' + "%4.4f" % self.mutation \
-                    + '/nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize)\
                     + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
@@ -295,8 +281,7 @@ class Experiment:
                     + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
         else:
             path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation + '/nd'+ str(self.nd()) \
-                    +'_groupsize' + str(self.groupsize)
+                    + '/pm' + "%4.4f" % self.mutation
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
