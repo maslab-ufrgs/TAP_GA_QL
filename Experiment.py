@@ -188,7 +188,8 @@ class Experiment:
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
-                self.outputFile.write("\n")
+
+            self.outputFile.write("\n")
 
     def nodesString(self):
         ##string of edges in graph that will be printed
