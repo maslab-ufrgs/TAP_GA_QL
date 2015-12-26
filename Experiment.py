@@ -225,9 +225,8 @@ class Experiment:
         """
         nd: number of drivers without groupsize
         """
-
-        path2simulationfiles = './results_gaql_grouped/QL/' +'_net_'+self.networkName  \
-                + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
+        fmt = './results_gaql_grouped/net_%s/QL/decay%4.3f/alpha%3.2f'
+        path2simulationfiles = fmt % (self.networkName, self.decay, self.alpha)
 
         filename = path2simulationfiles +  '/'+self.networkName \
                 + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
@@ -242,9 +241,9 @@ class Experiment:
 
     def createStringArguments(self, useQL, useInt):
         if(useQL and useInt):
-            path2simulationfiles = './results_gaql_grouped/GA<->QL/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation \
-                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha + '/QL<-GA_Interval' + str(self.interval)
+            fmt = './results_gaql_grouped/net_%s/GA<->QL/pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s'
+            path2simulationfiles = fmt % (self.networkName, self.mutation,
+                                          self.decay, self.alpha, self.interval)
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
@@ -261,9 +260,9 @@ class Experiment:
                     + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
 
         elif(useQL):
-            path2simulationfiles = './results_gaql_grouped/GA<-QL/' +'_net_'+ self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation \
-                    + '/decay' + "%4.3f" % self.decay  + '/alpha' + "%3.2f" % self.alpha
+            fmt = './results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f'
+            path2simulationfiles = fmt % (self.networkName, self.mutation,
+                                          self.decay, self.alpha)
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
@@ -278,8 +277,8 @@ class Experiment:
                     + ' groupsize= '+ str(self.groupsize) \
                     + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
         else:
-            path2simulationfiles = './results_gaql_grouped/GA/' +'_net_'+self.networkName  \
-                    + '/pm' + "%4.4f" % self.mutation
+            fmt = './results_gaql_grouped/net_%s/GA/pm%4.4f'
+            path2simulationfiles = fmt % (self.networkName, self.mutation)
 
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
