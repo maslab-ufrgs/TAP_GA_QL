@@ -1,4 +1,5 @@
 graph ortuzar {
+ graph[splines=lines, nodesep=0.8]
  A -- B
  A -- C
  A -- D
