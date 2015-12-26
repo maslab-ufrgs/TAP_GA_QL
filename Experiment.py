@@ -159,7 +159,7 @@ class Experiment:
         for k in ttByOD.keys():
             str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
 
-        return str_od
+        return str_od + ' '
 
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if stepNumber % self.printInterval == 0:
@@ -193,6 +193,9 @@ class Experiment:
     def nodesString(self):
         ##string of edges in graph that will be printed
         nodesString = ''
+        if self.printPairOD:
+            for od in self.ODlist:
+                nodesString += "tt_%s|%s " % (od.o, od.d)
         if(self.printTravelTime):
             for edgeN in self.edgeNames:
                 nodesString += 'tt_'+edgeN+' '
@@ -232,9 +235,7 @@ class Experiment:
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
                 + ' groupsize= '+ str(self.groupsize)\
-                + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
-
-        headerstr = self.appendExtraODPairTimes(headerstr)
+                + '\n#episode avg_tt ' + self.nodesString()
 
         return filename, path2simulationfiles, headerstr
 
@@ -290,19 +291,7 @@ class Experiment:
                     + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
                     + '\n#generation avg_tt ' +  self.nodesString()
 
-        headerstr = self.appendExtraODPairTimes(headerstr)
-
         return filenamewithtag, path2simulationfiles, headerstr
-
-    def appendExtraODPairTimes(self, baseHeader):
-        """
-        Appends the list of OD pairs and the list of edges to the header
-        """
-        if self.printPairOD:
-          for od in self.ODlist:
-            baseHeader += " tt_%s%s" % (od.o, od.d)
-
-        return baseHeader
 
     def run_ql(self, numEpisodes, alpha, decay):
         self.useGA = False
