@@ -169,15 +169,13 @@ class Experiment:
                 else:
                     self.outputFile.write(str(stepNumber)+" "+str(avgTT))
             else:
-                ##using ql
-                self.outputFile.write(str(stepNumber)+": "+ str(qlTT))
+                self.outputFile.write(str(stepNumber)+" "+ str(qlTT))
 
             if(self.printPairOD):
                 ttByOD = self.travelTimeByOD(stepSolution)
                 self.outputFile.write(self.buildODPairData(ttByOD))
 
             if(self.printTravelTime):
-                #print edges travel times
                 travel_times = ''
                 edges = self.calculateEdgesTravelTimes(stepSolution)
                 for edge in self.edgeNames:
@@ -185,13 +183,11 @@ class Experiment:
                 self.outputFile.write(travel_times.strip())
 
             if(self.printDriversPerLink):
-                ##prints number of drivers at each link
                 drivers = ''
                 edges = self.driversPerLink(stepSolution)
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
-
                 self.outputFile.write("\n")
 
     def nodesString(self):
