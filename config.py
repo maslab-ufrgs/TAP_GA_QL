@@ -5,7 +5,7 @@ OW10_1_NETWORK = "networks/OW10_1.kspnet.txt"
 OW10_1_NETWORK_OD = "networks/OW10_1.od.txt"
 SF_NETWORK = "networks/SF.kspnet.txt"
 SF_CAPACITY = "networks/SF.capacity.txt"
-SF_NETWORK_OD = "networks/OW10_1_SF_alpha.txt"
+SF_NETWORK_OD = "networks/SF.od.txt"
 
 DEBUG = True
 
