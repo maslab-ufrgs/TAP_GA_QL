@@ -86,21 +86,22 @@ def buildArgs():
                                 args.append([g,a,d,c,m,k,i])
     return args
 
-def runArg(a):
+def runArg(*args):
     """
     a: list of arguments
     """
+    a = args[0]
+    print(a)
     assert len(a) == 7
     group_size, alpha, decay, crossover, mutation, k, interval = a
-    echo("Running the configuration: group_size: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
-    for _ in range(repetitions):
-      runByType(k, group_size, alpha, decay, crossover, mutation, interval)
-    echo("Configuration complete: group_size: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
+    echo("Running the configuration: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
+    for r in range(repetitions):
+        runByType(k, group_size, alpha, decay, crossover, mutation, interval)
+        echo("Configuration complete: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
+        echo("Repetition %s/%s" (r,repetitions))
+
 
 def run(number_of_processes=4):
-    """
-    Typicaly the execution starts through here
-    """
     echo("Running experiment with %s processors.." % number_of_processes)
     pool = Pool(processes=number_of_processes)
     args = buildArgs()
