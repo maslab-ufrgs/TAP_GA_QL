@@ -88,7 +88,7 @@ def buildArgs():
 
 def runArg(*args):
     """
-    a: list of arguments
+    args: list of arguments
     """
     a = args[0]
     assert len(a) == 7
@@ -97,7 +97,7 @@ def runArg(*args):
     for r in range(repetitions):
         runByType(k, group_size, alpha, decay, crossover, mutation, interval)
         echo("Configuration complete: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
-        echo("Repetition %s/%s" (r,repetitions))
+        echo("Repetition %s/%s" % (r,repetitions))
 
 
 def run(number_of_processes=4):
