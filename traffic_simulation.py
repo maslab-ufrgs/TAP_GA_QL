@@ -1,10 +1,15 @@
+"""
+Traffic Assignment Problem v6.0.1-beta
+"""
 import config
 import argparse
 
 p = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-                            description="""Script to run the simulation of
-                            drivers going from different points in the ortuzar
-                            and siouxfalls networks""")
+                            description="""
+                            Traffic Assignment Problem v6.0.1-beta
+                            Script to run the simulation of
+                            drivers going from different points in the OW10_1
+                            and SF networks""")
 
 p.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file")
