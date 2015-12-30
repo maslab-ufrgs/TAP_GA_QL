@@ -91,7 +91,6 @@ def runArg(*args):
     a: list of arguments
     """
     a = args[0]
-    print(a)
     assert len(a) == 7
     group_size, alpha, decay, crossover, mutation, k, interval = a
     echo("Running the configuration: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
