@@ -39,7 +39,7 @@
 <ul>
 {% for release in site.github.releases %}
 <li>
-  <a id="{{release.name}}" class="anchor" href="release.html_url" aria-hidden="true"><span class="octicon octicon-link"></span>{{release.name}} - {{ release.published_at | date: "%Y-%m-%d" }}</a>
+  <a id="{{release.name}}" class="link" href="{{release.html_url}}" aria-hidden="true"><span class="octicon octicon-link"></span>{{release.name}} - {{ release.published_at | date: "%Y-%m-%d" }}</a>
 {{ release.body | markdownify }}
 {% endfor %}
 </li>
