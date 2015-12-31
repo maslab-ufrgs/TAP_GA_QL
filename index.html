@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Traffic Assignment Problem by maslab-ufrgs</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Traffic Assignment Problem</h1>
+          <h2>Script to run the simulation of drivers going from different points in the OW10_1 and SF networks</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/maslab-ufrgs/TAP_GA_QL/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/maslab-ufrgs/TAP_GA_QL/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/maslab-ufrgs/TAP_GA_QL" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <p>Script to run the simulation of drivers going from different points in the
+OW10_1 and SF networks</p>
+
+<h1>
+<a id="warning" class="anchor" href="#warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warning</h1>
+
+<blockquote>
+<p>The cost functions used for edge travel time avaliation are tied to the network being run (SF or OW10_1). If you are 
+going to use other networks, you most likely want to edit the calculateTravelTime function in the Experiment.py file.</p>
+</blockquote>
+
+<h1>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h1>
+
+<ul>
+<li>python 2.7</li>
+<li><a href="https://sourceforge.net/projects/pyevolve/">pyevolve</a></li>
+</ul>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<div class="highlight highlight-source-shell"><pre>python traffic_simulation.py [OPTIONS]</pre></div>
+
+<p>All the options have usable defaults so check them before running a experiment.</p>
+
+<p>Use:</p>
+
+<div class="highlight highlight-source-shell"><pre>python traffic_simulation.py -h</pre></div>
+
+<p>To list all the options.</p>
+
+<h2>
+<a id="checking-the-results" class="anchor" href="#checking-the-results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Checking the results</h2>
+
+<p>After the execution is complete, a new file in the "results_gaql_grouped" folder
+should be created.</p>
+
+<p>The name of the file will contain the parameters used to run the experiment
+and the local time when it happened.</p>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<ul>
+<li>Run an experiment with the <em>SF</em> network and prints the travel time
+for the each pair of Origin and Destination</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre>python traffic_simulation.py --network <span class="pl-s"><span class="pl-pds">"</span>SF<span class="pl-pds">"</span></span> --printPairOD</pre></div>
+
+<ul>
+<li>Run an experiment with the <em>OW10_1</em> network printing the link's travel time at every
+100 generations with the mutations of 0.003 and 0.03</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre>python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0.003 0.03</pre></div>
+
+<h1>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Options</h1>
+
+<pre><code>optional arguments:
+  -h, --help            show this help message and exit
+  --printTravelTime     Print link's travel time at each iteration in the
+                        output file (default: False)
+  -d, --printDriversPerLink
+                        Print the number of drivers in each link in the output
+                        file (default: False)
+  -o, --printPairOD     Print the average travel time for in the header in the
+                        output file (default: False)
+  -i PRINTINTERVAL, --printInterval PRINTINTERVAL
+                        Interval by which the messages are written in the
+                        output file (default: 1)
+  -g GENERATIONS, --generations GENERATIONS
+                        Maximum mumber of generations in each configuration
+                        (default: 400)
+  -p POPULATION, --population POPULATION
+                        Size of population for the genetic algorithm (default:
+                        100)
+  --grouping GROUPING [GROUPING ...]
+                        List of group sizes for drivers in each configuration
+                        (default: [100])
+  -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
+                        List of learning rates in each configuration (default:
+                        [0.9])
+  --decays DECAYS [DECAYS ...]
+                        List of decays in each configuration (default: [0.99])
+  -c CROSSOVERS [CROSSOVERS ...], --crossovers CROSSOVERS [CROSSOVERS ...]
+                        List of rate of crossover in the population in each
+                        configuration (default: [0.2])
+  -m MUTATIONS [MUTATIONS ...], --mutations MUTATIONS [MUTATIONS ...]
+                        List of rate of mutations in each configuration
+                        (default: [0.001])
+  --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
+                        (K-ShortestPath) Algorithm (default: [8])
+  --intervals INTERVALS [INTERVALS ...]
+                        List of intervals that signal the frequency the QL
+                        values are supposed to be fed into GA (default:
+                        [None])
+  --repetitions REPETITIONS
+                        How many times it should be repeated (default: 1)
+  --net {OW10_1,SF}     Which network should be used (default: OW10_1)
+  --experimentType {1,2,3,4}
+                        1 - QL only 2 - GA only 3 - QL builds solution for GA
+                        4 - GA and QL exchange solutions (default: 1)
+  -e ELITE_SIZE, --elite_size ELITE_SIZE
+                        How many elite individuals should be kept after each
+                        generation (default: 5)
+  --number-of-processes NUMBER_OF_PROCESSES
+                        How many parallel processes should be used to run the
+                        experiment configurations (default: 1)
+</code></pre>
+        </section>
+
+        <footer>
+          Traffic Assignment Problem is maintained by <a href="https://github.com/maslab-ufrgs">maslab-ufrgs</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
