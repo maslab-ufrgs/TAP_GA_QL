@@ -36,11 +36,15 @@
           <p>Script to run the simulation of drivers going from different points in the
 OW10_1 and SF networks</p>
 
+<h1>Releases</h1>
+<ul>
 {% for release in site.github.releases %}
+<li>
 ## [{{ release.name }}]({{ release.html_url }}) - {{ release.published_at | date: "%Y-%m-%d" }}
 {{ release.body | markdownify }}
 {% endfor %}
-
+</li>
+</ul>
 <h1>
 <a id="warning" class="anchor" href="#warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warning</h1>
 
