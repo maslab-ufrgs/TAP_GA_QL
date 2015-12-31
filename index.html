@@ -30,11 +30,14 @@
 
         <hr>
         
-        {{ site }}
-
         <section id="main_content">
           <p>Script to run the simulation of drivers going from different points in the
 OW10_1 and SF networks</p>
+
+{% for release in site.github.releases %}
+## [{{ release.name }}]({{ release.html_url }}) - {{ release.published_at | date: "%Y-%m-%d" }}
+{{ release.body | markdownify }}
+{% endfor %}
 
 <h1>
 <a id="warning" class="anchor" href="#warning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Warning</h1>
