@@ -58,7 +58,7 @@ python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0
 Options
 =======
 
-```sh
+```
 optional arguments:
   -h, --help            show this help message and exit
   --printTravelTime     Print link's travel time at each iteration in the
