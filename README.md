@@ -4,18 +4,18 @@ OW10_1 and SF networks
 Warning
 =======
 
-> The cost functions used for edge cost avaliation are tied to the network being run (SF or OW10_1). If you are 
+> The cost functions used for edge travel time avaliation are tied to the network being run (SF or OW10_1). If you are 
 > going to use other networks, you most likely want to edit the calculateTravelTime function in the Experiment.py file.
 
 Dependencies
 ============
  * python 2.7
- * [pyevolve](https://sourceforge.net/projects/pyevolve/) (pip install pyevolve)
+ * [pyevolve](https://sourceforge.net/projects/pyevolve/)
 
 Usage
 =====
 
-```bash
+```sh
 python traffic_simulation.py [OPTIONS]
 ```
 
@@ -23,7 +23,7 @@ All the options have usable defaults so check them before running a experiment.
 
 Use:
 
-```bash
+```sh
 python traffic_simulation.py -h
 ```
 
@@ -58,7 +58,7 @@ python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0
 Options
 =======
 
-```
+```sh
 optional arguments:
   -h, --help            show this help message and exit
   --printTravelTime     Print link's travel time at each iteration in the
