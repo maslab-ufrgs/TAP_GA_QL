@@ -125,7 +125,7 @@ class Experiment:
 
             #check if we are running the GA<->QL or GA<-QL experiment.
             if((self.useInterval) and (isGeneration == 0) and (generation != 0)):
-                (qlind,avg_tt) = self.ql.runEpisodeWithAction(ga_engine.bestIndividual().getInternalList()) #GA<-QL
+                (qlind,avg_tt) = self.ql.runEpisodeWithAction(ga_engine.bestIndividual().getInternalList()) #GA->QL
             else:
                 (qlind,avg_tt) = self.ql.runEpisode() #GA<-QL
                 #qlind is a array of paths taken by each driver
