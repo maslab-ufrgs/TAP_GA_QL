@@ -33,13 +33,13 @@ repetitions = 1
 
 experimentType = 1
 elite_size = 5
-group_sizes = [100]
+group_sizes = [1]
 alphas = [.9]
 decays = [.99]
 crossovers = [.2]
 mutations = [.001]
 ks = [8]
-GA_QL_Interval = [None] #intervalo para GA->QL
+GA_QL_Interval = [10] #intervalo para GA->QL
 
 def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
