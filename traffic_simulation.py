@@ -29,7 +29,7 @@ p.add_argument("-g", "--generations", type=int, default=400,
 p.add_argument("-p", "--population", type=int, default=100,
                help="Size of population for the genetic algorithm")
 
-p.add_argument("--grouping", nargs="+", type=int, default=[100],
+p.add_argument("--grouping", nargs="+", type=int, default=[1],
                help="List of group sizes for drivers in each configuration")
 
 p.add_argument("-a", "--alphas", nargs="+", type=float, default=[.9],
@@ -47,7 +47,7 @@ p.add_argument("-m", "--mutations", nargs="+", type=float, default=[0.001],
 p.add_argument("--ks", nargs="+", type=int, default=[8],
                help="List of the 'K' hyperparameters for the KSP (K-ShortestPath) Algorithm")
 
-p.add_argument("--intervals", nargs="+", type=int, default=[None],
+p.add_argument("--intervals", nargs="+", type=int, default=[10],
                help="List of intervals that signal the frequency the QL values are supposed to be fed into GA")
 
 p.add_argument("--repetitions", type=int, default=1,
