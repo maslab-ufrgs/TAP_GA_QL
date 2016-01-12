@@ -48,7 +48,7 @@ p.add_argument("--ks", nargs="+", type=int, default=[8],
                help="List of the 'K' hyperparameters for the KSP (K-ShortestPath) Algorithm")
 
 p.add_argument("--intervals", nargs="+", type=int, default=[10],
-               help="List of intervals that signal the frequency the best GA value is supposed to be fed into QL")
+               help="Frequency with which the GA sends its best solution to the QL")
 
 p.add_argument("--repetitions", type=int, default=1,
                help="How many times it should be repeated")
