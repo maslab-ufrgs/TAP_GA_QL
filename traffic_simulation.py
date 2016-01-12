@@ -47,7 +47,7 @@ p.add_argument("-m", "--mutations", nargs="+", type=float, default=[0.001],
 p.add_argument("--ks", nargs="+", type=int, default=[8],
                help="List of the 'K' hyperparameters for the KSP (K-ShortestPath) Algorithm")
 
-p.add_argument("--intervals", nargs="+", type=int, default=[10],
+p.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
                help="Frequency with which the GA sends its best solution to the QL")
 
 p.add_argument("--repetitions", type=int, default=1,
@@ -97,7 +97,7 @@ config.decays = a.decays
 config.crossovers = a.crossovers
 config.mutations = a.mutations
 config.ks = a.ks
-config.GA_QL_Interval = a.intervals
+config.GA_QL_Interval = a.exchangeGAQL
 
 config.run(number_of_processes=a.number_of_processes)
 
