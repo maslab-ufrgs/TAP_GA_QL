@@ -15,7 +15,7 @@ p.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file")
 #new flag
 p.add_argument("--printDriversPerRoute", action="store_true", default=False,
-               help="Print the amount of drivers per route of pair OD")
+               help="Print the amount of drivers per route of each OD pair(Warning:QL only!)")
 
 p.add_argument("-d", "--printDriversPerLink", action="store_true", default=False,
                help="Print the number of drivers in each link in the output file")
