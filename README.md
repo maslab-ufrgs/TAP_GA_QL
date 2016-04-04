@@ -68,6 +68,9 @@ optional arguments:
                         file (default: False)
   -o, --printPairOD     Print the average travel time for in the header in the
                         output file (default: False)
+  --printDriversPerRoute     
+                        Prints the amount of drivers per route of each OD pair
+                        (default: False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
                         output file (default: 1)
