@@ -14,26 +14,27 @@ class QL():
         self.decay = decay
         self.k = k        
         ##init qtable
-	    self.ODL = ODlist        
-	    self.qtable = []
-	    self.ODtable = {}
-	    self.drivers = drivers
+	self.ODL = ODlist        
+	self.qtable = []
+	self.ODtable = {}
+	self.drivers = drivers
         self.numdrivers=len(drivers)
         for i in range(self.numdrivers):
             self.qtable.append([0.0]*k)
-        for od in ODlist:
-		    listRoutes = []		
-		    for r in range(self.k):	    
-			    listRoutes.append(0)	
-		    self.ODtable[str(od)] = listRoutes
+	for od in ODlist:
+		listRoutes = []		
+		for r in range(self.k):	    
+			listRoutes.append(0)	
+		self.ODtable[str(od)] = listRoutes
+    
     
     def cleanODtable(self):
-	    self.ODtable = {}
-	    for od in self.ODL:
-		    listRoutes = []		
-		    for r in range(self.k):	    
-			    listRoutes.append(0)	
-		    self.ODtable[str(od)] = listRoutes	
+	self.ODtable = {}
+	for od in self.ODL:
+		listRoutes = []		
+		for r in range(self.k):	    
+			listRoutes.append(0)	
+		self.ODtable[str(od)] = listRoutes	
 
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
@@ -41,15 +42,15 @@ class QL():
     def runEpisode(self):
         actions=[]
         #for each driver, select its list of actions in qtable
-	    counter = 0
-	    self.cleanODtable() 
-	    for a in self.qtable:
+	counter = 0
+	self.cleanODtable() 
+	for a in self.qtable:
             #selection according to epsilon-greedy
             randomnb = random.uniform(0,1)
             if randomnb < self.epsilon:
                 # action is selected randomly
                 curaction = random.randint(0,self.k-1)		
-		        self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
+		self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
             else:
                 # action is selected greedly
                 max_in_array = max(a)
@@ -64,18 +65,18 @@ class QL():
                      if len(array_of_pointers2max) == 1: 
                           # this means only one action maximizes
                           curaction = array_of_pointers2max[0]
-                          self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
+			  self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
                      else: 
                           # more than one action with max value
                           curaction = random.choice(array_of_pointers2max)
-                          self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
+			  self.ODtable[str(self.drivers[counter].od.o)+str(self.drivers[counter].od.d)][curaction] += 1
             actions.append(curaction)
-	        counter+=1
+	    counter+=1
         
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
         
-	    print self.ODtable
-	    print len(self.drivers)
+	print self.ODtable
+	print len(self.drivers)
 
         #updates qtable. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
