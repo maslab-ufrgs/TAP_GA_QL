@@ -44,7 +44,7 @@ class Experiment:
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
-	    self.printDriversPerRoute = printDriversPerRoute #New flag
+	self.printDriversPerRoute = printDriversPerRoute #New flag
 
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
@@ -53,8 +53,8 @@ class Experiment:
         self.groupsize = groupSize
         odInput = self.parseODfile(odFile)
         self.ODlist = []
-	    self.ODL = []	
-	    self.ODheader = ""
+	self.ODL = []	
+	self.ODheader = ""
 
         for tupOD in odInput:
             if(tupOD[2]%self.groupsize!=0):
@@ -64,12 +64,14 @@ class Experiment:
             else:
                 #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
-		        self.ODL.append(str(tupOD[0])+str(tupOD[1]))
-		        for i in range(k):		
-			        if len(self.ODheader) == 0:			
-				        self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
-			        else:
-				        self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+		self.ODL.append(str(tupOD[0])+str(tupOD[1]))
+		for i in range(k):		
+			if len(self.ODheader) == 0:			
+				self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+			else:
+				self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+	print "Header: " + self.ODheader
+	print self.ODL
 			
         if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
@@ -198,12 +200,12 @@ class Experiment:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
 	    
-	        if(self.printDriversPerRoute):
-		        self.outputFile.write(" ")
-		        for keys in ODtable:
-			        for x in range(len(ODtable[keys])):
-			            
-				        self.outputFile.write(str(ODtable[keys][x]) + " ")
+	    if(self.printDriversPerRoute):
+		self.outputFile.write(" ")
+		for keys in ODtable:
+			for x in range(len(ODtable[keys])):
+				#string = string + str(ODtable[keys][x])	
+				self.outputFile.write(str(ODtable[keys][x]) + " ")
 
             self.outputFile.write("\n")
 
@@ -219,9 +221,9 @@ class Experiment:
         if(self.printDriversPerLink):
             for edgeN in self.edgeNames:
                 nodesString += "nd_"+edgeN+' '
-	    if(self.printDriversPerRoute):
-		    nodesString += self.ODheader        
-	    nodesString = nodesString.strip()
+	if(self.printDriversPerRoute):
+		nodesString += self.ODheader        
+	nodesString = nodesString.strip()
         return nodesString
 
     def nd(self):
@@ -329,6 +331,8 @@ class Experiment:
 
         for episode in range(numEpisodes):
             (instance, value,ODtable) = self.ql.runEpisode()
+	    print episode
+	    print ODtable
             self.__print_step(episode,instance,ODtable,qlTT=value)
 
         print("Output file location: %s" % filenamewithtag)
