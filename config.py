@@ -17,6 +17,7 @@ network_capacity = SF_CAPACITY
 printTravelTime = False
 printDriversPerLink = False
 printPairOD = False
+printDriversPerRoute = False #new flag
 printInterval = 1
 network = OW10_1_NETWORK
 network_od = OW10_1_NETWORK_OD
@@ -45,10 +46,9 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-
     ex = Experiment(k, network, network_capacity, network_od, group_size,
     printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
-    printPairOD=printPairOD, printInterval=printInterval)
+    printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute)
 
     if(experimentType==2): #GA only
         print("Running GA Only")
@@ -105,4 +105,3 @@ def run(number_of_processes=4):
     pool = Pool(processes=number_of_processes)
     args = buildArgs()
     pool.map(runArg, args)
-
