@@ -70,7 +70,7 @@ optional arguments:
                         output file (default: False)
   --printDriversPerRoute     
                         Prints the amount of drivers per route of each OD pair
-                        (default: False)
+                        Warning: use it only with QL(default: False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
                         output file (default: 1)
