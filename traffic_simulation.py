@@ -13,6 +13,9 @@ p = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatt
 
 p.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file")
+#new flag
+p.add_argument("--printDriversPerRoute", action="store_true", default=False,
+               help="Print the amount of drivers per route of pair OD")
 
 p.add_argument("-d", "--printDriversPerLink", action="store_true", default=False,
                help="Print the number of drivers in each link in the output file")
@@ -81,6 +84,7 @@ config.printTravelTime = a.printTravelTime
 config.printDriversPerLink = a.printDriversPerLink
 config.printPairOD = a.printPairOD
 config.printInterval = a.printInterval
+config.printDriversPerRoute = a.printDriversPerRoute ##New flag!
 
 config.network = networks[a.net][0]
 config.network_od = networks[a.net][1]
@@ -100,4 +104,3 @@ config.ks = a.ks
 config.GA_QL_Interval = a.exchangeGAQL
 
 config.run(number_of_processes=a.number_of_processes)
-
