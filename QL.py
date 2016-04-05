@@ -42,6 +42,48 @@ class QL():
     def runEpisode(self):
         actions=[]
         #for each driver, select its list of actions in qtable
+        for a in self.qtable:
+            #selection according to epsilon-greedy
+            randomnb = random.uniform(0,1)
+            if randomnb < self.epsilon:
+                # action is selected randomly
+                curaction = random.randint(0,self.k-1)
+            else:
+                # action is selected greedly
+                max_in_array = max(a)
+                #print max_in_array
+                array_of_pointers2max = []
+                for na in range(len(a)): #for each action
+                    if a[na] == max_in_array:
+                        array_of_pointers2max.append(na)
+                if len(array_of_pointers2max) == 0:##bloco estava identado
+                     raise Exception("error: no max found in qtable for  " + str(a))
+                else:
+                     if len(array_of_pointers2max) == 1: 
+                          # this means only one action maximizes
+                          curaction = array_of_pointers2max[0]  
+                     else: 
+                          # more than one action with max value
+                          curaction = random.choice(array_of_pointers2max)
+            actions.append(curaction)
+        
+        traveltimes = self.experiment.calculateIndividualTravelTime(actions)
+        
+        #updates qtable. reward is the negative of the travel time
+        for drIndex in range(self.numdrivers):
+            reward = -traveltimes[drIndex]
+            #print 'reward: '+str(reward)+"\n"
+            self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
+        
+        #updates epsilon
+        self.epsilon = self.epsilon * self.decay
+        average_tt_time = sum(traveltimes)/self.numdrivers
+        return (actions,average_tt_time)
+    
+    #Run QL with --printDriversPerRoute flag raised
+    def runEpisodeWithFlag(self):
+        actions=[]
+        #for each driver, select its list of actions in qtable
 	counter = 0
 	self.cleanODtable() 
 	for a in self.qtable:
