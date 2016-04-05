@@ -349,8 +349,6 @@ class Experiment:
 	if (self.printDriversPerRoute):
 	    for episode in range(numEpisodes):
                 (instance, value,ODtable) = self.ql.runEpisodeWithFlag()
-	        print episode
-	        print ODtable
                 self.__print_step(episode,instance,ODtable,qlTT=value)
 	else:
 	    for episode in range(numEpisodes):
