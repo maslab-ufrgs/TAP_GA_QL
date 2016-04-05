@@ -55,7 +55,7 @@ class Experiment:
         self.ODlist = []
 	self.ODL = []	
 	self.ODheader = ""
-
+	self.ODtable = {}
         for tupOD in odInput:
             if(tupOD[2]%self.groupsize!=0):
                 print(tupOD[2])
@@ -123,6 +123,13 @@ class Experiment:
     def genCallBack(self,ga_engine):
         population = ga_engine.getPopulation()
         generation = ga_engine.getCurrentGeneration()
+	if (self.printDriversPerRoute):	
+	    #Drivers per route	
+	    for od in self.ODL:
+		listRoutes = []		
+		for r in range(self.k):	    
+		    listRoutes.append(0)	
+		self.ODtable[str(od)] = listRoutes
 
         #gets worst individual
         worstsol = population[len(population)-1]
@@ -158,8 +165,18 @@ class Experiment:
                 #copies QL solution to worst in population
                 worstsol.copy(ga_engine.getPopulation()[1])
                 ga_engine.getPopulation()[len(population)-1].evaluate()
+	
+		
+	listOfValues = ga_engine.bestIndividual().getInternalList()
+	
+	if (self.printDriversPerRoute):	
+	    for d in range(len(listOfValues)):
+		self.ODtable[(self.drivers[d].od.o)+str(self.drivers[d].od.d)][listOfValues[d]]+= 1
 
-        self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
+	if (self.printDriversPerRoute):
+	    self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),self.ODtable,avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)			
+	else:        
+	    self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
     def buildODPairData(self, ttByOD):
         """
@@ -172,7 +189,7 @@ class Experiment:
 
         return str_od + ' '
 
-    def __print_step(self, stepNumber, stepSolution, ODtable, avgTT=None, qlTT=None):
+    def __print_step(self, stepNumber, stepSolution, ODtable={}, avgTT=None, qlTT=None):
         if stepNumber % self.printInterval == 0:
             if(self.useGA):
                 if(self.useQL):
@@ -203,9 +220,9 @@ class Experiment:
 	    if(self.printDriversPerRoute):
 		self.outputFile.write(" ")
 		for keys in ODtable:
-			for x in range(len(ODtable[keys])):
-				#string = string + str(ODtable[keys][x])	
-				self.outputFile.write(str(ODtable[keys][x]) + " ")
+		    for x in range(len(ODtable[keys])):
+		        #string = string + str(ODtable[keys][x])	
+			self.outputFile.write(str(ODtable[keys][x]) + " ")
 
             self.outputFile.write("\n")
 
@@ -329,11 +346,16 @@ class Experiment:
         self.outputFile = open(filenamewithtag, 'w')
         self.outputFile.write(headerstr+'\n')
 
-        for episode in range(numEpisodes):
-            (instance, value,ODtable) = self.ql.runEpisode()
-	    print episode
-	    print ODtable
-            self.__print_step(episode,instance,ODtable,qlTT=value)
+	if (self.printDriversPerRoute):
+	    for episode in range(numEpisodes):
+                (instance, value,ODtable) = self.ql.runEpisodeWithFlag()
+	        print episode
+	        print ODtable
+                self.__print_step(episode,instance,ODtable,qlTT=value)
+	else:
+	    for episode in range(numEpisodes):
+                (instance, value) = self.ql.runEpisode()
+                self.__print_step(episode,instance,qlTT=value)
 
         print("Output file location: %s" % filenamewithtag)
 
