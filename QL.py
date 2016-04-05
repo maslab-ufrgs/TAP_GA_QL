@@ -116,10 +116,6 @@ class QL():
 	    counter+=1
         
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
-        
-	print self.ODtable
-	print len(self.drivers)
-
         #updates qtable. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
