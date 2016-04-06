@@ -70,8 +70,15 @@ class Experiment:
 				self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
 			else:
 				self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
-	print "Header: " + self.ODheader
-	print self.ODL
+	#print "Header: " + self.ODheader
+	#print self.ODL
+	
+	for od in self.ODL:
+	    listRoutes = []		
+	    for r in range(self.k):	    
+		listRoutes.append(0)	
+	    self.ODtable[str(od)] = listRoutes
+	#print self.ODtable #step 1
 			
         if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
@@ -97,6 +104,14 @@ class Experiment:
         for od in self.ODlist:
             for travel in range(od.numTravels):
                 self.drivers.append(Driver(od))
+
+    def cleanODtable(self):
+	for od in self.ODL:
+	    listRoutes = []		
+	    for r in range(self.k):	    
+		listRoutes.append(0)	
+	    self.ODtable[str(od)] = listRoutes
+
 
     def parseODfile(self,path):
         with open(path) as odFILE:
@@ -165,18 +180,8 @@ class Experiment:
                 #copies QL solution to worst in population
                 worstsol.copy(ga_engine.getPopulation()[1])
                 ga_engine.getPopulation()[len(population)-1].evaluate()
-	
-		
-	listOfValues = ga_engine.bestIndividual().getInternalList()
-	
-	if (self.printDriversPerRoute):	
-	    for d in range(len(listOfValues)):
-		self.ODtable[(self.drivers[d].od.o)+str(self.drivers[d].od.d)][listOfValues[d]]+= 1
-
-	if (self.printDriversPerRoute):
-	    self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),self.ODtable,avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)			
-	else:        
-	    self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
+	       
+	self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
     def buildODPairData(self, ttByOD):
         """
@@ -189,7 +194,7 @@ class Experiment:
 
         return str_od + ' '
 
-    def __print_step(self, stepNumber, stepSolution, ODtable={}, avgTT=None, qlTT=None):
+    def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if stepNumber % self.printInterval == 0:
             if(self.useGA):
                 if(self.useQL):
@@ -218,11 +223,15 @@ class Experiment:
                 self.outputFile.write(drivers.strip())
 	    
 	    if(self.printDriversPerRoute):
+		self.cleanODtable()	
+		for s in range(len(stepSolution)):
+			self.ODtable[str(self.drivers[s].od.o) + str(self.drivers[s].od.d)][stepSolution[s]] += 1
+			#print self.ODtable		
 		self.outputFile.write(" ")
 		for keys in self.ODL:##Now it prints in the correct order
-		    for x in range(len(ODtable[keys])):
+		    for x in range(len(self.ODtable[keys])):
 		        #string = string + str(ODtable[keys][x])	
-			self.outputFile.write(str(ODtable[keys][x]) + " ")
+			self.outputFile.write(str(self.ODtable[keys][x]) + " ")
 
             self.outputFile.write("\n")
 
@@ -335,7 +344,7 @@ class Experiment:
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,self.ODL)
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha)
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
@@ -346,14 +355,9 @@ class Experiment:
         self.outputFile = open(filenamewithtag, 'w')
         self.outputFile.write(headerstr+'\n')
 
-	if (self.printDriversPerRoute):
-	    for episode in range(numEpisodes):
-                (instance, value,ODtable) = self.ql.runEpisodeWithFlag()
-                self.__print_step(episode,instance,ODtable,qlTT=value)
-	else:
-	    for episode in range(numEpisodes):
-                (instance, value) = self.ql.runEpisode()
-                self.__print_step(episode,instance,qlTT=value)
+	for episode in range(numEpisodes):
+            (instance, value) = self.ql.runEpisode()
+            self.__print_step(episode,instance,qlTT=value)
 
         print("Output file location: %s" % filenamewithtag)
 
@@ -372,7 +376,7 @@ class Experiment:
         self.alpha = alpha
         self.decay = decay
         if(useQL):
-            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha,self.ODL)
+            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)
