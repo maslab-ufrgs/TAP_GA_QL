@@ -219,7 +219,7 @@ class Experiment:
 	    
 	    if(self.printDriversPerRoute):
 		self.outputFile.write(" ")
-		for keys in ODtable:
+		for keys in self.ODL:##Now it prints in the correct order
 		    for x in range(len(ODtable[keys])):
 		        #string = string + str(ODtable[keys][x])	
 			self.outputFile.write(str(ODtable[keys][x]) + " ")
