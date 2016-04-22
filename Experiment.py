@@ -213,14 +213,14 @@ class Experiment:
                 edges = self.calculateEdgesTravelTimes(stepSolution)
                 for edge in self.edgeNames:
                     travel_times += str(edges[edge]) + " "
-                self.outputFile.write(travel_times.strip())
+                self.outputFile.write(travel_times.strip()+" ")
 
             if(self.printDriversPerLink):
                 drivers = ''
                 edges = self.driversPerLink(stepSolution)
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
-                self.outputFile.write(drivers.strip()+" ")
+                self.outputFile.write(drivers.strip())
 	    
 	    if(self.printDriversPerRoute):
 		self.cleanODtable()	
