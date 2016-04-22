@@ -220,7 +220,7 @@ class Experiment:
                 edges = self.driversPerLink(stepSolution)
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
-                self.outputFile.write(drivers.strip())
+                self.outputFile.write(drivers.strip()+" ")
 	    
 	    if(self.printDriversPerRoute):
 		self.cleanODtable()	
