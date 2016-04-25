@@ -7,7 +7,7 @@ Created on Thu Jun 18 19:51:35 2015
 import random
 
 class QL():
-    def __init__(self, experiment,drivers, k, decay,alpha):
+    def __init__(self, experiment,drivers, k, decay,alpha,tableFill,iniTable = "zero"):
         self.experiment = experiment 
         self.epsilon = 1
         self.alpha = alpha
@@ -18,8 +18,18 @@ class QL():
 	self.ODtable = {}
 	self.drivers = drivers
         self.numdrivers=len(drivers)
-        for i in range(self.numdrivers):
-            self.qtable.append([0.0]*k)
+        if iniTable == "zero":
+        	for i in range(self.numdrivers):
+            		self.qtable.append([0.0]*k)
+	elif iniTable == "Coupling": #New way to fill the table
+		print "Generating with mean coupling!"
+		for d in drivers:
+			string = []			
+			for r in range(len(d.od.paths)):
+						
+				string.append(-1*(self.tablefill[str(d.od.o)+"|"+str(d.od.d)][r]))
+				              		
+			self.qtable.append(string)
     
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
