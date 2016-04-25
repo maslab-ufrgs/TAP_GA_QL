@@ -5,6 +5,7 @@ from time import localtime
 import KSP
 
 SF_NETWORK_NAME = "SF"
+TABLE_FILL = {"A|L":[36.84,39.47,23.68,30.70,31.58],"A|M":[31.58,37.89,32.63,22.37,35.53],"B|L":[27.37,27.63,32.46,33.68,21.05],"B|M":[21.05,27.63,20.00,18.95,28.42]}
 
 class Driver():
     #od:OD = instance of OD class
@@ -344,7 +345,7 @@ class Experiment:
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha)
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,"zero") #Change for "Coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
@@ -376,7 +377,7 @@ class Experiment:
         self.alpha = alpha
         self.decay = decay
         if(useQL):
-            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha)
+            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha,TABLE_FILL,"zero")
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)
