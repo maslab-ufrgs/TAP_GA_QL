@@ -72,6 +72,8 @@ p.add_argument("-e", "--elite_size", type=int, default=5,
 
 p.add_argument("--number-of-processes", type=int, default=1,
                help="How many parallel processes should be used to run the experiment configurations")
+p.add_argument("--ql-table-initiation", type=unicode,choices=['zero','Coupling'],default='zero',
+               help="How to initiate the QL table.")
 
 a = p.parse_args()
 
@@ -102,5 +104,6 @@ config.crossovers = a.crossovers
 config.mutations = a.mutations
 config.ks = a.ks
 config.GA_QL_Interval = a.exchangeGAQL
+config.QL_TABLE_STATE = a.ql_table_initiation
 
 config.run(number_of_processes=a.number_of_processes)
