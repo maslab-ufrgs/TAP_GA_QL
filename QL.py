@@ -17,6 +17,7 @@ class QL():
 	self.qtable = []
 	self.ODtable = {}
 	self.drivers = drivers
+	self.tableFill = tableFill
         self.numdrivers=len(drivers)
         if iniTable == "zero":
         	for i in range(self.numdrivers):
@@ -27,7 +28,7 @@ class QL():
 			string = []			
 			for r in range(len(d.od.paths)):
 						
-				string.append(-1*(self.tablefill[str(d.od.o)+"|"+str(d.od.d)][r]))
+				string.append(-1*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
 				              		
 			self.qtable.append(string)
     
