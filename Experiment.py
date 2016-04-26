@@ -36,7 +36,7 @@ class Experiment:
 
     def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,
                  printTravelTime=False, printDriversPerLink=False,
-                 printPairOD=False, printInterval=1,printDriversPerRoute=False):
+                 printPairOD=False, printInterval=1,printDriversPerRoute=False,TABLE_INITIAL_STATE='zero'):
         self.printDriversPerLink = printDriversPerLink
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
@@ -46,6 +46,7 @@ class Experiment:
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
 	self.printDriversPerRoute = printDriversPerRoute #New flag
+	self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
 
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
@@ -345,7 +346,7 @@ class Experiment:
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,"zero") #Change for "Coupling" to use TABLE_FILL
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE) #Change for "Coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
@@ -377,7 +378,7 @@ class Experiment:
         self.alpha = alpha
         self.decay = decay
         if(useQL):
-            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha,TABLE_FILL,"zero")
+            self.ql = QL(self,self.drivers, self.k, self.decay,self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)
