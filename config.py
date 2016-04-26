@@ -21,6 +21,7 @@ printDriversPerRoute = False #new flag
 printInterval = 1
 network = OW10_1_NETWORK
 network_od = OW10_1_NETWORK_OD
+QL_TABLE_STATE = "zero" ##How to initiate the Qtable
 
 generations = 10
 population = 100
@@ -46,10 +47,11 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
+    print "i'm here"
     ex = Experiment(k, network, network_capacity, network_od, group_size,
     printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
-    printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute)
-
+    printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
+    print "i'm here too"
     if(experimentType==2): #GA only
         print("Running GA Only")
         print(mutation)
@@ -63,11 +65,12 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
         print("Running GA<->QL ")
         ex.run_ga_ql(True,True, generations, population, crossover,
                       mutation, elite_size, alpha, decay, interval)
-
     ##FOR QL only use this method:
     elif(experimentType==1): # QL only
-        print("Running QL Only ")
+	print "i'm here also"        
+	print("Running QL Only ")
         ex.run_ql(generations, alpha, decay)
+	
 
 def buildArgs():
     """
