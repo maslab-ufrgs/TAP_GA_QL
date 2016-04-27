@@ -346,7 +346,7 @@ class Experiment:
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE) #Change for "Coupling" to use TABLE_FILL
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE)
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
