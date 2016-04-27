@@ -20,16 +20,29 @@ class QL():
 	self.tableFill = tableFill
         self.numdrivers=len(drivers)
         if iniTable == "zero":
+        	print "Generating Q-Table with zeros."
         	for i in range(self.numdrivers):
             		self.qtable.append([0.0]*k)
 	elif iniTable == "coupling": #New way to fill the table
-		print "Generating with mean coupling!"
+		print "Generating Q-Table with mean coupling."
 		for d in drivers:
 			string = []			
 			for r in range(len(d.od.paths)):
 						
 				string.append(-1*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
 				              		
+			self.qtable.append(string)
+	elif iniTable == "random":
+		print "Generating Q-Table with random values."
+		MAX = 0		
+		for key in self.tableFill:
+			for t in self.tableFill[key]:
+				if MAX <= t:
+					MAX = t
+		for i in range(self.numdrivers):
+			string = []			
+			for t in range(self.k):
+				string.append(-1*(random.uniform(0,round(MAX)))) 		
 			self.qtable.append(string)
     
     ##runs one episode of ql
