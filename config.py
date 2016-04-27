@@ -47,11 +47,9 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-    print "i'm here"
     ex = Experiment(k, network, network_capacity, network_od, group_size,
     printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
     printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
-    print "i'm here too"
     if(experimentType==2): #GA only
         print("Running GA Only")
         print(mutation)
@@ -67,7 +65,6 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
                       mutation, elite_size, alpha, decay, interval)
     ##FOR QL only use this method:
     elif(experimentType==1): # QL only
-	print "i'm here also"        
 	print("Running QL Only ")
         ex.run_ql(generations, alpha, decay)
 	
