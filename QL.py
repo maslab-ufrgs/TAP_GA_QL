@@ -22,7 +22,7 @@ class QL():
         if iniTable == "zero":
         	for i in range(self.numdrivers):
             		self.qtable.append([0.0]*k)
-	elif iniTable == "Coupling": #New way to fill the table
+	elif iniTable == "coupling": #New way to fill the table
 		print "Generating with mean coupling!"
 		for d in drivers:
 			string = []			
