@@ -1,11 +1,5 @@
 from Experiment import Experiment
 from multiprocessing import Pool
-##
-OW10_1_NETWORK = "networks/OW10_1.kspnet.txt"
-OW10_1_NETWORK_OD = "networks/OW10_1.od.txt"
-SF_NETWORK = "networks/SF.kspnet.txt"
-SF_CAPACITY = "networks/SF.capacity.txt"
-SF_NETWORK_OD = "networks/SF.od.txt"
 
 DEBUG = True
 
@@ -13,16 +7,13 @@ def echo(msg):
   if DEBUG:
     print(msg)
 
-network_capacity = SF_CAPACITY
 printTravelTime = False
 printDriversPerLink = False
 printPairOD = False
 printDriversPerRoute = False #new flag
 printInterval = 1
-network = OW10_1_NETWORK
-network_od = OW10_1_NETWORK_OD
 QL_TABLE_STATE = "zero" ##How to initiate the Qtable
-
+networkName = "OW10_1" ##Network name now will be an input
 generations = 10
 population = 100
 repetitions = 1
@@ -47,7 +38,11 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-    ex = Experiment(k, network, network_capacity, network_od, group_size,
+    network = "networks/"+str(networkName)+"/"+str(networkName)+".kspnet.txt"
+    network_od = "networks/"+str(networkName)+"/"+str(networkName)+".od.txt"
+    network_capacity = "networks/"+str(networkName)+"/"+str(networkName)+".capacity.txt"
+
+    ex = Experiment(k, network, network_capacity, network_od, group_size,networkName,
     printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
     printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
     if(experimentType==2): #GA only
@@ -64,7 +59,7 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
         ex.run_ga_ql(True,True, generations, population, crossover,
                       mutation, elite_size, alpha, decay, interval)
     ##FOR QL only use this method:
-    elif(experimentType==1): # QL only
+    elif(experimentType==1): # QL only       
 	print("Running QL Only ")
         ex.run_ql(generations, alpha, decay)
 	
