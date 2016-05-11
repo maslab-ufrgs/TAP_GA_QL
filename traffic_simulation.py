@@ -1,15 +1,14 @@
 """
-Traffic Assignment Problem v6.0.1-beta
+Traffic Assignment Problem v6.1.0
 """
 import config
 import argparse
 #new version
 p = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                             description="""
-                            Traffic Assignment Problem v6.0.1-beta
+                            Traffic Assignment Problem v6.1.0
                             Script to run the simulation of
-                            drivers going from different points in the OW10_1
-                            and SF networks""")
+                            drivers going from different points in a given network""")
 
 p.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file")
@@ -56,8 +55,8 @@ p.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
 p.add_argument("--repetitions", type=int, default=1,
                help="How many times it should be repeated")
 
-p.add_argument("--net", type=unicode, choices=['OW10_1', 'SF'], default='OW10_1',
-               help="Which network should be used")
+p.add_argument("--net", type=unicode, default='OW10_1',
+               help="The name of the network to be used")
 
 p.add_argument("--experimentType", type=int, choices=[1,2,3,4], default=1,
                help="""
@@ -73,23 +72,16 @@ p.add_argument("-e", "--elite_size", type=int, default=5,
 p.add_argument("--number-of-processes", type=int, default=1,
                help="How many parallel processes should be used to run the experiment configurations")
 p.add_argument("--ql-table-initiation", type=unicode,choices=['zero','coupling','random'],default='zero',
-               help="How to initiate the QL table.")
+               help="How to initiate the Q-Table.")
 
 a = p.parse_args()
 
-networks = {
-  'OW10_1': (config.OW10_1_NETWORK, config.OW10_1_NETWORK_OD),
-  'SF': (config.SF_NETWORK, config.SF_NETWORK_OD)
-}
-
+config.networkName = a.net
 config.printTravelTime = a.printTravelTime
 config.printDriversPerLink = a.printDriversPerLink
 config.printPairOD = a.printPairOD
 config.printInterval = a.printInterval
 config.printDriversPerRoute = a.printDriversPerRoute ##New flag!
-
-config.network = networks[a.net][0]
-config.network_od = networks[a.net][1]
 
 config.generations = a.generations
 config.population = a.population
