@@ -34,14 +34,14 @@ class OD():
 
 class Experiment:
 
-    def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,
-                 printTravelTime=False, printDriversPerLink=False,
+    def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,networkName,
+       		 printTravelTime=False, printDriversPerLink=False,
                  printPairOD=False, printInterval=1,printDriversPerRoute=False,TABLE_INITIAL_STATE='zero'):
         self.printDriversPerLink = printDriversPerLink
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
         self.printInterval = printInterval
-        self.networkName = "OW10_1" if "OW10_1" in networkFile else SF_NETWORK_NAME
+        self.networkName = networkName
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
@@ -346,7 +346,7 @@ class Experiment:
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE)
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,TABLE_FILL,self.TABLE_INITIAL_STATE) #Change for "coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
