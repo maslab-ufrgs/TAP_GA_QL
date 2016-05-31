@@ -55,6 +55,19 @@ python traffic_simulation.py --network "SF" --printPairOD
 python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0.003 0.03
 ```
 
+* Run an experiment with the *SF* network using alphas 0.3 and 0.4,
+decays 0.9 and 0.99 and 1000 generations.
+
+```sh
+python traffic_simulation.py --network "SF" --alphas 0.3 0.4 --decays 0.9 0.99 --generations 1000
+```
+
+* Run an QL experiment with the *OW10_1* network initiating the QL-table with random values.
+
+```sh
+python traffic_simulation.py --network "OW10_1" --experimentType 1 --ql-table-initiation random
+```
+
 Options
 =======
 
@@ -69,7 +82,7 @@ optional arguments:
   -o, --printPairOD     Print the average travel time for in the header in the
                         output file (default: False)
   --printDriversPerRoute     
-                        Prints the amount of drivers per route of each OD pair
+                        Prints the amount of drivers per route of each OD pair(default:False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
                         output file (default: 1)
@@ -101,7 +114,7 @@ optional arguments:
                         [None])
   --repetitions REPETITIONS
                         How many times it should be repeated (default: 1)
-  --net {OW10_1,SF}     Which network should be used (default: OW10_1)
+  --net [NETWORK_NAME]  Which network should be used (default: OW10_1)
   --experimentType {1,2,3,4}
                         1 - QL only 2 - GA only 3 - QL builds solution for GA
                         4 - GA and QL exchange solutions (default: 1)
@@ -111,4 +124,6 @@ optional arguments:
   --number-of-processes NUMBER_OF_PROCESSES
                         How many parallel processes should be used to run the
                         experiment configurations (default: 1)
+  --ql-table-initiation {zero,coupling,random}
+                        Defines what values the QL-table will be initiated with.(default: zero)
 ```
