@@ -3,8 +3,14 @@ from GA import GA
 from QL import QL
 from time import localtime
 import KSP
+import string
+from py_expression_eval import Parser 
 
 SF_NETWORK_NAME = "SF"
+
+#This is a hardcoded coupling data for an specific experiment with k=5
+# and it is used when the flag --ql-table-initiation is initiated with "coupling"
+#In the future this is need to be read from a file
 TABLE_FILL = {"A|L":[36.84,39.47,23.68,30.70,31.58],"A|M":[31.58,37.89,32.63,22.37,35.53],"B|L":[27.37,27.63,32.46,33.68,21.05],"B|M":[21.05,27.63,20.00,18.95,28.42]}
 
 class Driver():
@@ -32,6 +38,36 @@ class OD():
                 "number of travels: " + str(self.numTravels) + " number of shortest paths: " \
                 + str(self.numPaths)
 
+# represents a node in the graph
+class Node:
+	def __init__(self, name):
+		self.name = name	# name of the node
+		self.dist = 1000000	# distance to this node from start node
+		self.prev = None	# previous node to this node
+		self.flag = 0		# access flag
+
+# represents an edge in the graph
+class Edge:
+	def __init__(self, u, v, length,cost_formula):
+		self.start = u
+		self.end = v
+		self.length = length #FreeFlow of the edge
+		self.cost_formula = cost_formula #cost formula of the edge
+	
+	def eval_cost(self,f):
+	
+		p = Parser()
+		exp = p.parse(self.cost_formula)
+	
+		return exp.evaluate({'f':f})
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 class Experiment:
 
     def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,networkName,
@@ -47,18 +83,192 @@ class Experiment:
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
 	self.printDriversPerRoute = printDriversPerRoute #New flag
 	self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
+    
+    #Read the new .net file
+    def generateGraphNew(self,graph_file):
+	V = []
+	E = []
+	F = {}
+	ODlist = []
+	fname = open(graph_file, "r")
+	line = fname.readline()
+	print line	
+	line = line[:-1]
+	while line:
+		taglist = string.split(line)
+		if taglist[0] == 'function':
+			variables = []
+			variables = taglist[2].replace("(","")
+			variables = variables.replace(")","")
+			variables = variables.split(",")
+			F[taglist[1]] = [taglist[3],variables]
+		elif taglist[0] == 'node':
+			V.append(Node(taglist[1]))
+		elif taglist[0] == 'arc':			
+			constants = []
+			cost_formula = "" 
+			freeflow_cost = 0
+			constant_acc = 0
+
+			if len(taglist) > 5:
+				i = 5
+				while i <= (len(taglist)-1):
+					constants.append(taglist[i])
+					i+=1
+				freeflow_index=0
+				p = Parser()
+				exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+				LV = exp.variables()
+				buffer_LV = []
+				for l in LV:
+					if l not in F[taglist[4]][1]:
+						constant_acc+=1
+						buffer_LV.append(l)
+				
+				#check if the formula has any parameters(variables)				
+				flag = False
+				for v in F[taglist[4]][1]:
+					if v in LV:
+						flag = True
+				
+				buffer_dic = {}
+				i = 0
+				for index in range(constant_acc):
+					buffer_dic[buffer_LV[index]] = float(constants[index])
+					i = 1	
+				
+				if not flag:
+					freeflow_cost = exp.evaluate(buffer_dic)
+					cost_formula = str(freeflow_cost)
+				elif is_number(F[taglist[4]][0]):
+								
+					freeflow_cost = float(F[taglist[4]][0])					
+					cost_fomula = F[taglist[4]][0]
+				
+				else:				
+					exp = exp.simplify(buffer_dic)					
+					cost_formula = exp.toString()
+					exp = Parser()
+					exp = exp.parse(cost_formula)					
+					freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
+	
+				E.append(Edge(taglist[2], taglist[3],cost_formula,freeflow_cost))		
+			else:
+				
+				cost_formula = "" 
+				freeflow_cost = 0
+				p = Parser()
+				
+				if is_number(F[taglist[4]][0]):
+					cost_formula = F[taglist[4]][0]
+					freeflow_cost = float(F[taglist[4]][0])
+				else:
+					exp = p.parse(F[taglist[4]][0])
+					cost_formula = exp.toString()
+					freeflow_cost = exp.evaluate({'f':0})
+				
+				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))	
+		elif taglist[0] == 'edge':
+			constants = []
+			cost_formula = "" 
+			freeflow_cost = 0
+			constant_acc = 0
+
+			if len(taglist) > 5:
+				i = 5
+				while i <= (len(taglist)-1):
+					constants.append(taglist[i])
+					i+=1
+				freeflow_index=0
+				p = Parser()
+				exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+				LV = exp.variables()
+				buffer_LV = []
+				for l in LV:
+					if l not in F[taglist[4]][1]:
+						constant_acc+=1
+						buffer_LV.append(l)
+				
+				#check if the formula has any parameters(variables)				
+				flag = False
+				for v in F[taglist[4]][1]:
+					if v in LV:
+						flag = True
+				
+				buffer_dic = {}
+				i = 0
+				for index in range(constant_acc):
+					buffer_dic[buffer_LV[index]] = float(constants[index])
+					i = 1	
+				
+				if not flag:
+					freeflow_cost = exp.evaluate(buffer_dic)
+					cost_formula = str(freeflow_cost)
+				elif is_number(F[taglist[4]][0]):
+													
+					freeflow_cost = float(F[taglist[4]][0])					
+					cost_fomula = F[taglist[4]][0]
+				
+				else:					
+					exp = exp.simplify(buffer_dic)			
+					cost_formula = exp.toString()
+					exp = Parser()
+					exp = exp.parse(cost_formula)					
+					freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
+
+				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+				E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))			
+			else:
+				
+				cost_formula = "" 
+				freeflow_cost = 0
+				p = Parser()
+				
+				if is_number(F[taglist[4]][0]):
+					cost_formula = F[taglist[4]][0]
+
+					freeflow_cost = float(F[taglist[4]][0])
+				else:
+					exp = p.parse(F[taglist[4]][0])
+					cost_formula = exp.toString()
+					freeflow_cost = exp.evaluate({'f':0})#hardcoded
+				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+				E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))					
+		elif taglist[0] == 'od':
+			ODlist.append((taglist[2],taglist[3],int(taglist[4])))
+
+		line = fname.readline()
+		line = line[:-1]
+	fname.close()
+	
+	for e in E:
+
+		print "Edge " + str(e.start)+"-"+str(e.end)+" has length: " + str(e.length)
+	return V, E, F,ODlist
 
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
 
         self.networkSet = True
         self.k = k
         self.groupsize = groupSize
-        odInput = self.parseODfile(odFile)
         self.ODlist = []
 	self.ODL = []	
 	self.ODheader = ""
 	self.ODtable = {}
-        for tupOD in odInput:
+	
+        if self.networkName == SF_NETWORK_NAME:
+            print("Parsing capacity file: %s" % capacitiesFile)
+            self.capacities = self.parseCapacityFile(capacitiesFile)
+
+	#This parses the new .net file
+	#returns the vertices,edges,the function cost(not used anymore) and the list of OD pairs
+	self.Vo,self.Eo,self.F,odInputo = self.generateGraphNew(networkFile)
+	
+	#Old version
+	#self.V,self.E,odInput = KSP.generateGraph(networkFile)
+        
+
+	for tupOD in odInputo:
             if(tupOD[2]%self.groupsize!=0):
                 print(tupOD[2])
                 raise Exception("Error: number of travels is not a multiple of the group size \
@@ -72,33 +282,27 @@ class Experiment:
 				self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
 			else:
 				self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
-	#print "Header: " + self.ODheader
-	#print self.ODL
-	
+
 	for od in self.ODL:
 	    listRoutes = []		
 	    for r in range(self.k):	    
 		listRoutes.append(0)	
 	    self.ODtable[str(od)] = listRoutes
-	#print self.ODtable #step 1
-			
-        if self.networkName == SF_NETWORK_NAME:
-            print("Parsing capacity file: %s" % capacitiesFile)
-            self.capacities = self.parseCapacityFile(capacitiesFile)
 
-        #calculating k shortest routes for each OD pair
-        V,E = KSP.generateGraph(networkFile)
-        for od in self.ODlist:
-            od.paths = KSP.getKRoutes(V, E, od.o, od.d, od.numPaths)
+	#Get the k shortest routes
+        print "getKRoutes"	
+	for od in self.ODlist:
+            od.paths = KSP.getKRoutes(self.Vo, self.Eo, od.o, od.d, od.numPaths)
+
 
         ##get the value of each link - free flow travel time
         self.freeFlow={}
-        for edge in E:
+        for edge in self.Eo:
             self.freeFlow[edge.start+"|"+edge.end]=edge.length
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
-        self.edges = self.parseCapacityFile(networkFile)
+        #self.edges = self.parseCapacityFile(networkFile)
 
         #creates different drivers according to the number of travels of each OD
         #instance
@@ -190,9 +394,11 @@ class Experiment:
         returns the string of OD pair data
         """
         str_od = ''
-
         for k in ttByOD.keys():
-            str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
+	    if len(ttByOD[k]) == 0:
+		str_od = '0'
+            else:
+		str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
 
         return str_od + ' '
 
@@ -206,13 +412,13 @@ class Experiment:
             else:
                 self.outputFile.write(str(stepNumber)+" "+ str(qlTT))
 
-            if(self.printPairOD):
+	    if(self.printPairOD):
                 ttByOD = self.travelTimeByOD(stepSolution)
                 self.outputFile.write(self.buildODPairData(ttByOD))
 
-            if(self.printTravelTime):
+	    if(self.printTravelTime):
                 travel_times = ''
-                edges = self.calculateEdgesTravelTimes(stepSolution)
+                edges = self.calculateEdgesTravelTimesnew(stepSolution)
                 for edge in self.edgeNames:
                     travel_times += str(edges[edge]) + " "
                 self.outputFile.write(travel_times.strip()+" ")
@@ -358,7 +564,8 @@ class Experiment:
         self.outputFile.write(headerstr+'\n')
 
 	for episode in range(numEpisodes):
-            (instance, value) = self.ql.runEpisode()
+	    print "episode " +str(episode)
+	    (instance, value) = self.ql.runEpisode()
             self.__print_step(episode,instance,qlTT=value)
 
         print("Output file location: %s" % filenamewithtag)
@@ -437,9 +644,10 @@ class Experiment:
             d["%s%s" % (od.o, od.d)] = []
         return d
 
-    def travelTimeByOD(self, stringOfActions):
-        edgesTravelTimes = self.calculateEdgesTravelTimes(stringOfActions)
-        odTravelTimeDict = self.initTravelTimeByODDict()
+    def travelTimeByOD(self, stringOfActions):      
+	edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
+      
+	odTravelTimeDict = self.initTravelTimeByODDict()
 
         for driverIdx, action in enumerate(stringOfActions):
             path = self.drivers[driverIdx].od.paths[action][0]
@@ -451,7 +659,7 @@ class Experiment:
 
     def calculateIndividualTravelTime(self, stringOfActions):
         #returns list of travel times for each driver
-        edgesTravelTimes = self.calculateEdgesTravelTimes(stringOfActions)
+        edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
         results = []
         for driverIdx, action in enumerate(stringOfActions):
             travel_times = self.evaluateActionTravelTime(driverIdx, action, edgesTravelTimes)
@@ -475,6 +683,23 @@ class Experiment:
           else:
               edges_travel_times[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
         return edges_travel_times
+    
+    
+    #THIS IS THE NEW EVALUATE FUNCTION(THE ONE ABOVE IS NOT USED ANYMORE)
+    #EACH EDGE OF THE NETWORK HAS ITS OWN COST FUNCTION NOW.
+    def calculateEdgesTravelTimesNew(self, stringOfActions): #New Version
+	edges_travel_times = {}
+	#Get the flow of that edge
+	linkOccupancy = self.driversPerLink(stringOfActions)
+	#For each edge	
+	for edge in self.Eo:			
+		p = Parser()
+		exp = p.parse(edge.cost_formula)
+		#Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
+		edges_travel_times[edge.start+"|"+edge.end] = edge.eval_cost(linkOccupancy[edge.start+"|"+edge.end])
+	return edges_travel_times
+	
+		
 
     def calculateAverageTravelTime(self,stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
