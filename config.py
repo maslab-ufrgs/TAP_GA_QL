@@ -38,7 +38,7 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-    network = "networks/"+str(networkName)+"/"+str(networkName)+".kspnet.txt"
+    network = "networks/"+str(networkName)+"/"+str(networkName)+".net"
     network_od = "networks/"+str(networkName)+"/"+str(networkName)+".od.txt"
     network_capacity = "networks/"+str(networkName)+"/"+str(networkName)+".capacity.txt"
 
