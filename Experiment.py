@@ -18,7 +18,23 @@ SF_NETWORK_NAME = "SF"
 TABLE_FILL = {"A|L":[36.84,39.47,23.68,30.70,31.58],"A|M":[31.58,37.89,32.63,22.37,35.53],"B|L":[27.37,27.63,32.46,33.68,21.05],"B|M":[21.05,27.63,20.00,18.95,28.42]}
 
 class Driver:
-    #od:OD = instance of OD class
+    '''
+    Represents a driver in the network.
+
+    Input:
+    od: OD = instance of OD class
+
+    >>> isinstance(Driver(OD(1, 2, 8, 15)), Driver)
+    True
+    >>> isinstance(Driver(1), Driver)
+    True
+    >>> isinstance(Driver(OD(1, 2, 8, 15)).od, OD)
+    True
+
+    Test #3 is wrong because you don't really need to pass an OD object to the constructor.
+    >>> Driver(OD(1, 2, 8, 15)).od_s()
+    '12'
+    '''
     def __init__(self, OD):
         self.od = OD
 
@@ -26,10 +42,32 @@ class Driver:
         return "%s%s" % (self.od.o, self.od.d)
 
 class OD:
-    #O:string = origin node
-    #D:string = destination node
-    #numPath: int = number of shortest paths to generate
-    #numTravels: int = number of travels
+    '''
+    Represents an origin-destination pair, where:
+
+    Inputs:
+    O: string = origin node
+    D: string = destination node
+    numPath: int = number of shortest paths to generate
+    numTravels: int = number of travels
+    
+    Tests to verify the attributes:
+    >>> isinstance(OD('A', 'B', 5, 100), OD)
+    True
+    >>> OD('A', 'B', 5, 100).o
+    'A'
+    >>> OD('A', 'B', 5, 100).d
+    'B'
+    >>> OD('A', 'B', 5, 100).numPaths
+    5
+    >>> OD('A', 'B', 5, 100).numTravels
+    100
+    >>> OD('A', 'B', 5, 100).paths
+
+    Test for the __str__ method:
+    >>> print OD('A', 'B', 5, 100)
+    Origin: A, Destination: B, Number of travels: 100, Number of shortest paths: 5
+    '''
     def __init__(self, O, D, numPaths, numTravels):
         self.o = O
         self.d = D
@@ -38,8 +76,8 @@ class OD:
         self.paths = None
 
     def __str__(self):
-        return "origin: " + str(self.o) + " destination: "+str(self.d) + \
-                "number of travels: " + str(self.numTravels) + " number of shortest paths: " \
+        return "Origin: " + str(self.o) + ", Destination: "+str(self.d) + \
+                ", Number of travels: " + str(self.numTravels) + ", Number of shortest paths: " \
                 + str(self.numPaths)
 
 class Node:
