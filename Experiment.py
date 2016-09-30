@@ -12,9 +12,11 @@ from py_expression_eval import Parser
 
 SF_NETWORK_NAME = "SF"
 
-#This is a hardcoded coupling data for an specific experiment with k=5
-# and it is used when the flag --ql-table-initiation is initiated with "coupling"
-#In the future this is need to be read from a file
+'''
+This is a hardcoded coupling data for an specific experiment with k=5
+and it is used when the flag --ql-table-initiation is initiated with "coupling".
+In the future this is needed to be read from a file.
+'''
 TABLE_FILL = {"A|L":[36.84,39.47,23.68,30.70,31.58],"A|M":[31.58,37.89,32.63,22.37,35.53],"B|L":[27.37,27.63,32.46,33.68,21.05],"B|M":[21.05,27.63,20.00,18.95,28.42]}
 
 class Driver:
@@ -35,6 +37,7 @@ class Driver:
     >>> Driver(OD(1, 2, 8, 15)).od_s()
     '12'
     '''
+
     def __init__(self, OD):
         self.od = OD
 
@@ -63,11 +66,18 @@ class OD:
     >>> OD('A', 'B', 5, 100).numTravels
     100
     >>> OD('A', 'B', 5, 100).paths
+    >>> isinstance(OD(1, 2, 3, 4).o, int)
+    True
+    >>> isinstance(OD('A', 'B', 5, 100).o, str)
+    True
+
+    Tests #7 and #8 sugests that self.o and self.d need to be more strictly controlled, perhaps converting the O  and the D to a string.
 
     Test for the __str__ method:
     >>> print OD('A', 'B', 5, 100)
     Origin: A, Destination: B, Number of travels: 100, Number of shortest paths: 5
     '''
+
     def __init__(self, O, D, numPaths, numTravels):
         self.o = O
         self.d = D
@@ -84,6 +94,9 @@ class Node:
     '''
     Represents a node in the graph.
 
+    Input:
+    name: string = name of the node
+
     These are the tests to verify if the object is being instantiated as it should:
     >>> isinstance(Node('nome'), Node)
     True
@@ -94,25 +107,62 @@ class Node:
     >>> Node('nome').prev
     >>> Node('nome').flag
     0
+    >>> isinstance(Node(1).name, int)
+    True
+    >>> isinstance(Node('nome').name, str)
+    True
+
+    Tests #6 and #7 have the same observation as the tests #7 and #8 of the OD class.
     '''
+
     def __init__(self, name):
-        self.name = name	# name of the node
+        self.name = name
         self.dist = 1000000	# distance to this node from start node
         self.prev = None	# previous node to this node
         self.flag = 0		# access flag
 
-# represents an edge in the graph
 class Edge:
-    def __init__(self, u, v, length,cost_formula):
+    '''
+    Represents an edge in the graph.
+
+    Inputs:
+    u: string = start node of the edge
+    v: string = end node of the edge
+    length: float = length of the edge
+    cost_formula: string = cost formula of the edge
+    var_value: float = value for the function to calculate the cost_formula
+
+    >>> isinstance(Edge('a', 'b', 11, '12+5*t'), Edge)
+    True
+    >>> Edge('a', 'b', 11, '12+5t').start
+    'a'
+    >>> Edge('a', 'b', 11, '12+5t').end
+    'b'
+    >>> Edge('a', 'b', 11, '12+5t').length
+    11
+    >>> Edge('a', 'b', 11, '12+5*t').cost_formula
+    '12+5*t'
+
+    The eval_cost method calculates the value of the cost formula for a given var_value:
+    WARNING: the variable in the function MUST be f.
+    >>> Edge(1, 2, 3, '5+5*f').eval_cost(5.0)
+    30.0
+    >>> Edge(1, 2, 3, '5+5*t').eval_cost(5.0)
+    Traceback (most recent call last):
+    ...
+    Exception: undefined variable: t
+    '''
+
+    def __init__(self, u, v, length, cost_formula):
         self.start = u
         self.end = v
-        self.length = length #FreeFlow of the edge
-        self.cost_formula = cost_formula #cost formula of the edge
+        self.length = length #FreeFlow of the edge (?)
+        self.cost_formula = cost_formula 
 
-    def eval_cost(self,f):
+    def eval_cost(self, var_value):
         p = Parser()
         exp = p.parse(self.cost_formula)
-        return exp.evaluate({'f':f})
+        return exp.evaluate({'f':var_value})
 
 def is_number(s):
     try:
@@ -209,7 +259,7 @@ class Experiment:
                         exp = exp.parse(cost_formula)
                         freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],cost_formula,freeflow_cost))
+                    E.append(Edge(taglist[2], taglist[3], cost_formula, freeflow_cost))
 
                 else:		
                     cost_formula = "" 
@@ -224,7 +274,7 @@ class Experiment:
                         cost_formula = exp.toString()
                         freeflow_cost = exp.evaluate({'f':0})
 
-                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+                    E.append(Edge(taglist[2], taglist[3], freeflow_cost, cost_formula))
 
             elif taglist[0] == 'edge':
                 constants = []
