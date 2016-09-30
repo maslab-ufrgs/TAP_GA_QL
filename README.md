@@ -9,8 +9,8 @@ Warning
 
 Dependencies
 ============
- * python 2.7
- * [pyevolve](https://sourceforge.net/projects/pyevolve/)
+ * [Python 2.7](https://www.python.org/downloads/)
+ * [Pyevolve](https://sourceforge.net/projects/pyevolve/)
  * [Python Mathematical Expression Evaluator](https://pypi.python.org/pypi/py_expression_eval)
 
 Usage
@@ -18,6 +18,10 @@ Usage
 
 ```sh
 python traffic_simulation.py [OPTIONS]
+```
+Or:
+```sh
+./traffic_simulation.py [OPTIONS]
 ```
 
 All the options have usable defaults so check them before running a experiment.
