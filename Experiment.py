@@ -1,3 +1,7 @@
+'''
+    Use spaces instead of tabs, or configure your editor to transform tab to 4 spaces.
+'''
+
 import os
 from GA import GA
 from QL import QL
@@ -40,26 +44,24 @@ class OD():
 
 # represents a node in the graph
 class Node:
-	def __init__(self, name):
-		self.name = name	# name of the node
-		self.dist = 1000000	# distance to this node from start node
-		self.prev = None	# previous node to this node
-		self.flag = 0		# access flag
+    def __init__(self, name):
+        self.name = name	# name of the node
+        self.dist = 1000000	# distance to this node from start node
+        self.prev = None	# previous node to this node
+        self.flag = 0		# access flag
 
 # represents an edge in the graph
 class Edge:
-	def __init__(self, u, v, length,cost_formula):
-		self.start = u
-		self.end = v
-		self.length = length #FreeFlow of the edge
-		self.cost_formula = cost_formula #cost formula of the edge
-	
-	def eval_cost(self,f):
-	
-		p = Parser()
-		exp = p.parse(self.cost_formula)
-	
-		return exp.evaluate({'f':f})
+    def __init__(self, u, v, length,cost_formula):
+        self.start = u
+        self.end = v
+        self.length = length #FreeFlow of the edge
+        self.cost_formula = cost_formula #cost formula of the edge
+
+    def eval_cost(self,f):
+        p = Parser()
+        exp = p.parse(self.cost_formula)
+        return exp.evaluate({'f':f})
 
 def is_number(s):
     try:
@@ -71,8 +73,10 @@ def is_number(s):
 class Experiment:
 
     def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,networkName,
-       		 printTravelTime=False, printDriversPerLink=False,
-                 printPairOD=False, printInterval=1,printDriversPerRoute=False,TABLE_INITIAL_STATE='zero'):
+                printTravelTime=False, printDriversPerLink=False,
+                printPairOD=False, printInterval=1, 
+                printDriversPerRoute=False, TABLE_INITIAL_STATE='zero'):
+
         self.printDriversPerLink = printDriversPerLink
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
@@ -81,194 +85,191 @@ class Experiment:
         self.networkSet = False
         self.edges = {}
         self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
-	self.printDriversPerRoute = printDriversPerRoute #New flag
-	self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
-    
+        self.printDriversPerRoute = printDriversPerRoute #New flag
+        self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
+
     #Read the new .net file
     def generateGraphNew(self,graph_file):
-	V = []
-	E = []
-	F = {}
-	ODlist = []
-	fname = open(graph_file, "r")
-	line = fname.readline()
-	print line	
-	line = line[:-1]
-	while line:
-		taglist = string.split(line)
-		if taglist[0] == 'function':
-			variables = []
-			variables = taglist[2].replace("(","")
-			variables = variables.replace(")","")
-			variables = variables.split(",")
-			F[taglist[1]] = [taglist[3],variables]
-		elif taglist[0] == 'node':
-			V.append(Node(taglist[1]))
-		elif taglist[0] == 'arc':			
-			constants = []
-			cost_formula = "" 
-			freeflow_cost = 0
-			constant_acc = 0
+        V = []
+        E = []
+        F = {}
+        ODlist = []
+        fname = open(graph_file, "r")
+        line = fname.readline()
+        print line	
+        line = line[:-1]
+        while line:
+            taglist = string.split(line)
+            if taglist[0] == 'function':
+                variables = []
+                variables = taglist[2].replace("(","")
+                variables = variables.replace(")","")
+                variables = variables.split(",")
+                F[taglist[1]] = [taglist[3],variables]
 
-			if len(taglist) > 5:
-				i = 5
-				while i <= (len(taglist)-1):
-					constants.append(taglist[i])
-					i+=1
-				freeflow_index=0
-				p = Parser()
-				exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
-				LV = exp.variables()
-				buffer_LV = []
-				for l in LV:
-					if l not in F[taglist[4]][1]:
-						constant_acc+=1
-						buffer_LV.append(l)
-				
-				#check if the formula has any parameters(variables)				
-				flag = False
-				for v in F[taglist[4]][1]:
-					if v in LV:
-						flag = True
-				
-				buffer_dic = {}
-				i = 0
-				for index in range(constant_acc):
-					buffer_dic[buffer_LV[index]] = float(constants[index])
-					i = 1	
-				
-				if not flag:
-					freeflow_cost = exp.evaluate(buffer_dic)
-					cost_formula = str(freeflow_cost)
-				elif is_number(F[taglist[4]][0]):
-								
-					freeflow_cost = float(F[taglist[4]][0])					
-					cost_fomula = F[taglist[4]][0]
-				
-				else:				
-					exp = exp.simplify(buffer_dic)					
-					cost_formula = exp.toString()
-					exp = Parser()
-					exp = exp.parse(cost_formula)					
-					freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
-	
-				E.append(Edge(taglist[2], taglist[3],cost_formula,freeflow_cost))		
-			else:
-				
-				cost_formula = "" 
-				freeflow_cost = 0
-				p = Parser()
-				
-				if is_number(F[taglist[4]][0]):
-					cost_formula = F[taglist[4]][0]
-					freeflow_cost = float(F[taglist[4]][0])
-				else:
-					exp = p.parse(F[taglist[4]][0])
-					cost_formula = exp.toString()
-					freeflow_cost = exp.evaluate({'f':0})
-				
-				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))	
-		elif taglist[0] == 'edge':
-			constants = []
-			cost_formula = "" 
-			freeflow_cost = 0
-			constant_acc = 0
+            elif taglist[0] == 'node':
+                V.append(Node(taglist[1]))
 
-			if len(taglist) > 5:
-				i = 5
-				while i <= (len(taglist)-1):
-					constants.append(taglist[i])
-					i+=1
-				freeflow_index=0
-				p = Parser()
-				exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
-				LV = exp.variables()
-				buffer_LV = []
-				for l in LV:
-					if l not in F[taglist[4]][1]:
-						constant_acc+=1
-						buffer_LV.append(l)
-				
-				#check if the formula has any parameters(variables)				
-				flag = False
-				for v in F[taglist[4]][1]:
-					if v in LV:
-						flag = True
-				
-				buffer_dic = {}
-				i = 0
-				for index in range(constant_acc):
-					buffer_dic[buffer_LV[index]] = float(constants[index])
-					i = 1	
-				
-				if not flag:
-					freeflow_cost = exp.evaluate(buffer_dic)
-					cost_formula = str(freeflow_cost)
-				elif is_number(F[taglist[4]][0]):
-													
-					freeflow_cost = float(F[taglist[4]][0])					
-					cost_fomula = F[taglist[4]][0]
-				
-				else:					
-					exp = exp.simplify(buffer_dic)			
-					cost_formula = exp.toString()
-					exp = Parser()
-					exp = exp.parse(cost_formula)					
-					freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
+            elif taglist[0] == 'arc':			
+                constants = []
+                cost_formula = "" 
+                freeflow_cost = 0
+                constant_acc = 0
+                if len(taglist) > 5:
+                    i = 5
+                    while i <= (len(taglist)-1):
+                        constants.append(taglist[i])
+                        i+=1
 
-				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
-				E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))			
-			else:
+                    freeflow_index=0
+                    p = Parser()
+                    exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+                    LV = exp.variables()
+                    buffer_LV = []
+                    for l in LV:
+                        if l not in F[taglist[4]][1]:
+                            constant_acc+=1
+                            buffer_LV.append(l)
+
+                    #check if the formula has any parameters(variables)
+                    flag = False
+                    for v in F[taglist[4]][1]:
+                        if v in LV:
+                            flag = True
+
+                    buffer_dic = {}
+                    i = 0
+                    for index in range(constant_acc):
+                        buffer_dic[buffer_LV[index]] = float(constants[index])
+                        i = 1	
+
+                    if not flag:
+                        freeflow_cost = exp.evaluate(buffer_dic)
+                        cost_formula = str(freeflow_cost)
+
+                    elif is_number(F[taglist[4]][0]):
+                        freeflow_cost = float(F[taglist[4]][0])
+                        cost_fomula = F[taglist[4]][0]
+
+                    else:				
+                        exp = exp.simplify(buffer_dic)
+                        cost_formula = exp.toString()
+                        exp = Parser()
+                        exp = exp.parse(cost_formula)
+                        freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
+
+                    E.append(Edge(taglist[2], taglist[3],cost_formula,freeflow_cost))
+
+                else:		
+                    cost_formula = "" 
+                    freeflow_cost = 0
+                    p = Parser()				
+                    if is_number(F[taglist[4]][0]):
+                        cost_formula = F[taglist[4]][0]
+                        freeflow_cost = float(F[taglist[4]][0])
+
+                    else:
+                        exp = p.parse(F[taglist[4]][0])
+                        cost_formula = exp.toString()
+                        freeflow_cost = exp.evaluate({'f':0})
+
+                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+
+            elif taglist[0] == 'edge':
+                constants = []
+                cost_formula = "" 
+                freeflow_cost = 0
+                constant_acc = 0
+                if len(taglist) > 5:
+                    i = 5
+                    while i <= (len(taglist)-1):
+                        constants.append(taglist[i])
+                        i+=1
+                    freeflow_index=0
+                    p = Parser()
+                    exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+                    LV = exp.variables()
+                    buffer_LV = []
+                    for l in LV:
+                        if l not in F[taglist[4]][1]:
+                            constant_acc+=1
+                            buffer_LV.append(l)
 				
-				cost_formula = "" 
-				freeflow_cost = 0
-				p = Parser()
-				
-				if is_number(F[taglist[4]][0]):
-					cost_formula = F[taglist[4]][0]
+                    #check if the formula has any parameters(variables)
+                    flag = False
+                    for v in F[taglist[4]][1]:
+                        if v in LV:
+                            flag = True
 
-					freeflow_cost = float(F[taglist[4]][0])
-				else:
-					exp = p.parse(F[taglist[4]][0])
-					cost_formula = exp.toString()
-					freeflow_cost = exp.evaluate({'f':0})#hardcoded
-				E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
-				E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))					
-		elif taglist[0] == 'od':
-			ODlist.append((taglist[2],taglist[3],int(taglist[4])))
+                    buffer_dic = {}
+                    i = 0
+                    for index in range(constant_acc):
+                        buffer_dic[buffer_LV[index]] = float(constants[index])
+                        i = 1
 
-		line = fname.readline()
-		line = line[:-1]
-	fname.close()
-	
-	for e in E:
+                    if not flag:
+                        freeflow_cost = exp.evaluate(buffer_dic)
+                        cost_formula = str(freeflow_cost)
 
-		print "Edge " + str(e.start)+"-"+str(e.end)+" has length: " + str(e.length)
-	return V, E, F,ODlist
+                    elif is_number(F[taglist[4]][0]):
+                        freeflow_cost = float(F[taglist[4]][0])
+                        cost_fomula = F[taglist[4]][0]
+
+                    else:					
+                        exp = exp.simplify(buffer_dic)			
+                        cost_formula = exp.toString()
+                        exp = Parser()
+                        exp = exp.parse(cost_formula)
+                        freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
+
+                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+                    E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))
+
+                else:
+                    cost_formula = "" 
+                    freeflow_cost = 0
+                    p = Parser()
+                    if is_number(F[taglist[4]][0]):
+                        cost_formula = F[taglist[4]][0]
+                        freeflow_cost = float(F[taglist[4]][0])
+
+                    else:
+                        exp = p.parse(F[taglist[4]][0])
+                        cost_formula = exp.toString()
+                        freeflow_cost = exp.evaluate({'f':0})#hardcoded
+
+                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
+                    E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))
+
+            elif taglist[0] == 'od':
+                ODlist.append((taglist[2],taglist[3],int(taglist[4])))
+
+            line = fname.readline()
+            line = line[:-1]
+        fname.close()
+
+        for e in E:
+            print "Edge " + str(e.start)+"-"+str(e.end)+" has length: " + str(e.length)
+
+        return V, E, F,ODlist
 
     def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
-
         self.networkSet = True
         self.k = k
         self.groupsize = groupSize
         self.ODlist = []
-	self.ODL = []	
-	self.ODheader = ""
-	self.ODtable = {}
-	
+        self.ODL = []	
+        self.ODheader = ""
+        self.ODtable = {}
         if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
             self.capacities = self.parseCapacityFile(capacitiesFile)
 
-	#This parses the new .net file
-	#returns the vertices,edges,the function cost(not used anymore) and the list of OD pairs
-	self.Vo,self.Eo,self.F,odInputo = self.generateGraphNew(networkFile)
-	
-	#Old version
-	#self.V,self.E,odInput = KSP.generateGraph(networkFile)
-        
+        #This parses the new .net file
+        #returns the vertices, the edges,the function cost(not used anymore) and the list of OD pairs
+        self.Vo,self.Eo,self.F,odInputo = self.generateGraphNew(networkFile)
 
-	for tupOD in odInputo:
+        for tupOD in odInputo:
             if(tupOD[2]%self.groupsize!=0):
                 print(tupOD[2])
                 raise Exception("Error: number of travels is not a multiple of the group size \
@@ -276,24 +277,23 @@ class Experiment:
             else:
                 #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
-		self.ODL.append(str(tupOD[0])+str(tupOD[1]))
-		for i in range(k):		
-			if len(self.ODheader) == 0:			
-				self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
-			else:
-				self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+                self.ODL.append(str(tupOD[0])+str(tupOD[1]))
+                for i in range(k):		
+                    if len(self.ODheader) == 0:			
+                        self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+                    else:
+                        self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
 
-	for od in self.ODL:
-	    listRoutes = []		
-	    for r in range(self.k):	    
-		listRoutes.append(0)	
-	    self.ODtable[str(od)] = listRoutes
+        for od in self.ODL:
+            listRoutes = []		
+            for r in range(self.k):	    
+                listRoutes.append(0)	
+            self.ODtable[str(od)] = listRoutes
 
-	#Get the k shortest routes
+        #Get the k shortest routes
         print "getKRoutes"	
-	for od in self.ODlist:
+        for od in self.ODlist:
             od.paths = KSP.getKRoutes(self.Vo, self.Eo, od.o, od.d, od.numPaths)
-
 
         ##get the value of each link - free flow travel time
         self.freeFlow={}
@@ -312,12 +312,11 @@ class Experiment:
                 self.drivers.append(Driver(od))
 
     def cleanODtable(self):
-	for od in self.ODL:
-	    listRoutes = []		
-	    for r in range(self.k):	    
-		listRoutes.append(0)	
-	    self.ODtable[str(od)] = listRoutes
-
+        for od in self.ODL:
+            listRoutes = []
+            for r in range(self.k):	    
+                listRoutes.append(0)	
+            self.ODtable[str(od)] = listRoutes
 
     def parseODfile(self,path):
         with open(path) as odFILE:
@@ -344,13 +343,13 @@ class Experiment:
     def genCallBack(self,ga_engine):
         population = ga_engine.getPopulation()
         generation = ga_engine.getCurrentGeneration()
-	if (self.printDriversPerRoute):	
-	    #Drivers per route	
-	    for od in self.ODL:
-		listRoutes = []		
-		for r in range(self.k):	    
-		    listRoutes.append(0)	
-		self.ODtable[str(od)] = listRoutes
+        if (self.printDriversPerRoute):	
+            #Drivers per route	
+            for od in self.ODL:
+                listRoutes = []		
+                for r in range(self.k):	    
+                    listRoutes.append(0)	
+                self.ODtable[str(od)] = listRoutes
 
         #gets worst individual
         worstsol = population[len(population)-1]
@@ -386,8 +385,8 @@ class Experiment:
                 #copies QL solution to worst in population
                 worstsol.copy(ga_engine.getPopulation()[1])
                 ga_engine.getPopulation()[len(population)-1].evaluate()
-	       
-	self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
+       
+        self.__print_step(generation,ga_engine.bestIndividual().getInternalList(),avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
     def buildODPairData(self, ttByOD):
         """
@@ -395,10 +394,10 @@ class Experiment:
         """
         str_od = ''
         for k in ttByOD.keys():
-	    if len(ttByOD[k]) == 0:
-		str_od = '0'
+            if len(ttByOD[k]) == 0:
+                str_od = '0'
             else:
-		str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
+                str_od += " %4.4f" % (sum(ttByOD[k])/len(ttByOD[k]))
 
         return str_od + ' '
 
@@ -412,11 +411,11 @@ class Experiment:
             else:
                 self.outputFile.write(str(stepNumber)+" "+ str(qlTT))
 
-	    if(self.printPairOD):
+            if(self.printPairOD):
                 ttByOD = self.travelTimeByOD(stepSolution)
                 self.outputFile.write(self.buildODPairData(ttByOD))
 
-	    if(self.printTravelTime):
+            if(self.printTravelTime):
                 travel_times = ''
                 edges = self.calculateEdgesTravelTimesnew(stepSolution)
                 for edge in self.edgeNames:
@@ -429,17 +428,17 @@ class Experiment:
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
-	    
-	    if(self.printDriversPerRoute):
-		self.cleanODtable()	
-		for s in range(len(stepSolution)):
-			self.ODtable[str(self.drivers[s].od.o) + str(self.drivers[s].od.d)][stepSolution[s]] += 1
-			#print self.ODtable		
-		self.outputFile.write(" ")
-		for keys in self.ODL:##Now it prints in the correct order
-		    for x in range(len(self.ODtable[keys])):
-		        #string = string + str(ODtable[keys][x])	
-			self.outputFile.write(str(self.ODtable[keys][x]) + " ")
+
+            if(self.printDriversPerRoute):
+                self.cleanODtable()	
+                for s in range(len(stepSolution)):
+                    self.ODtable[str(self.drivers[s].od.o) + str(self.drivers[s].od.d)][stepSolution[s]] += 1
+                    #print self.ODtable		
+                self.outputFile.write(" ")
+                for keys in self.ODL:##Now it prints in the correct order
+                    for x in range(len(self.ODtable[keys])):
+                        #string = string + str(ODtable[keys][x])	
+                        self.outputFile.write(str(self.ODtable[keys][x]) + " ")
 
             self.outputFile.write("\n")
 
@@ -455,9 +454,9 @@ class Experiment:
         if(self.printDriversPerLink):
             for edgeN in self.edgeNames:
                 nodesString += "nd_"+edgeN+' '
-	if(self.printDriversPerRoute):
-		nodesString += self.ODheader        
-	nodesString = nodesString.strip()
+        if(self.printDriversPerRoute):
+            nodesString += self.ODheader
+        nodesString = nodesString.strip()
         return nodesString
 
     def nd(self):
@@ -563,9 +562,9 @@ class Experiment:
         self.outputFile = open(filenamewithtag, 'w')
         self.outputFile.write(headerstr+'\n')
 
-	for episode in range(numEpisodes):
-	    print "episode " +str(episode)
-	    (instance, value) = self.ql.runEpisode()
+        for episode in range(numEpisodes):
+            print "episode " +str(episode)
+            (instance, value) = self.ql.runEpisode()
             self.__print_step(episode,instance,qlTT=value)
 
         print("Output file location: %s" % filenamewithtag)
@@ -645,8 +644,7 @@ class Experiment:
         return d
 
     def travelTimeByOD(self, stringOfActions):      
-	edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
-      
+        edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
 	odTravelTimeDict = self.initTravelTimeByODDict()
 
         for driverIdx, action in enumerate(stringOfActions):
@@ -668,7 +666,7 @@ class Experiment:
 
     def calculateEdgesTravelTimes(self, stringOfActions):
         ###############################
-        # TRAVEL TIME FUNCTION               #
+        # TRAVEL TIME FUNCTION        #
         ###############################
         ##VDF TRAVEL TIME FUNCTION
         vdfAlpha = 0.15
@@ -683,23 +681,20 @@ class Experiment:
           else:
               edges_travel_times[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
         return edges_travel_times
-    
-    
+
     #THIS IS THE NEW EVALUATE FUNCTION(THE ONE ABOVE IS NOT USED ANYMORE)
     #EACH EDGE OF THE NETWORK HAS ITS OWN COST FUNCTION NOW.
     def calculateEdgesTravelTimesNew(self, stringOfActions): #New Version
-	edges_travel_times = {}
-	#Get the flow of that edge
-	linkOccupancy = self.driversPerLink(stringOfActions)
-	#For each edge	
-	for edge in self.Eo:			
-		p = Parser()
-		exp = p.parse(edge.cost_formula)
-		#Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
-		edges_travel_times[edge.start+"|"+edge.end] = edge.eval_cost(linkOccupancy[edge.start+"|"+edge.end])
-	return edges_travel_times
-	
-		
+        edges_travel_times = {}
+        #Get the flow of that edge
+        linkOccupancy = self.driversPerLink(stringOfActions)
+        #For each edge	
+        for edge in self.Eo:			
+            p = Parser()
+            exp = p.parse(edge.cost_formula)
+            #Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
+            edges_travel_times[edge.start+"|"+edge.end] = edge.eval_cost(linkOccupancy[edge.start+"|"+edge.end])
+        return edges_travel_times
 
     def calculateAverageTravelTime(self,stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Traffic Assignment Problem v6.1.0
 """
