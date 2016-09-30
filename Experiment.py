@@ -17,20 +17,20 @@ SF_NETWORK_NAME = "SF"
 #In the future this is need to be read from a file
 TABLE_FILL = {"A|L":[36.84,39.47,23.68,30.70,31.58],"A|M":[31.58,37.89,32.63,22.37,35.53],"B|L":[27.37,27.63,32.46,33.68,21.05],"B|M":[21.05,27.63,20.00,18.95,28.42]}
 
-class Driver():
+class Driver:
     #od:OD = instance of OD class
-    def __init__(self,OD):
+    def __init__(self, OD):
         self.od = OD
 
     def od_s(self):
         return "%s%s" % (self.od.o, self.od.d)
 
-class OD():
+class OD:
     #O:string = origin node
     #D:string = destination node
     #numPath: int = number of shortest paths to generate
     #numTravels: int = number of travels
-    def __init__(self,O,D,numPaths,numTravels):
+    def __init__(self, O, D, numPaths, numTravels):
         self.o = O
         self.d = D
         self.numPaths = numPaths
@@ -42,8 +42,21 @@ class OD():
                 "number of travels: " + str(self.numTravels) + " number of shortest paths: " \
                 + str(self.numPaths)
 
-# represents a node in the graph
 class Node:
+    '''
+    Represents a node in the graph.
+
+    These are the tests to verify if the object is being instantiated as it should:
+    >>> isinstance(Node('nome'), Node)
+    True
+    >>> Node('nome').name
+    'nome'
+    >>> Node('nome').dist
+    1000000
+    >>> Node('nome').prev
+    >>> Node('nome').flag
+    0
+    '''
     def __init__(self, name):
         self.name = name	# name of the node
         self.dist = 1000000	# distance to this node from start node
@@ -698,3 +711,14 @@ class Experiment:
 
     def calculateAverageTravelTime(self,stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
+
+'''
+To run the tests you should call from the terminal:
+python Experiment.py
+
+If the tests succeed, nothing should happen.
+Else it will show the error and where it is on the file.
+'''
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
