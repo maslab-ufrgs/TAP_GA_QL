@@ -11,6 +11,7 @@ Dependencies
 ============
  * python 2.7
  * [pyevolve](https://sourceforge.net/projects/pyevolve/)
+ * [Python Mathematical Expression Evaluator](https://pypi.python.org/pypi/py_expression_eval)
 
 Usage
 =====
