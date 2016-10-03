@@ -235,6 +235,10 @@ class Experiment:
         TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
 
         '''
+
+        self.k = k
+        self.groupSize = groupSize
+
         self.printDriversPerLink = printDriversPerLink
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
@@ -242,7 +246,7 @@ class Experiment:
         self.networkName = networkName
         self.networkSet = False
         self.edges = {}
-        self.initializeNetworkData(k, networkFile, groupSize)
+        self.initializeNetworkData(self.k, networkFile, self.groupSize)
         self.printDriversPerRoute = printDriversPerRoute #New flag
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
 
@@ -412,14 +416,28 @@ class Experiment:
         return V, E, ODlist
 
     def initializeNetworkData(self, k, networkFile, groupSize):
+        '''
+        Initialize the network data.
+
+        Inputs:
+        k: integer = Number of KSP routes to generate
+        networkFile: file = .net file
+        groupSize: integer = Size of the grouping
+
+       # >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').initializeNetworkData(8, './networks/OW10_1/OW10_1.net', 1)
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').groupSize
+        #type name formula variable
+        ...
+        1
+        '''
         self.networkSet = True
-        self.k = k
-        self.groupsize = groupSize
         self.ODlist = []
         self.ODL = []	
         self.ODheader = ""
         self.ODtable = {}
+
         '''
+        As for now it is not importing the capacities file
         if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
             self.capacities = self.parseCapacityFile(capacitiesFile)
@@ -431,13 +449,13 @@ class Experiment:
         self.Vo, self.Eo, odInputo = self.generateGraphNew(networkFile)
 
         for tupOD in odInputo:
-            if(tupOD[2]%self.groupsize!=0):
+            if(tupOD[2]%self.groupSize!=0):
                 print(tupOD[2])
                 raise Exception("Error: number of travels is not a multiple of the group size \
                         origin: "+str(tupOD[0])+" destination: "+ str(tupOD[1]))
             else:
                 #Origin,destination,number of paths, number of travels
-                self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupsize))
+                self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupSize))
                 self.ODL.append(str(tupOD[0])+str(tupOD[1]))
                 for i in range(k):		
                     if len(self.ODheader) == 0:			
@@ -621,7 +639,7 @@ class Experiment:
         return nodesString
 
     def nd(self):
-        return len(self.drivers)*self.groupsize
+        return len(self.drivers)*self.groupSize
 
     def appendTag(self, filenamewithtag):
         #tests if there isn't already a file with the desired name
@@ -648,7 +666,7 @@ class Experiment:
 
         headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                 + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
-                + ' groupsize= '+ str(self.groupsize)\
+                + ' groupsize= '+ str(self.groupSize)\
                 + '\n#episode avg_tt ' + self.nodesString()
 
         return filename, path2simulationfiles, headerstr
@@ -662,7 +680,7 @@ class Experiment:
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
                     + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupSize) \
                     + '_interval'+ str(self.interval) + '_' + str(localtime()[3])+'h'+ str(localtime()[4]) \
                     +'m'+ str(localtime()[5])+'s'
 
@@ -670,7 +688,7 @@ class Experiment:
                     + str(self.population) + ' self.mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
-                    + ' groupsize= '+ str(self.groupsize) + ' GA->QL interval=' + str(self.interval)\
+                    + ' groupsize= '+ str(self.groupSize) + ' GA->QL interval=' + str(self.interval)\
                     + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
 
         elif(useQL):
@@ -681,14 +699,14 @@ class Experiment:
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
                     + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupSize) \
                     + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
                     + ' elit=' + str(self.elite) + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
                     + ' decay=' + str(self.decay) + ' number of drivers=' + str(self.nd()) \
-                    + ' groupsize= '+ str(self.groupsize) \
+                    + ' groupsize= '+ str(self.groupSize) \
                     + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
         else:
             fmt = './results_gaql_grouped/net_%s/GA/pm%4.4f'
@@ -697,12 +715,12 @@ class Experiment:
             filenamewithtag = path2simulationfiles +  '/net'+self.networkName + '_pm'\
                     + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
                     + '_k' + str(self.k) \
-                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupsize) \
+                    + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.groupSize) \
                     + '_'+ str(localtime()[3])+'h'+ str(localtime()[4])+'m'+ str(localtime()[5])+'s'
 
             headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
                     + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' + str(self.crossover) \
-                    + ' groupsize= '+ str(self.groupsize) + " k= "+str(self.k) \
+                    + ' groupsize= '+ str(self.groupSize) + " k= "+str(self.k) \
                     + '\n#generation avg_tt ' +  self.nodesString()
 
         return filenamewithtag, path2simulationfiles, headerstr
@@ -774,7 +792,7 @@ class Experiment:
         """
         global drivers
         global freeFlow
-        global groupsize
+        global groupSize
         dicti = {}
         for inx,dr in enumerate(driverString):
             if(type(dr) != int):
@@ -782,9 +800,9 @@ class Experiment:
             path = self.drivers[inx].od.paths[dr]
             for edge in path[0]:
                 if edge in dicti.keys():
-                    dicti[edge] +=self.groupsize
+                    dicti[edge] +=self.groupSize
                 else:
-                    dicti[edge] = self.groupsize
+                    dicti[edge] = self.groupSize
         for link in self.freeFlow.keys():
             if link not in dicti.keys():
                 dicti[link]=0
