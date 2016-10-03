@@ -122,7 +122,7 @@ class Node:
 
     def __init__(self, name):
         self.name = name
-        self.dist = 1000000	# distance to this node from start node
+        self.dist = 1000000	# distance to this node from start node (?)
         self.prev = None	# previous node to this node
         self.flag = 0		# access flag
 
@@ -167,6 +167,7 @@ class Edge:
     def eval_cost(self, var_value):
         p = Parser()
         exp = p.parse(self.cost_formula)
+        #Hardcoded variable 'f'
         return exp.evaluate({'f':var_value})
 
 def is_number(s):
@@ -205,12 +206,35 @@ def is_number(s):
         return False
 
 class Experiment:
+    '''
+    Sets up an experiment.
+    '''
 
-    def __init__(self, k, networkFile, capacitiesFile, odFile, groupSize,networkName,
+    def __init__(self, k, networkFile, groupSize, networkName,
                 printTravelTime=False, printDriversPerLink=False,
                 printPairOD=False, printInterval=1, 
                 printDriversPerRoute=False, TABLE_INITIAL_STATE='zero'):
 
+        '''
+        Construct the experiment.
+
+        Inputs:
+        k: integer =  List of the 'K' hyperparameters for the KSP (K-ShortestPath) Algorithm (default: [8])
+        networkFile: file = .net file in the ./networks/ folder
+        capacitiesFile: file = .capacity.txt file in the network folder
+        odFile: file = .od.txt file in the network folder
+        groupSize: integer = List of group sizes for drivers in each configuration (default: [1])
+        networkName: string = The name of the network to be used (default: OW10_1)
+
+        printTravelTime: boolean = Print link's travel time at each iteration in the output file (default: False)
+        printDriversPerLink: boolean = Print the number of drivers in each link in the output file (default: False)
+        printPairOD: boolean = Print the average travel time for in the header in the output file (default: False)
+        printInterval: integer = Interval by which the messages are written in the output file (default: 1)
+        printDriversPerRoute: boolean = Print the amount of drivers per route of each OD pair (Warning: QL only!) (default: False)
+        
+        TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
+
+        '''
         self.printDriversPerLink = printDriversPerLink
         self.printTravelTime = printTravelTime
         self.printPairOD= printPairOD
@@ -218,12 +242,12 @@ class Experiment:
         self.networkName = networkName
         self.networkSet = False
         self.edges = {}
-        self.initializeNetworkData(k, networkFile, capacitiesFile, odFile, groupSize)
+        self.initializeNetworkData(k, networkFile, groupSize)
         self.printDriversPerRoute = printDriversPerRoute #New flag
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
 
     #Read the new .net file
-    def generateGraphNew(self,graph_file):
+    def generateGraphNew(self, graph_file):
         V = []
         E = []
         F = {}
@@ -387,7 +411,7 @@ class Experiment:
 
         return V, E, F,ODlist
 
-    def initializeNetworkData(self, k, networkFile, capacitiesFile, odFile, groupSize):
+    def initializeNetworkData(self, k, networkFile, groupSize):
         self.networkSet = True
         self.k = k
         self.groupsize = groupSize
@@ -395,13 +419,15 @@ class Experiment:
         self.ODL = []	
         self.ODheader = ""
         self.ODtable = {}
+        '''
         if self.networkName == SF_NETWORK_NAME:
             print("Parsing capacity file: %s" % capacitiesFile)
             self.capacities = self.parseCapacityFile(capacitiesFile)
+        '''
 
         #This parses the new .net file
         #returns the vertices, the edges,the function cost(not used anymore) and the list of OD pairs
-        self.Vo,self.Eo,self.F,odInputo = self.generateGraphNew(networkFile)
+        self.Vo, self.Eo, self.F, odInputo = self.generateGraphNew(networkFile)
 
         for tupOD in odInputo:
             if(tupOD[2]%self.groupsize!=0):

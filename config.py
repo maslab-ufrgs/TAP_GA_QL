@@ -39,12 +39,17 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     Call the apropriate script to run the experiment based on experiment type
     """
     network = "networks/"+str(networkName)+"/"+str(networkName)+".net"
-    network_od = "networks/"+str(networkName)+"/"+str(networkName)+".od.txt"
-    network_capacity = "networks/"+str(networkName)+"/"+str(networkName)+".capacity.txt"
+    #network_od = "networks/"+str(networkName)+"/"+str(networkName)+".od.txt"
+    #network_capacity = "networks/"+str(networkName)+"/"+str(networkName)+".capacity.txt"
 
-    ex = Experiment(k, network, network_capacity, network_od, group_size,networkName,
-    printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
-    printPairOD=printPairOD, printInterval=printInterval,printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
+    #ex = Experiment(k, network, network_capacity, network_od, group_size,networkName,
+    #printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
+    #printPairOD=printPairOD, printInterval=printInterval, 
+    #printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
+
+    ex = Experiment(k, network, group_size,networkName, printTravelTime=printTravelTime, 
+    printDriversPerLink=printDriversPerLink, printPairOD=printPairOD, printInterval=printInterval,
+    printDriversPerRoute=printDriversPerRoute, TABLE_INITIAL_STATE=QL_TABLE_STATE)
     if(experimentType==2): #GA only
         print("Running GA Only")
         print(mutation)
