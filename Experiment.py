@@ -409,7 +409,7 @@ class Experiment:
         for e in E:
             print "Edge " + str(e.start)+"-"+str(e.end)+" has length: " + str(e.length)
 
-        return V, E, F,ODlist
+        return V, E, ODlist
 
     def initializeNetworkData(self, k, networkFile, groupSize):
         self.networkSet = True
@@ -427,7 +427,8 @@ class Experiment:
 
         #This parses the new .net file
         #returns the vertices, the edges,the function cost(not used anymore) and the list of OD pairs
-        self.Vo, self.Eo, self.F, odInputo = self.generateGraphNew(networkFile)
+        #it doesn't return the cost function anymore
+        self.Vo, self.Eo, odInputo = self.generateGraphNew(networkFile)
 
         for tupOD in odInputo:
             if(tupOD[2]%self.groupsize!=0):
