@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
     Use spaces instead of tabs, or configure your editor to transform tab to 4 spaces.
 '''
@@ -33,7 +34,11 @@ class Driver:
     >>> isinstance(Driver(OD(1, 2, 8, 15)).od, OD)
     True
 
-    Test #3 is wrong because you don't really need to pass an OD object to the constructor.
+    The class contructor needs to be more precise about its input.
+    >>> Driver(1).od_s()
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'int' object has no attribute 'o'
     >>> Driver(OD(1, 2, 8, 15)).od_s()
     '12'
     '''
@@ -165,6 +170,34 @@ class Edge:
         return exp.evaluate({'f':var_value})
 
 def is_number(s):
+    '''
+    This function try to convert whatever is its argument to a float number.
+    
+    Input:
+    s: anything = the object that it tries to convert to a number.
+
+    Output:
+    True if it converts successfully to a float.
+    False if it can't, by getting a ValueError exception.
+    
+    >>> is_number(1)
+    True
+    >>> is_number(1e1000)
+    True
+    >>> is_number('5000')
+    True
+    >>> is_number(3.141598)
+    True
+    >>> is_number('a')
+    False
+    >>> is_number('hello')
+    False
+    >>> is_number(Node('a'))
+    Traceback (most recent call last):
+    ...
+    AttributeError: Node instance has no attribute '__float__'
+    '''
+
     try:
         float(s)
         return True
