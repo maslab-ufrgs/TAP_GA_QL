@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-'''
-    Use spaces instead of tabs, or configure your editor to transform tab to 4 spaces.
-'''
+"""
+    Use spaces instead of tabs, or configure your editor to transform tab to 4
+    spaces.
+"""
 #Standard modules
 import os
 from time import localtime
@@ -15,11 +16,12 @@ import KSP
 
 SF_NETWORK_NAME = "SF"
 
-'''
-This is a hardcoded coupling data for an specific experiment with k=5
-and it is used when the flag --ql-table-initiation is initiated with "coupling".
-In the future this is needed to be read from a file.
-'''
+"""
+    This is a hardcoded coupling data for an specific experiment with k=5 and
+    it is used when the flag --ql-table-initiation is initiated with
+    "coupling".  In the future this is needed to be read from a file.
+"""
+
 TABLE_FILL = {"A|L":[36.84, 39.47, 23.68, 30.70, 31.58],
               "A|M":[31.58, 37.89, 32.63, 22.37, 35.53],
               "B|L":[27.37, 27.63, 32.46, 33.68, 21.05],
@@ -882,13 +884,12 @@ class Experiment:
     def calculateAverageTravelTime(self,stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
 
-'''
-To run the tests you should call from the terminal:
-python Experiment.py
+""""
+    To run the tests you should call from the terminal: python Experiment.py
 
-If the tests succeed, nothing should happen.
-Else it will show the error and where it is on the file.
-'''
+    If the tests succeed, nothing should happen.  Else it will show the error
+    and where it is on the file.
+"""
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
