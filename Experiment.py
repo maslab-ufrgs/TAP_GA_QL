@@ -61,10 +61,10 @@ class OD:
     Represents an origin-destination pair, where:
 
     Inputs:
-    O: string = origin node
-    D: string = destination node
-    numPath: int = number of shortest paths to generate
-    numTravels: int = number of travels
+    origin: string = origin node
+    destiny: string = destination node
+    num_path: int = number of shortest paths to generate
+    num_travels: int = number of travels
 
     Tests to verify the attributes:
     >>> isinstance(OD('A', 'B', 5, 100), OD)
@@ -91,11 +91,11 @@ class OD:
     Origin: A, Destination: B, Number of travels: 100, Number of shortest paths: 5
     """
 
-    def __init__(self, O, D, numPaths, numTravels):
-        self.o = O
-        self.d = D
-        self.numPaths = numPaths
-        self.numTravels = numTravels
+    def __init__(self, origin, destiny, num_paths, num_travels):
+        self.o = origin
+        self.d = destiny
+        self.numPaths = num_paths
+        self.numTravels = num_travels
         self.paths = None
 
     def __str__(self):
@@ -135,12 +135,12 @@ class Node:
         self.flag = 0		# access flag
 
 class Edge:
-    '''
+    """
     Represents an edge in the graph.
 
     Inputs:
-    u: string = start node of the edge
-    v: string = end node of the edge
+    start: string = start node of the edge
+    end: string = end node of the edge
     length: float = length of the edge
     cost_formula: string = cost formula of the edge
     var_value: float = value for the function to calculate the cost_formula
@@ -155,35 +155,37 @@ class Edge:
     11
     >>> Edge('a', 'b', 11, '12+5*t').cost_formula
     '12+5*t'
+    """
 
-    The eval_cost method calculates the value of the cost formula for a given var_value:
-    WARNING: the variable in the function MUST be f.
-    >>> Edge(1, 2, 3, '5+5*f').eval_cost(5.0)
-    30.0
-    >>> Edge(1, 2, 3, '5+5*t').eval_cost(5.0)
-    Traceback (most recent call last):
-    ...
-    Exception: undefined variable: t
-    '''
-
-    def __init__(self, u, v, length, cost_formula):
-        self.start = u
-        self.end = v
+    def __init__(self, start, end, length, cost_formula):
+        self.start = start
+        self.end = end
         self.length = length #FreeFlow of the edge (?)
         self.cost_formula = cost_formula
 
     def eval_cost(self, var_value):
-        p = Parser()
-        exp = p.parse(self.cost_formula)
+        """
+        The eval_cost method calculates the value of the cost formula for a given var_value:
+
+        WARNING: the variable in the function MUST be f.
+        >>> Edge(1, 2, 3, '5+5*f').eval_cost(5.0)
+        30.0
+        >>> Edge(1, 2, 3, '5+5*t').eval_cost(5.0)
+        Traceback (most recent call last):
+        ...
+        Exception: undefined variable: t
+        """
+        parser = Parser()
+        exp = parser.parse(self.cost_formula)
         #Hardcoded variable 'f'
         return exp.evaluate({'f':var_value})
 
-def is_number(s):
+def is_number(arg):
     '''
     This function try to convert whatever is its argument to a float number.
 
     Input:
-    s: anything = the object that it tries to convert to a number.
+    arg: anything = the object that it tries to convert to a number.
 
     Output:
     True if it converts successfully to a float.
@@ -208,7 +210,7 @@ def is_number(s):
     '''
 
     try:
-        float(s)
+        float(arg)
         return True
     except ValueError:
         return False
@@ -218,45 +220,40 @@ class Experiment:
     Sets up an experiment.
     '''
 
-    def __init__(self, k, networkFile, groupSize, networkName,
-                 printTravelTime=False, printDriversPerLink=False,
-                 printPairOD=False, printInterval=1,
-                 printDriversPerRoute=False, TABLE_INITIAL_STATE='zero'):
+    def __init__(self, k, net_file, group_size, net_name,
+                 p_travel_time=False, p_drivers_link=False,
+                 p_pair_od=False, p_interval=1,
+                 p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
 
         """
         Construct the experiment.
 
         Inputs:
         k: integer =  List of the 'K' hyperparameters for the KSP (default: [8])
-        networkFile: file = .net file in the ./networks/ folder
-        capacitiesFile: file = .capacity.txt file in the network folder
-        odFile: file = .od.txt file in the network folder
-        groupSize: integer = List of group sizes for drivers in each configuration (default: [1])
-        networkName: string = The name of the network to be used (default: OW10_1)
-
-        printTravelTime: boolean = Print link's travel time of the iteration on the file (default: False)
-        printDriversPerLink: boolean = Print the number of drivers in each link in the output file (default: False)
-        printPairOD: boolean = Print the average travel time for in the header in the output file (default: False)
-        printInterval: integer = Interval by which the messages are written in the output file (default: 1)
-        printDriversPerRoute: boolean = Print the amount of drivers per route of each OD pair (Warning: QL only!) (default: False)
-
+        net_file: file = .net file in the ./networks/ folder
+        group_size: integer = List of group sizes for drivers in each configuration (default: [1])
+        net_name: string = The name of the network to be used (default: OW10_1)
+        p_travel_time: boolean = Print link's travel time of the iteration on the file
+        p_drivers_link: boolean = Print the number of drivers in each link in the output file
+        p_pair_od: boolean = Print the average travel time for in the header in the output file
+        p_interval: integer = Interval by which the messages are written in the output file
+        p_drivers_route: boolean = Print the amount of drivers per route of each OD pair
         TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
 
         """
 
         self.k = k
-        self.groupSize = groupSize
-
-        self.printDriversPerLink = printDriversPerLink
-        self.printTravelTime = printTravelTime
-        self.printPairOD= printPairOD
-        self.printInterval = printInterval
-        self.networkName = networkName
+        self.groupSize = group_size
+        self.printDriversPerLink = p_drivers_link
+        self.printTravelTime = p_travel_time
+        self.printPairOD = p_pair_od
+        self.printInterval = p_interval
+        self.printDriversPerRoute = p_drivers_route #New flag
+        self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
+        self.networkName = net_name
         self.networkSet = False
         self.edges = {}
-        self.initializeNetworkData(self.k, networkFile, self.groupSize)
-        self.printDriversPerRoute = printDriversPerRoute #New flag
-        self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
+        self.initializeNetworkData(self.k, net_file, self.groupSize)
 
     #Read the new .net file
     def generateGraphNew(self, graph_file):
@@ -460,80 +457,69 @@ class Experiment:
             self.capacities = self.parseCapacityFile(capacitiesFile)
         """
 
-        #This parses the new .net file
-        #returns the vertices, the edges,the function cost(not used anymore) and the list of OD pairs
-        #it doesn't return the cost function anymore
         self.Vo, self.Eo, odInputo = self.generateGraphNew(networkFile)
 
-        for tupOD in odInputo:
-            if(tupOD[2]%self.groupSize!=0):
-                print(tupOD[2])
-                raise Exception("Error: number of travels is not a multiple of the group size \
-                        origin: " + str(tupOD[0]) 
-                        + " destination: " + str(tupOD[1]))
+        for tup_od in odInputo:
+            if tup_od[2]%self.groupSize != 0:
+                print tup_od[2]
+                raise Exception("Error: number of travels is not a multiple \
+                                 of the group size origin: " + str(tup_od[0])
+                                + " destination: " + str(tup_od[1]))
             else:
                 #Origin,destination,number of paths, number of travels
-                self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupSize))
-                self.ODL.append(str(tupOD[0])+str(tupOD[1]))
+                self.ODlist.append(OD(tup_od[0], tup_od[1],
+                                      k, tup_od[2]/self.groupSize))
+                self.ODL.append(str(tup_od[0]) + str(tup_od[1]))
                 for i in range(k):
                     if len(self.ODheader) == 0:
-                        self.ODheader = self.ODheader + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+                        self.ODheader = self.ODheader \
+                                      + str(tup_od[0]) + "to" + str(tup_od[1]) \
+                                      + "_" + str(i+1)
                     else:
-                        self.ODheader = self.ODheader + " " + str(tupOD[0])+"to"+str(tupOD[1]) + "_" + str(i+1)
+                        self.ODheader = self.ODheader + " " + str(tup_od[0]) \
+                                      + "to" + str(tup_od[1]) + "_" + str(i+1)
 
-        for od in self.ODL:
-            listRoutes = []
-            for r in range(self.k):
-                listRoutes.append(0)
-            self.ODtable[str(od)] = listRoutes
+        for od_pair in self.ODL:
+            list_routes = []
+            for i in range(self.k):
+                list_routes.append(0)
+            self.ODtable[str(od_pair)] = list_routes
 
         #Get the k shortest routes
         print "getKRoutes"
-        for od in self.ODlist:
-            od.paths = KSP.getKRoutes(self.Vo, self.Eo, od.o, od.d, od.numPaths)
+        for od_pair in self.ODlist:
+            od_pair.paths = KSP.getKRoutes(self.Vo, self.Eo, od_pair.o,
+                                           od_pair.d, od_pair.numPaths)
 
         ##get the value of each link - free flow travel time
-        self.freeFlow={}
+        self.freeFlow = {}
         for edge in self.Eo:
-            self.freeFlow[edge.start+"|"+edge.end]=edge.length
+            self.freeFlow[edge.start+"|"+edge.end] = edge.length
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
-        #self.edges = self.parseCapacityFile(networkFile)
-
         #creates different drivers according to the number of travels of each OD
         #instance
-        self.drivers=[]
-        for od in self.ODlist:
-            for travel in range(od.numTravels):
-                self.drivers.append(Driver(od))
+        self.drivers = []
+        for od_pair in self.ODlist:
+            for i in range(od_pair.numTravels):
+                self.drivers.append(Driver(od_pair))
 
     def cleanODtable(self):
-        for od in self.ODL:
-            listRoutes = []
-            for r in range(self.k):
-                listRoutes.append(0)
-            self.ODtable[str(od)] = listRoutes
-
-    def parseODfile(self,path):
-        with open(path) as odFILE:
-            lines = odFILE.readlines()
-        odList = []
-        for line in lines:
-            line = line.replace(' ', '').replace('\n','')
-            items = line.split(',')
-            if(len(items) == 3):
-                odList.append((items[0],items[1],int(items[2])))
-        return odList
+        for od_pair in self.ODL:
+            list_routes = []
+            for i in range(self.k):
+                list_routes.append(0)
+            self.ODtable[str(od_pair)] = list_routes
 
     def parseCapacityFile(self, path):
         links = {}
         with open(path) as capFILE:
             lines = capFILE.readlines()
             for line in lines:
-                line = line.replace('\n','')
+                line = line.replace('\n', '')
                 items = line.split(' ')
-                if(len(items) == 4):
+                if len(items) == 4:
                     links[items[1]+"|"+items[2]] = float(items[3])
         return links
 

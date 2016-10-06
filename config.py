@@ -4,8 +4,8 @@ from multiprocessing import Pool
 DEBUG = True
 
 def echo(msg):
-  if DEBUG:
-    print(msg)
+    if DEBUG:
+        print msg
 
 printTravelTime = False
 printDriversPerLink = False
@@ -39,35 +39,28 @@ def runByType(k, group_size, alpha, decay, crossover, mutation, interval):
     Call the apropriate script to run the experiment based on experiment type
     """
     network = "networks/"+str(networkName)+"/"+str(networkName)+".net"
-    #network_od = "networks/"+str(networkName)+"/"+str(networkName)+".od.txt"
-    #network_capacity = "networks/"+str(networkName)+"/"+str(networkName)+".capacity.txt"
 
-    #ex = Experiment(k, network, network_capacity, network_od, group_size,networkName,
-    #printTravelTime=printTravelTime, printDriversPerLink=printDriversPerLink,
-    #printPairOD=printPairOD, printInterval=printInterval, 
-    #printDriversPerRoute=printDriversPerRoute,TABLE_INITIAL_STATE=QL_TABLE_STATE)
-
-    ex = Experiment(k, network, group_size,networkName, printTravelTime=printTravelTime, 
-    printDriversPerLink=printDriversPerLink, printPairOD=printPairOD, printInterval=printInterval,
-    printDriversPerRoute=printDriversPerRoute, TABLE_INITIAL_STATE=QL_TABLE_STATE)
-    if(experimentType==2): #GA only
-        print("Running GA Only")
-        print(mutation)
-        ex.run_ga_ql(False,False, generations, population, crossover,
-                      mutation, elite_size, None, None,None)
-    elif(experimentType==3):#GA<-QL
-        print("Running GA<-QL ")
-        ex.run_ga_ql(True,False, generations, population, crossover,
-                      mutation, elite_size, alpha, decay,None)
-    elif(experimentType==4):#GA<->QL
-        print("Running GA<->QL ")
-        ex.run_ga_ql(True,True, generations, population, crossover,
-                      mutation, elite_size, alpha, decay, interval)
+    ex = Experiment(k, network, group_size, networkName, p_travel_time=printTravelTime,
+                    p_drivers_link=printDriversPerLink, p_pair_od=printPairOD,
+                    p_interval=printInterval, p_drivers_route=printDriversPerRoute,
+                    TABLE_INITIAL_STATE=QL_TABLE_STATE)
+    if experimentType == 2: #GA only
+        print "Running GA Only"
+        print mutation
+        ex.run_ga_ql(False, False, generations, population, crossover,
+                     mutation, elite_size, None, None, None)
+    elif experimentType == 3:#GA<-QL
+        print "Running GA<-QL "
+        ex.run_ga_ql(True, False, generations, population, crossover,
+                     mutation, elite_size, alpha, decay, None)
+    elif experimentType == 4:#GA<->QL
+        print "Running GA<->QL "
+        ex.run_ga_ql(True, True, generations, population, crossover,
+                     mutation, elite_size, alpha, decay, interval)
     ##FOR QL only use this method:
-    elif(experimentType==1): # QL only       
-	print("Running QL Only ")
+    elif experimentType == 1: # QL only
+        print "Running QL Only "
         ex.run_ql(generations, alpha, decay)
-	
 
 def buildArgs():
     """
@@ -90,15 +83,16 @@ def runArg(*args):
     """
     args: list of arguments
     """
-    a = args[0]
-    assert len(a) == 7
-    group_size, alpha, decay, crossover, mutation, k, interval = a
-    echo("Running the configuration: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
-    for r in range(repetitions):
+    arg_0 = args[0]
+    assert len(arg_0) == 7
+    group_size, alpha, decay, crossover, mutation, k, interval = arg_0
+    echo("Running the configuration: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s \
+          k: %s interval: %s" % tuple(arg_0))
+    for repetition in range(repetitions):
         runByType(k, group_size, alpha, decay, crossover, mutation, interval)
-        echo("Configuration complete: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s k: %s interval: %s" % tuple(a))
-        echo("Repetition %s/%s" % (r,repetitions))
-
+        echo("Configuration complete: grouping: %s alpha: %s decay: %s crossover: %s mutation: %s \
+              k: %s interval: %s" % tuple(arg_0))
+        echo("Repetition %s/%s" % (repetition, repetitions))
 
 def run(number_of_processes=4):
     echo("Running experiment with %s processors.." % number_of_processes)
