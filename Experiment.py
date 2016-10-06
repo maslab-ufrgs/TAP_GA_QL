@@ -234,7 +234,7 @@ class Experiment:
         groupSize: integer = List of group sizes for drivers in each configuration (default: [1])
         networkName: string = The name of the network to be used (default: OW10_1)
 
-        printTravelTime: boolean = Print link's travel time at each iteration in the output file (default: False)
+        printTravelTime: boolean = Print link's travel time of the iteration on the file (default: False)
         printDriversPerLink: boolean = Print the number of drivers in each link in the output file (default: False)
         printPairOD: boolean = Print the average travel time for in the header in the output file (default: False)
         printInterval: integer = Interval by which the messages are written in the output file (default: 1)
@@ -272,10 +272,10 @@ class Experiment:
             taglist = string.split(line)
             if taglist[0] == 'function':
                 variables = []
-                variables = taglist[2].replace("(","")
-                variables = variables.replace(")","")
+                variables = taglist[2].replace("(", "")
+                variables = variables.replace(")", "")
                 variables = variables.split(",")
-                F[taglist[1]] = [taglist[3],variables]
+                F[taglist[1]] = [taglist[3], variables]
 
             elif taglist[0] == 'node':
                 V.append(Node(taglist[1]))
@@ -289,16 +289,17 @@ class Experiment:
                     i = 5
                     while i <= (len(taglist)-1):
                         constants.append(taglist[i])
-                        i+=1
+                        i += 1
 
-                    freeflow_index=0
+                    freeflow_index = 0
                     p = Parser()
-                    exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+                    #[4] is function name.[0] is expression
+                    exp = p.parse(F[taglist[4]][0]) 
                     LV = exp.variables()
                     buffer_LV = []
                     for l in LV:
                         if l not in F[taglist[4]][1]:
-                            constant_acc+=1
+                            constant_acc += 1
                             buffer_LV.append(l)
 
                     #check if the formula has any parameters(variables)
@@ -309,6 +310,7 @@ class Experiment:
 
                     buffer_dic = {}
                     i = 0
+
                     for index in range(constant_acc):
                         buffer_dic[buffer_LV[index]] = float(constants[index])
                         i = 1
@@ -328,7 +330,8 @@ class Experiment:
                         exp = exp.parse(cost_formula)
                         freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3], cost_formula, freeflow_cost))
+                    E.append(Edge(taglist[2], taglist[3],
+                                  cost_formula, freeflow_cost))
 
                 else:
                     cost_formula = ""
@@ -343,7 +346,8 @@ class Experiment:
                         cost_formula = exp.toString()
                         freeflow_cost = exp.evaluate({'f':0})
 
-                    E.append(Edge(taglist[2], taglist[3], freeflow_cost, cost_formula))
+                    E.append(Edge(taglist[2], taglist[3],
+                                  freeflow_cost, cost_formula))
 
             elif taglist[0] == 'edge':
                 constants = []
@@ -354,15 +358,15 @@ class Experiment:
                     i = 5
                     while i <= (len(taglist)-1):
                         constants.append(taglist[i])
-                        i+=1
-                    freeflow_index=0
+                        i += 1
+                    freeflow_index = 0
                     p = Parser()
                     exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
                     LV = exp.variables()
                     buffer_LV = []
                     for l in LV:
                         if l not in F[taglist[4]][1]:
-                            constant_acc+=1
+                            constant_acc += 1
                             buffer_LV.append(l)
 
                     #check if the formula has any parameters(variables)
@@ -392,8 +396,10 @@ class Experiment:
                         exp = exp.parse(cost_formula)
                         freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
-                    E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))
+                    E.append(Edge(taglist[2], taglist[3],
+                                  freeflow_cost, cost_formula))
+                    E.append(Edge(taglist[3], taglist[2],
+                                  freeflow_cost, cost_formula))
 
                 else:
                     cost_formula = ""
@@ -408,23 +414,26 @@ class Experiment:
                         cost_formula = exp.toString()
                         freeflow_cost = exp.evaluate({'f':0})#hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],freeflow_cost,cost_formula))
-                    E.append(Edge(taglist[3], taglist[2],freeflow_cost,cost_formula))
+                    E.append(Edge(taglist[2], taglist[3],
+                                  freeflow_cost, cost_formula))
+                    E.append(Edge(taglist[3], taglist[2],
+                                  freeflow_cost, cost_formula))
 
             elif taglist[0] == 'od':
-                ODlist.append((taglist[2],taglist[3],int(taglist[4])))
+                ODlist.append((taglist[2], taglist[3], int(taglist[4])))
 
             line = fname.readline()
             line = line[:-1]
         fname.close()
 
         for e in E:
-            print "Edge " + str(e.start)+"-"+str(e.end)+" has length: " + str(e.length)
+            print("Edge " + str(e.start) + "-"
+                  + str(e.end) + " has length: " + str(e.length))
 
         return V, E, ODlist
 
     def initializeNetworkData(self, k, networkFile, groupSize):
-        '''
+        """
         Initialize the network data.
 
         Inputs:
@@ -432,12 +441,12 @@ class Experiment:
         networkFile: file = .net file
         groupSize: integer = Size of the grouping
 
-       # >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').initializeNetworkData(8, './networks/OW10_1/OW10_1.net', 1)
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').groupSize
+        #>>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').initializeNetworkData(8, './networks/OW10_1/OW10_1.net', 1)
+        #>>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').groupSize
         #type name formula variable
         ...
         1
-        '''
+        """
         self.networkSet = True
         self.ODlist = []
         self.ODL = []
@@ -460,7 +469,8 @@ class Experiment:
             if(tupOD[2]%self.groupSize!=0):
                 print(tupOD[2])
                 raise Exception("Error: number of travels is not a multiple of the group size \
-                        origin: "+str(tupOD[0])+" destination: "+ str(tupOD[1]))
+                        origin: " + str(tupOD[0]) 
+                        + " destination: " + str(tupOD[1]))
             else:
                 #Origin,destination,number of paths, number of travels
                 self.ODlist.append(OD(tupOD[0],tupOD[1],k,tupOD[2]/self.groupSize))
@@ -863,7 +873,7 @@ class Experiment:
         linkOccupancy = self.driversPerLink(stringOfActions)
         for edge in self.freeFlow.keys():
           if self.networkName == SF_NETWORK_NAME:
-              edges_travel_times[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
+                edges_travel_times[edge] = self.freeFlow[edge]*(1+vdfAlpha *((linkOccupancy[edge]/self.capacities[edge])**vdfBeta))
           else:
               edges_travel_times[edge] = self.freeFlow[edge] + .02*linkOccupancy[edge]
         return edges_travel_times
@@ -882,7 +892,7 @@ class Experiment:
             edges_travel_times[edge.start+"|"+edge.end] = edge.eval_cost(linkOccupancy[edge.start+"|"+edge.end])
         return edges_travel_times
 
-    def calculateAverageTravelTime(self,stringOfActions):
+    def calculateAverageTravelTime(self, stringOfActions):
         return sum(self.calculateIndividualTravelTime(stringOfActions))/len(stringOfActions)
 
 """"
