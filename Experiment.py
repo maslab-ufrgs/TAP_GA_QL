@@ -83,7 +83,8 @@ class OD:
     >>> isinstance(OD('A', 'B', 5, 100).o, str)
     True
 
-    Tests #7 and #8 sugests that self.o and self.d need to be more strictly controlled, perhaps converting the O  and the D to a string.
+    Tests #7 and #8 sugests that self.o and self.d need to be more strictly
+    controlled perhaps converting the O and the D to a string is a solution.
 
     Test for the __str__ method:
     >>> print OD('A', 'B', 5, 100)
