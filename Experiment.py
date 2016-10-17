@@ -124,6 +124,10 @@ class Node:
     True
     >>> isinstance(Node('nome').name, str)
     True
+    >>> Node(1)
+    1
+    >>> Node('nome')
+    'nome'
 
     Tests #6 and #7 have the same observation as the tests #7 and #8 of the OD class.
     '''
@@ -133,6 +137,9 @@ class Node:
         self.dist = 1000000	# distance to this node from start node (?)
         self.prev = None	# previous node to this node
         self.flag = 0		# access flag
+
+    def __repr__(self):
+        return repr(self.name)
 
 class Edge:
     """
@@ -155,6 +162,10 @@ class Edge:
     11
     >>> Edge('a', 'b', 11, '12+5*t').cost_formula
     '12+5*t'
+    >>> Edge('a','k', 11, '12+5*t')
+    'a|k'
+    >>> Edge(1,2,11,'12+5*t')
+    '1|2'
     """
 
     def __init__(self, start, end, length, cost_formula):
@@ -179,6 +190,9 @@ class Edge:
         exp = parser.parse(self.cost_formula)
         #Hardcoded variable 'f'
         return exp.evaluate({'f':var_value})
+
+    def __repr__(self):
+        return repr(str(str(self.start) + '|' + str(self.end)))
 
 def is_number(arg):
     '''
@@ -257,13 +271,44 @@ class Experiment:
 
     #Read the new .net file
     def generateGraphNew(self, graph_file):
+        """
+        Reads the .net file and return it's infos.
+        The infos are:
+            function(s)
+            node(s)
+            arc(s)
+            edge(s)
+            od(s)
+
+        It returns a list of vertices(V), a list of edges(E) and a list of OD(ODlist)
+
+        Tests:
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', \
+                       1, 'OW').generateGraphNew('./networks/OW10_1/OW10_1.net')
+        getKRoutes
+        (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A|B', 'B|A', 'A|C', \
+'C|A', 'A|D', 'D|A', 'B|D', 'D|B', 'B|E', 'E|B', 'C|D', 'D|C', 'C|F', 'F|C', 'C|G', 'G|C', 'D|E', \
+'E|D', 'D|G', 'G|D', 'D|H', 'H|D', 'E|H', 'H|E', 'F|G', 'G|F', 'F|I', 'I|F', 'G|H', 'H|G', 'G|J', \
+'J|G', 'G|K', 'K|G', 'H|K', 'K|H', 'I|J', 'J|I', 'I|L', 'L|I', 'J|K', 'K|J', 'J|L', 'L|J', 'J|M', \
+'M|J', 'K|M', 'M|K'], [('A', 'L', 600), ('A', 'M', 400), ('B', 'L', 300), ('B', 'M', 400)])
+
+        In order: The vertice list, edge list and the OD list.
+        Vertices -> ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+
+        Edges -> ['A|B', 'B|A', 'A|C', 'C|A', 'A|D', 'D|A', 'B|D', 'D|B', 'B|E', 'E|B', 'C|D',
+                  'D|C', 'C|F', 'F|C', 'C|G', 'G|C', 'D|E', 'E|D', 'D|G', 'G|D', 'D|H', 'H|D',
+                  'E|H', 'H|E', 'F|G', 'G|F', 'F|I', 'I|F', 'G|H', 'H|G', 'G|J', 'J|G', 'G|K',
+                  'K|G', 'H|K', 'K|H', 'I|J', 'J|I', 'I|L', 'L|I', 'J|K', 'K|J', 'J|L', 'L|J',
+                  'J|M', 'M|J', 'K|M', 'M|K']
+
+        OD -> [('A', 'L', 600), ('A', 'M', 400), ('B', 'L', 300), ('B', 'M', 400)]
+        """
         V = []
         E = []
         F = {}
         ODlist = []
         fname = open(graph_file, "r")
         line = fname.readline()
-        print line
         line = line[:-1]
         while line:
             taglist = string.split(line)
@@ -423,9 +468,9 @@ class Experiment:
             line = line[:-1]
         fname.close()
 
-        for e in E:
+        '''for e in E:
             print("Edge " + str(e.start) + "-"
-                  + str(e.end) + " has length: " + str(e.length))
+                  + str(e.end) + " has length: " + str(e.length))'''
 
         return V, E, ODlist
 
