@@ -270,7 +270,7 @@ class Experiment:
         self.initializeNetworkData(self.k, net_file, self.groupSize)
 
     #Read the new .net file
-    def generateGraphNew(self, graph_file):
+    def generate_graph(self, graph_file):
         """
         Reads the .net file and return it's infos.
         The infos are:
@@ -284,7 +284,7 @@ class Experiment:
 
         Tests:
         >>> Experiment(8, './networks/OW10_1/OW10_1.net', \
-                       1, 'OW').generateGraphNew('./networks/OW10_1/OW10_1.net')
+                       1, 'OW').generate_graph('./networks/OW10_1/OW10_1.net')
         getKRoutes
         (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A|B', 'B|A', 'A|C', \
 'C|A', 'A|D', 'D|A', 'B|D', 'D|B', 'B|E', 'E|B', 'C|D', 'D|C', 'C|F', 'F|C', 'C|G', 'G|C', 'D|E', \
@@ -303,10 +303,10 @@ class Experiment:
 
         OD -> [('A', 'L', 600), ('A', 'M', 400), ('B', 'L', 300), ('B', 'M', 400)]
         """
-        V = []
-        E = []
-        F = {}
-        ODlist = []
+        vertices = []
+        edges = []
+        functions = {}
+        OD_list = []
         fname = open(graph_file, "r")
         line = fname.readline()
         line = line[:-1]
@@ -317,10 +317,10 @@ class Experiment:
                 variables = taglist[2].replace("(", "")
                 variables = variables.replace(")", "")
                 variables = variables.split(",")
-                F[taglist[1]] = [taglist[3], variables]
+                functions[taglist[1]] = [taglist[3], variables]
 
             elif taglist[0] == 'node':
-                V.append(Node(taglist[1]))
+                vertices.append(Node(taglist[1]))
 
             elif taglist[0] == 'arc':
                 constants = []
@@ -333,20 +333,19 @@ class Experiment:
                         constants.append(taglist[i])
                         i += 1
 
-                    freeflow_index = 0
-                    p = Parser()
+                    parser = Parser()
                     #[4] is function name.[0] is expression
-                    exp = p.parse(F[taglist[4]][0]) 
+                    exp = parser.parse(functions[taglist[4]][0])
                     LV = exp.variables()
                     buffer_LV = []
                     for l in LV:
-                        if l not in F[taglist[4]][1]:
+                        if l not in functions[taglist[4]][1]:
                             constant_acc += 1
                             buffer_LV.append(l)
 
                     #check if the formula has any parameters(variables)
                     flag = False
-                    for v in F[taglist[4]][1]:
+                    for v in functions[taglist[4]][1]:
                         if v in LV:
                             flag = True
 
@@ -361,9 +360,9 @@ class Experiment:
                         freeflow_cost = exp.evaluate(buffer_dic)
                         cost_formula = str(freeflow_cost)
 
-                    elif is_number(F[taglist[4]][0]):
-                        freeflow_cost = float(F[taglist[4]][0])
-                        cost_fomula = F[taglist[4]][0]
+                    elif is_number(functions[taglist[4]][0]):
+                        freeflow_cost = float(functions[taglist[4]][0])
+                        cost_fomula = functions[taglist[4]][0]
 
                     else:
                         exp = exp.simplify(buffer_dic)
@@ -372,23 +371,23 @@ class Experiment:
                         exp = exp.parse(cost_formula)
                         freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],
+                    edges.append(Edge(taglist[2], taglist[3],
                                   cost_formula, freeflow_cost))
 
                 else:
                     cost_formula = ""
                     freeflow_cost = 0
-                    p = Parser()
-                    if is_number(F[taglist[4]][0]):
-                        cost_formula = F[taglist[4]][0]
-                        freeflow_cost = float(F[taglist[4]][0])
+                    parser = Parser()
+                    if is_number(functions[taglist[4]][0]):
+                        cost_formula = functions[taglist[4]][0]
+                        freeflow_cost = float(functions[taglist[4]][0])
 
                     else:
-                        exp = p.parse(F[taglist[4]][0])
+                        exp = parser.parse(functions[taglist[4]][0])
                         cost_formula = exp.toString()
                         freeflow_cost = exp.evaluate({'f':0})
 
-                    E.append(Edge(taglist[2], taglist[3],
+                    edges.append(Edge(taglist[2], taglist[3],
                                   freeflow_cost, cost_formula))
 
             elif taglist[0] == 'edge':
@@ -401,19 +400,19 @@ class Experiment:
                     while i <= (len(taglist)-1):
                         constants.append(taglist[i])
                         i += 1
-                    freeflow_index = 0
-                    p = Parser()
-                    exp = p.parse(F[taglist[4]][0]) ##[4] is function name.[0] is expression
+                    parser = Parser()
+                    ##[4] is function name.[0] is expression
+                    exp = parser.parse(functions[taglist[4]][0])
                     LV = exp.variables()
                     buffer_LV = []
                     for l in LV:
-                        if l not in F[taglist[4]][1]:
+                        if l not in functions[taglist[4]][1]:
                             constant_acc += 1
                             buffer_LV.append(l)
 
                     #check if the formula has any parameters(variables)
                     flag = False
-                    for v in F[taglist[4]][1]:
+                    for v in functions[taglist[4]][1]:
                         if v in LV:
                             flag = True
 
@@ -427,9 +426,9 @@ class Experiment:
                         freeflow_cost = exp.evaluate(buffer_dic)
                         cost_formula = str(freeflow_cost)
 
-                    elif is_number(F[taglist[4]][0]):
-                        freeflow_cost = float(F[taglist[4]][0])
-                        cost_fomula = F[taglist[4]][0]
+                    elif is_number(functions[taglist[4]][0]):
+                        freeflow_cost = float(functions[taglist[4]][0])
+                        cost_fomula = functions[taglist[4]][0]
 
                     else:
                         exp = exp.simplify(buffer_dic)
@@ -438,41 +437,44 @@ class Experiment:
                         exp = exp.parse(cost_formula)
                         freeflow_cost = exp.evaluate({'f':0}) #Hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],
+                    edges.append(Edge(taglist[2], taglist[3],
                                   freeflow_cost, cost_formula))
-                    E.append(Edge(taglist[3], taglist[2],
+                    edges.append(Edge(taglist[3], taglist[2],
                                   freeflow_cost, cost_formula))
 
                 else:
                     cost_formula = ""
                     freeflow_cost = 0
-                    p = Parser()
-                    if is_number(F[taglist[4]][0]):
-                        cost_formula = F[taglist[4]][0]
-                        freeflow_cost = float(F[taglist[4]][0])
+                    parser = Parser()
+                    if is_number(functions[taglist[4]][0]):
+                        cost_formula = functions[taglist[4]][0]
+                        freeflow_cost = float(functions[taglist[4]][0])
 
                     else:
-                        exp = p.parse(F[taglist[4]][0])
+                        exp = parser.parse(functions[taglist[4]][0])
                         cost_formula = exp.toString()
                         freeflow_cost = exp.evaluate({'f':0})#hardcoded
 
-                    E.append(Edge(taglist[2], taglist[3],
+                    edges.append(Edge(taglist[2], taglist[3],
                                   freeflow_cost, cost_formula))
-                    E.append(Edge(taglist[3], taglist[2],
+                    edges.append(Edge(taglist[3], taglist[2],
                                   freeflow_cost, cost_formula))
 
             elif taglist[0] == 'od':
-                ODlist.append((taglist[2], taglist[3], int(taglist[4])))
+                OD_list.append((taglist[2], taglist[3], int(taglist[4])))
 
             line = fname.readline()
             line = line[:-1]
         fname.close()
 
-        '''for e in E:
+        '''
+        Print edges but there are too many lines to be printed!!
+        for e in E:
             print("Edge " + str(e.start) + "-"
-                  + str(e.end) + " has length: " + str(e.length))'''
+                  + str(e.end) + " has length: " + str(e.length))
+        '''
 
-        return V, E, ODlist
+        return vertices, edges, OD_list
 
     def initializeNetworkData(self, k, networkFile, groupSize):
         """
@@ -502,7 +504,7 @@ class Experiment:
             self.capacities = self.parseCapacityFile(capacitiesFile)
         """
 
-        self.Vo, self.Eo, odInputo = self.generateGraphNew(networkFile)
+        self.Vo, self.Eo, odInputo = self.generate_graph(networkFile)
 
         for tup_od in odInputo:
             if tup_od[2]%self.groupSize != 0:
