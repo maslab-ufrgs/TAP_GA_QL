@@ -312,7 +312,7 @@ class Experiment:
         vertices = []
         edges = []
         functions = {}
-        OD_list = []
+        od_list = []
         fname = open(graph_file, "r")
         line = fname.readline()
         line = line[:-1]
@@ -467,7 +467,7 @@ class Experiment:
                                   freeflow_cost, cost_formula))
 
             elif taglist[0] == 'od':
-                OD_list.append((taglist[2], taglist[3], int(taglist[4])))
+                od_list.append((taglist[2], taglist[3], int(taglist[4])))
 
             line = fname.readline()
             line = line[:-1]
@@ -480,7 +480,7 @@ class Experiment:
                   + str(e.end) + " has length: " + str(e.length))
         '''
 
-        return vertices, edges, OD_list
+        return vertices, edges, od_list
 
     def init_network_data(self, k, network_file, group_size):
         """
@@ -561,22 +561,24 @@ class Experiment:
         """
         return repr(str('Experiment: k = ' + str(self.k) + ', net_name = ' + (self.network_name)))
 
-    def cleanODtable(self):
+    def __clean_od_table(self):
+        """
+        Zeroes the OD table.
+        """
         for od_pair in self.ODL:
-            list_routes = []
-            for i in range(self.k):
-                list_routes.append(0)
-            self.ODtable[str(od_pair)] = list_routes
+            self.ODtable[str(od_pair)] = [0]*self.k
 
     def parseCapacityFile(self, path):
+        """
+        Not used for now. v6.1.5
+        """
         links = {}
-        with open(path) as capFILE:
-            lines = capFILE.readlines()
-            for line in lines:
-                line = line.replace('\n', '')
-                items = line.split(' ')
-                if len(items) == 4:
-                    links[items[1]+"|"+items[2]] = float(items[3])
+        for line in open(path, 'r'):
+            line = line.replace('\n', '')
+            items = line.split(' ')
+            if len(items) == 4:
+                links[items[1]+"|"+items[2]] = float(items[3])
+
         return links
 
     def genCallBack(self,ga_engine):
@@ -656,7 +658,7 @@ class Experiment:
 
             if(self.printTravelTime):
                 travel_times = ''
-                edges = self.calculateEdgesTravelTimesnew(stepSolution)
+                edges = self.calculateEdgesTravelTimesNew(stepSolution)
                 for edge in self.edgeNames:
                     travel_times += str(edges[edge]) + " "
                 self.outputFile.write(travel_times.strip()+" ")
@@ -669,9 +671,10 @@ class Experiment:
                 self.outputFile.write(drivers.strip())
 
             if(self.printDriversPerRoute):
-                self.cleanODtable()
+                self.__clean_od_table()
                 for s in range(len(stepSolution)):
-                    self.ODtable[str(self.drivers[s].od.o) + str(self.drivers[s].od.d)][stepSolution[s]] += 1
+                    self.ODtable[str(self.drivers[s].od.o) \
+                    + str(self.drivers[s].od.d)][stepSolution[s]] += 1
                     #print self.ODtable
                 self.outputFile.write(" ")
                 for keys in self.ODL:##Now it prints in the correct order
