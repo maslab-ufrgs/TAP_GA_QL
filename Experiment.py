@@ -631,9 +631,21 @@ class Experiment(object):
     def __clean_od_table(self):
         """
         Zeroes the OD table.
+        In the future, it needs to be changed when used in the program.
+
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').ODtable #doctest: +NORMALIZE_WHITESPACE
+        {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
+         'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1')._Experiment__clean_od_table() #doctest: +NORMALIZE_WHITESPACE
+        {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
+         'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
+
+
         """
         for od_pair in self.ODL:
             self.ODtable[str(od_pair)] = [0] * self.k
+
+        return self.ODtable
 
     def parseCapacityFile(self, path):
         """
