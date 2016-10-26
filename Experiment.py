@@ -28,37 +28,57 @@ TABLE_FILL = {"A|L": [36.84, 39.47, 23.68, 30.70, 31.58],
               "B|M": [21.05, 27.63, 20.00, 18.95, 28.42]}
 
 
-class Driver:
+class Driver(object):
     '''
     Represents a driver in the network.
 
     Input:
     od: OD = instance of OD class
 
-    >>> isinstance(Driver(OD(1, 2, 8, 15)), Driver)
-    True
-    >>> isinstance(Driver(1), Driver)
-    True
-    >>> isinstance(Driver(OD(1, 2, 8, 15)).od, OD)
-    True
-
-    The class contructor needs to be more precise about its input.
-    >>> Driver(1).od_s()
-    Traceback (most recent call last):
-    ...
-    AttributeError: 'int' object has no attribute 'o'
-    >>> Driver(OD(1, 2, 8, 15)).od_s()
-    '12'
+    >>> type(Driver(OD(1, 2, 8, 15)))
+    <class '__main__.Driver'>
     '''
 
     def __init__(self, OD):
+        """
+        Class constructor.
+
+        >>> isinstance(Driver(OD(1, 2, 8, 15)), Driver)
+        True
+        >>> isinstance(Driver(1), Driver)
+        True
+        >>> isinstance(Driver(OD(1, 2, 8, 15)).od, OD)
+        True
+
+        The class contructor needs to be more precise about its input.
+        """
         self.od = OD
 
     def od_s(self):
+        """
+        String of OD pair of the Driver.
+        Could be substituted by the __repr__ method.
+
+        >>> Driver(1).od_s()
+        Traceback (most recent call last):
+        ...
+        AttributeError: 'int' object has no attribute 'o'
+        >>> Driver(OD(1, 2, 8, 15)).od_s()
+        '12'
+        """
         return "%s%s" % (self.od.o, self.od.d)
 
+    def __repr__(self):
+        """
+        __repr__ method override.
 
-class OD:
+        >>> Driver(OD(1, 2, 8, 15))
+        '1|2'
+        """
+        return repr(str(self.od.o) + '|' + str(self.od.d))
+
+
+class OD(object):
     """
     Represents an origin-destination pair, where:
 
@@ -106,7 +126,7 @@ class OD:
                 + str(self.numPaths)
 
 
-class Node:
+class Node(object):
     '''
     Represents a node in the graph.
 
@@ -145,7 +165,7 @@ class Node:
         return repr(self.name)
 
 
-class Edge:
+class Edge(object):
     """
     Represents an edge in the graph.
 
@@ -225,7 +245,7 @@ def is_number(arg):
     >>> is_number(Node('a'))
     Traceback (most recent call last):
     ...
-    AttributeError: Node instance has no attribute '__float__'
+    TypeError: float() argument must be a string or a number
     '''
 
     try:
@@ -235,7 +255,7 @@ def is_number(arg):
         return False
 
 
-class Experiment:
+class Experiment(object):
     '''
     Sets up an experiment.
     '''
