@@ -91,29 +91,33 @@ class OD(object):
     Tests to verify the attributes:
     >>> isinstance(OD('A', 'B', 5, 100), OD)
     True
-    >>> OD('A', 'B', 5, 100).o
-    'A'
-    >>> OD('A', 'B', 5, 100).d
-    'B'
-    >>> OD('A', 'B', 5, 100).numPaths
-    5
-    >>> OD('A', 'B', 5, 100).numTravels
-    100
-    >>> OD('A', 'B', 5, 100).paths
+    >>> type(OD('A', 'B', 5, 100))
+    <class '__main__.OD'>
     >>> isinstance(OD(1, 2, 3, 4).o, int)
     True
     >>> isinstance(OD('A', 'B', 5, 100).o, str)
     True
 
-    Tests #7 and #8 sugests that self.o and self.d need to be more strictly
+    Tests #3 and #4 sugests that self.o and self.d need to be more strictly
     controlled perhaps converting the O and the D to a string is a solution.
 
-    Test for the __str__ method:
-    >>> print OD('A', 'B', 5, 100)
-    Origin: A, Destination: B, Number of travels: 100, Number of shortest paths: 5
+    ** OD notation: origin|destiny
     """
 
     def __init__(self, origin, destiny, num_paths, num_travels):
+        """
+        Class Constructor.
+
+        >>> OD('A', 'B', 5, 100).o
+        'A'
+        >>> OD('A', 'B', 5, 100).d
+        'B'
+        >>> OD('A', 'B', 5, 100).numPaths
+        5
+        >>> OD('A', 'B', 5, 100).numTravels
+        100
+        >>> OD('A', 'B', 5, 100).paths
+        """
         self.o = origin
         self.d = destiny
         self.numPaths = num_paths
@@ -121,9 +125,15 @@ class OD(object):
         self.paths = None
 
     def __str__(self):
-        return "Origin: " + str(self.o) + ", Destination: "+str(self.d) + \
-                ", Number of travels: " + str(self.numTravels) + ", Number of shortest paths: " \
-                + str(self.numPaths)
+        """
+        __str__ method override.
+
+        >>> print OD('A', 'B', 5, 100)
+        Origin: A, Destination: B, Number of travels: 100, Number of shortest paths: 5
+        """
+        return "Origin: " + str(self.o) + ", Destination: " + str(self.d) + \
+            ", Number of travels: " + str(self.numTravels) + ", Number of shortest paths: " \
+            + str(self.numPaths)
 
 
 class Node(object):
@@ -136,32 +146,42 @@ class Node(object):
     These are the tests to verify if the object is being instantiated as it should:
     >>> isinstance(Node('nome'), Node)
     True
-    >>> Node('nome').name
-    'nome'
-    >>> Node('nome').dist
-    1000000
-    >>> Node('nome').prev
-    >>> Node('nome').flag
-    0
     >>> isinstance(Node(1).name, int)
     True
     >>> isinstance(Node('nome').name, str)
     True
-    >>> Node(1)
-    1
-    >>> Node('nome')
-    'nome'
+    >>> type(Node(1))
+    <class '__main__.Node'>
 
-    Tests #6 and #7 have the same observation as the tests #7 and #8 of the OD class.
+    Tests #2 and #3 have the same observation as the tests #7 and #8 of the OD class.
     '''
 
     def __init__(self, name):
+        """
+        Class constructor.
+
+        >>> Node('nome').name
+        'nome'
+        >>> Node('nome').dist
+        1000000
+        >>> Node('nome').prev
+        >>> Node('nome').flag
+        0
+        """
         self.name = name
         self.dist = 1000000  # distance to this node from start node (?)
         self.prev = None     # previous node to this node
         self.flag = 0        # access flag
 
     def __repr__(self):
+        """
+        __repr__ method override.
+
+        >>> Node(1)
+        1
+        >>> Node('nome')
+        'nome'
+        """
         return repr(self.name)
 
 
@@ -178,21 +198,25 @@ class Edge(object):
 
     >>> isinstance(Edge('a', 'b', 11, '12+5*t'), Edge)
     True
-    >>> Edge('a', 'b', 11, '12+5t').start
-    'a'
-    >>> Edge('a', 'b', 11, '12+5t').end
-    'b'
-    >>> Edge('a', 'b', 11, '12+5t').length
-    11
-    >>> Edge('a', 'b', 11, '12+5*t').cost_formula
-    '12+5*t'
-    >>> Edge('a','k', 11, '12+5*t')
-    'a|k'
-    >>> Edge(1,2,11,'12+5*t')
-    '1|2'
+    >>> type(Edge('a', 'b', 11, '12+5*t'))
+    <class '__main__.Edge'>
+
+    ** Edge notation: origin-destiny
     """
 
     def __init__(self, start, end, length, cost_formula):
+        """
+        Class constructor.
+
+        >>> Edge('a', 'b', 11, '12+5t').start
+        'a'
+        >>> Edge('a', 'b', 11, '12+5t').end
+        'b'
+        >>> Edge('a', 'b', 11, '12+5t').length
+        11
+        >>> Edge('a', 'b', 11, '12+5*t').cost_formula
+        '12+5*t'
+        """
         self.start = start
         self.end = end
         self.length = length  # FreeFlow of the edge (?)
@@ -216,7 +240,15 @@ class Edge(object):
         return exp.evaluate({'f': var_value})
 
     def __repr__(self):
-        return repr(str(str(self.start) + '|' + str(self.end)))
+        """
+        __repr__ method override.
+
+        >>> Edge('a','k', 11, '12+5*t')
+        'a-k'
+        >>> Edge(1,2,11,'12+5*t')
+        '1-2'
+        """
+        return repr(str(str(self.start) + '-' + str(self.end)))
 
 
 def is_number(arg):
@@ -258,6 +290,11 @@ def is_number(arg):
 class Experiment(object):
     '''
     Sets up an experiment.
+
+    >>> isinstance(Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'), Experiment)
+    True
+    >>> type(Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'))
+    <class '__main__.Experiment'>
     '''
 
     def __init__(self, k, net_file, group_size, net_name,
@@ -280,13 +317,12 @@ class Experiment(object):
         p_drivers_route: boolean = Print the amount of drivers per route of each OD pair
         TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
 
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1')
-        getKRoutes
-        'Experiment: k = 8, net_name = OW10_1'
-
         >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').group_size
-        getKRoutes
         1
+        >>> Experiment(8, './networks/OW10_1/1.net', 1, 'OW10_1')
+        Traceback (most recent call last):
+        ...
+        IOError: [Errno 2] No such file or directory: './networks/OW10_1/1.net'
         """
 
         self.k = k
@@ -295,13 +331,12 @@ class Experiment(object):
         self.printTravelTime = p_travel_time
         self.printPairOD = p_pair_od
         self.printInterval = p_interval
-        self.printDriversPerRoute = p_drivers_route #New flag
+        self.printDriversPerRoute = p_drivers_route
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
         self.network_name = net_name
         self.edges = {}
         self.init_network_data(self.k, net_file, self.group_size)
 
-    #Read the new .net file
     def generate_graph(self, graph_file):
         """
         Reads the .net file and return it's infos.
@@ -312,27 +347,29 @@ class Experiment(object):
             edge(s)
             od(s)
 
+        It should be following the specification from:
+            https://wiki.inf.ufrgs.br/Network_files_specification
+
         It returns a list of vertices(V), a list of edges(E) and a list of OD(ODlist)
 
         Tests:
         >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW').\
                 generate_graph('./networks/OW10_1/OW10_1.net') #doctest:+NORMALIZE_WHITESPACE
-        getKRoutes
-        (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A|B', 'B|A', 'A|C', \
-         'C|A', 'A|D', 'D|A', 'B|D', 'D|B', 'B|E', 'E|B', 'C|D', 'D|C', 'C|F', 'F|C', 'C|G', 'G|C',\
-         'D|E', 'E|D', 'D|G', 'G|D', 'D|H', 'H|D', 'E|H', 'H|E', 'F|G', 'G|F', 'F|I', 'I|F', 'G|H',\
-         'H|G', 'G|J', 'J|G', 'G|K', 'K|G', 'H|K', 'K|H', 'I|J', 'J|I', 'I|L', 'L|I', 'J|K', 'K|J',\
-         'J|L', 'L|J', 'J|M', 'M|J', 'K|M', 'M|K'], [('A', 'L', 600), ('A', 'M', 400),\
+        (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A-B', 'B-A', 'A-C', \
+         'C-A', 'A-D', 'D-A', 'B-D', 'D-B', 'B-E', 'E-B', 'C-D', 'D-C', 'C-F', 'F-C', 'C-G', 'G-C',\
+         'D-E', 'E-D', 'D-G', 'G-D', 'D-H', 'H-D', 'E-H', 'H-E', 'F-G', 'G-F', 'F-I', 'I-F', 'G-H',\
+         'H-G', 'G-J', 'J-G', 'G-K', 'K-G', 'H-K', 'K-H', 'I-J', 'J-I', 'I-L', 'L-I', 'J-K', 'K-J',\
+         'J-L', 'L-J', 'J-M', 'M-J', 'K-M', 'M-K'], [('A', 'L', 600), ('A', 'M', 400),\
          ('B', 'L', 300), ('B', 'M', 400)])
 
         In order: The vertice list, edge list and the OD list.
         Vertices -> ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
 
-        Edges -> ['A|B', 'B|A', 'A|C', 'C|A', 'A|D', 'D|A', 'B|D', 'D|B', 'B|E', 'E|B', 'C|D',
-                  'D|C', 'C|F', 'F|C', 'C|G', 'G|C', 'D|E', 'E|D', 'D|G', 'G|D', 'D|H', 'H|D',
-                  'E|H', 'H|E', 'F|G', 'G|F', 'F|I', 'I|F', 'G|H', 'H|G', 'G|J', 'J|G', 'G|K',
-                  'K|G', 'H|K', 'K|H', 'I|J', 'J|I', 'I|L', 'L|I', 'J|K', 'K|J', 'J|L', 'L|J',
-                  'J|M', 'M|J', 'K|M', 'M|K']
+        Edges -> ['A-B', 'B-A', 'A-C', 'C-A', 'A-D', 'D-A', 'B-D', 'D-B', 'B-E', 'E-B', 'C-D',
+                  'D-C', 'C-F', 'F-C', 'C-G', 'G-C', 'D-E', 'E-D', 'D-G', 'G-D', 'D-H', 'H-D',
+                  'E-H', 'H-E', 'F-G', 'G-F', 'F-I', 'I-F', 'G-H', 'H-G', 'G-J', 'J-G', 'G-K',
+                  'K-G', 'H-K', 'K-H', 'I-J', 'J-I', 'I-L', 'L-I', 'J-K', 'K-J', 'J-L', 'L-J',
+                  'J-M', 'M-J', 'K-M', 'M-K']
 
         OD -> [('A', 'L', 600), ('A', 'M', 400), ('B', 'L', 300), ('B', 'M', 400)]
         """
@@ -563,7 +600,7 @@ class Experiment(object):
             self.ODtable[str(od_pair)] = list_routes
 
         #Get the k shortest routes
-        print "getKRoutes"
+        #print "getKRoutes"
         for od_pair in self.ODlist:
             od_pair.paths = KSP.getKRoutes(self.Vo, self.Eo, od_pair.o,
                                            od_pair.d, od_pair.numPaths)
@@ -584,7 +621,10 @@ class Experiment(object):
 
     def __repr__(self):
         """
-        Representation method of the class.
+        __repr__ method override.
+
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1')
+        'Experiment: k = 8, net_name = OW10_1'
         """
         return repr(str('Experiment: k = ' + str(self.k) + ', net_name = ' + (self.network_name)))
 
