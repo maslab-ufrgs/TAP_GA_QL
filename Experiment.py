@@ -718,7 +718,8 @@ class Experiment(object):
 
     def build_od_pair_data(self, ttByOD):
         """
-        returns the string of OD pair data
+        Returns the string of OD pair data for each OD.
+        Not tested yet, need to test QL module first.
         """
         str_od = ''
         for k in ttByOD.keys():
@@ -730,6 +731,10 @@ class Experiment(object):
         return str_od + ' '
 
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
+        """
+        Write infos to the output file.
+        """
+
         if stepNumber % self.printInterval == 0:
             if self.useGA:
                 if self.useQL:
