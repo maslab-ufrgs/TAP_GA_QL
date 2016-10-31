@@ -633,10 +633,12 @@ class Experiment(object):
         Zeroes the OD table.
         In the future, it needs to be changed when used in the program.
 
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').ODtable #doctest: +NORMALIZE_WHITESPACE
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1') \
+            .ODtable #doctest: +NORMALIZE_WHITESPACE
         {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
          'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1')._Experiment__clean_od_table() #doctest: +NORMALIZE_WHITESPACE
+        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'). \
+            _Experiment__clean_od_table() #doctest: +NORMALIZE_WHITESPACE
         {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
          'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
 
@@ -650,6 +652,8 @@ class Experiment(object):
     def parseCapacityFile(self, path):
         """
         Not used for now. v6.1.5
+
+        Parses the capacity file.
         """
         links = {}
         for line in open(path, 'r'):
@@ -661,28 +665,28 @@ class Experiment(object):
         return links
 
     def genCallBack(self, ga_engine):
+        """
+        GA stuff. Not ready for it yet, assuming it is working as it should.
+        """
         population = ga_engine.getPopulation()
         generation = ga_engine.getCurrentGeneration()
-        if (self.printDriversPerRoute):
+        if self.printDriversPerRoute:
             #Drivers per route
             for od in self.ODL:
-                listRoutes = []
-                for r in range(self.k):
-                    listRoutes.append(0)
-                self.ODtable[str(od)] = listRoutes
+                self.ODtable[str(od)] = [0] * self.k
 
         #gets worst individual
         worstsol = population[len(population) - 1]
 
         if self.useQL:  # if using QL
             #check if the GA->QL interval is None
-            if (self.interval is None):
+            if self.interval is None:
                 isGeneration = 1
             else:
                 isGeneration = (generation + 1) % self.interval
 
             #check if we are running the GA<->QL or GA<-QL experiment.
-            if((self.useInterval) and (isGeneration == 0) and (generation != 0)):
+            if self.useInterval and (isGeneration == 0) and (generation != 0):
                 (qlind, avg_tt) = \
                     self.ql.runEpisodeWithAction(ga_engine.bestIndividual().getInternalList())
                     #GA->QL
@@ -712,7 +716,7 @@ class Experiment(object):
         self.__print_step(generation, ga_engine.bestIndividual().getInternalList(),
                           avgTT=ga_engine.bestIndividual().score, qlTT=worstsol.score)
 
-    def buildODPairData(self, ttByOD):
+    def build_od_pair_data(self, ttByOD):
         """
         returns the string of OD pair data
         """
@@ -727,33 +731,33 @@ class Experiment(object):
 
     def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
         if stepNumber % self.printInterval == 0:
-            if(self.useGA):
-                if(self.useQL):
+            if self.useGA:
+                if self.useQL:
                     self.outputFile.write(str(stepNumber) + " " + str(avgTT) +" "+ str(qlTT))
                 else:
                     self.outputFile.write(str(stepNumber) + " " + str(avgTT))
             else:
                 self.outputFile.write(str(stepNumber) + " " + str(qlTT))
 
-            if(self.printPairOD):
+            if self.printPairOD:
                 ttByOD = self.travelTimeByOD(stepSolution)
-                self.outputFile.write(self.buildODPairData(ttByOD))
+                self.outputFile.write(self.build_od_pair_data(ttByOD))
 
-            if(self.printTravelTime):
+            if self.printTravelTime:
                 travel_times = ''
                 edges = self.calculateEdgesTravelTimesNew(stepSolution)
                 for edge in self.edgeNames:
                     travel_times += str(edges[edge]) + " "
                 self.outputFile.write(travel_times.strip() + " ")
 
-            if(self.printDriversPerLink):
+            if self.printDriversPerLink:
                 drivers = ''
                 edges = self.driversPerLink(stepSolution)
                 for edge in self.edgeNames:
                     drivers += str(edges[edge]) + " "
                 self.outputFile.write(drivers.strip())
 
-            if(self.printDriversPerRoute):
+            if self.printDriversPerRoute:
                 self.__clean_od_table()
                 for s in range(len(stepSolution)):
                     self.ODtable[str(self.drivers[s].od.o)
@@ -993,25 +997,6 @@ class Experiment(object):
             travel_times = self.evaluateActionTravelTime(driverIdx, action, edgesTravelTimes)
             results.append(travel_times)
         return results
-
-    def calculateEdgesTravelTimes(self, stringOfActions):
-        ###############################
-        # TRAVEL TIME FUNCTION        #
-        ###############################
-        ##VDF TRAVEL TIME FUNCTION
-        vdfAlpha = 0.15
-        vdfBeta = 4
-        #calculates travel time each edge
-        edges_travel_times = {}
-        ##flow
-        linkOccupancy = self.driversPerLink(stringOfActions)
-        for edge in self.freeFlow.keys():
-            if self.network_name == SF_NETWORK_NAME:
-                edges_travel_times[edge] = self.freeFlow[edge]\
-                    *(1 + vdfAlpha * ((linkOccupancy[edge] / self.capacities[edge])**vdfBeta))
-            else:
-                edges_travel_times[edge] = self.freeFlow[edge] + .02 * linkOccupancy[edge]
-        return edges_travel_times
 
     def calculateEdgesTravelTimesNew(self, stringOfActions):
         """
