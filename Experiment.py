@@ -13,6 +13,7 @@ from py_expression_eval import Parser
 from GA import GA
 from QL import QL
 import KSP
+import modules.ksp.functions as functions
 
 SF_NETWORK_NAME = "SF"
 
@@ -572,6 +573,8 @@ class Experiment(object):
         """
 
         self.Vo, self.Eo, odInputo = self.generate_graph(network_file)
+ #       self.Vo, self.Eo, odInputo = functions.generateGraph(network_file)
+
 
         for tup_od in odInputo:
             if tup_od[2] % self.group_size != 0:
