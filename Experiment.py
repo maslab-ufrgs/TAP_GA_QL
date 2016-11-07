@@ -730,19 +730,21 @@ class Experiment(object):
 
         return str_od + ' '
 
-    def __print_step(self, stepNumber, stepSolution, avgTT=None, qlTT=None):
+    def __print_step(self, step_number, stepSolution, avgTT=None, qlTT=None):
         """
         Write infos to the output file.
+            step_number:int = episode/generation
+            step_solution:QL = instance of QL class.
         """
 
-        if stepNumber % self.printInterval == 0:
+        if step_number % self.printInterval == 0:
             if self.useGA:
                 if self.useQL:
-                    self.outputFile.write(str(stepNumber) + " " + str(avgTT) +" "+ str(qlTT))
+                    self.outputFile.write(str(step_number) + " " + str(avgTT) +" "+ str(qlTT))
                 else:
-                    self.outputFile.write(str(stepNumber) + " " + str(avgTT))
+                    self.outputFile.write(str(step_number) + " " + str(avgTT))
             else:
-                self.outputFile.write(str(stepNumber) + " " + str(qlTT))
+                self.outputFile.write(str(step_number) + " " + str(qlTT))
 
             if self.printPairOD:
                 ttByOD = self.travelTimeByOD(stepSolution)
@@ -776,29 +778,36 @@ class Experiment(object):
 
             self.outputFile.write("\n")
 
-    def nodesString(self):
-        ##string of edges in graph that will be printed
-        nodesString = ''
+    def nodes_string(self):
+        """
+            String of edges of the graph that will be printed or stored in the file.
+        """
+        nodes_string = ''
         if self.printPairOD:
             for od in self.ODlist:
-                nodesString += "tt_%s|%s " % (od.o, od.d)
+                nodes_string += "tt_%s|%s " % (od.o, od.d)
         if(self.printTravelTime):
             for edgeN in self.edgeNames:
-                nodesString += 'tt_' + edgeN + ' '
+                nodes_string += 'tt_' + edgeN + ' '
         if(self.printDriversPerLink):
             for edgeN in self.edgeNames:
-                nodesString += "nd_" + edgeN + ' '
+                nodes_string += "nd_" + edgeN + ' '
         if(self.printDriversPerRoute):
-            nodesString += self.ODheader
-        nodesString = nodesString.strip()
-        return nodesString
+            nodes_string += self.ODheader
+        nodes_string = nodes_string.strip()
+        return nodes_string
 
     def nd(self):
+        """
+        Number of drivers.
+        """
         return len(self.drivers) * self.group_size
 
     def appendTag(self, filenamewithtag):
-        #tests if there isn't already a file with the desired name
-        #paralellization of experiments may result in filename conflit
+        """
+            Test if there isn't already a file with the desired name,
+            paralellization of experiments may result in filename conflict.
+        """
         append_number = ''
         while(os.path.isfile(filenamewithtag + append_number + ".txt")):
             if(append_number == ''):
@@ -810,7 +819,13 @@ class Experiment(object):
 
     def createStringArgumentsQL(self, nd):
         """
-        nd: number of drivers without groupsize
+        Generate filename, generate the path to the file and generate the header infos for the file
+        In:
+            nd:int = number of drivers without groupsize
+        Out:
+            filename:string = filename
+            path2simulationfiles:string = path to file
+            headerstr:string = parameters used in the experiment
         """
         fmt = './results_gaql_grouped/net_%s/QL/decay%4.3f/alpha%3.2f'
         path2simulationfiles = fmt % (self.network_name, self.decay, self.alpha)
@@ -819,10 +834,10 @@ class Experiment(object):
             + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
             + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = '#parameters:' + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) \
-            + ' decay=' + str(self.decay) + ' number of drivers=' + str(nd) \
-            + ' groupsize= '+ str(self.group_size)\
-            + '\n#episode avg_tt ' + self.nodesString()
+        headerstr = '#Parameters:' + ' k = ' + str(self.k) + ' alpha = ' + str(self.alpha) \
+            + ' decay = ' + str(self.decay) + ' number of drivers = ' + str(nd) \
+            + ' group_size = '+ str(self.group_size)\
+            + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr
 
@@ -846,7 +861,7 @@ class Experiment(object):
                 + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) + ' decay=' + str(self.decay) \
                 + ' number of drivers=' + str(self.nd()) + ' groupsize= '+ str(self.group_size) \
                 + ' GA->QL interval=' + str(self.interval) + '\n#generation avg_tt ql_avg_tt ' \
-                + self.nodesString()
+                + self.nodes_string()
 
         elif(useQL):
             fmt = './results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f'
@@ -864,7 +879,7 @@ class Experiment(object):
                 + str(self.crossover) + ' elit=' + str(self.elite) + ' k=' + str(self.k) \
                 + ' alpha=' + str(self.alpha) + ' decay=' + str(self.decay) \
                 + ' number of drivers=' + str(self.nd()) + ' groupsize= '+ str(self.group_size)\
-                + '\n#generation avg_tt ql_avg_tt ' + self.nodesString()
+                + '\n#generation avg_tt ql_avg_tt ' + self.nodes_string()
         else:
             fmt = './results_gaql_grouped/net_%s/GA/pm%4.4f'
             path2simulationfiles = fmt % (self.network_name, self.mutation)
@@ -879,7 +894,7 @@ class Experiment(object):
                 + str(self.population) + ' mutation=' + str(self.mutation)\
                 + ' crossover=' + str(self.crossover) \
                 + ' groupsize= '+ str(self.group_size) + " k= " + str(self.k) \
-                + '\n#generation avg_tt ' + self.nodesString()
+                + '\n#generation avg_tt ' + self.nodes_string()
 
         return filenamewithtag, path2simulationfiles, headerstr
 
