@@ -13,7 +13,7 @@ from py_expression_eval import Parser
 from GA import GA
 from QL import QL
 import KSP
-import modules.ksp.functions as functions
+#import modules.ksp.functions as functions
 
 SF_NETWORK_NAME = "SF"
 
@@ -378,10 +378,7 @@ class Experiment(object):
         edges = []
         functions = {}
         od_list = []
-        fname = open(graph_file, "r")
-        line = fname.readline()
-        line = line[:-1]
-        while line:
+        for line in open(graph_file, 'r'):
             taglist = string.split(line)
             if taglist[0] == 'function':
                 variables = []
@@ -392,74 +389,6 @@ class Experiment(object):
 
             elif taglist[0] == 'node':
                 vertices.append(Node(taglist[1]))
-
-            elif taglist[0] == 'arc':
-                constants = []
-                cost_formula = ""
-                freeflow_cost = 0
-                constant_acc = 0
-                if len(taglist) > 5:
-                    i = 5
-                    while i <= (len(taglist) - 1):
-                        constants.append(taglist[i])
-                        i += 1
-
-                    parser = Parser()
-                    #[4] is function name.[0] is expression
-                    exp = parser.parse(functions[taglist[4]][0])
-                    LV = exp.variables()
-                    buffer_LV = []
-                    for l in LV:
-                        if l not in functions[taglist[4]][1]:
-                            constant_acc += 1
-                            buffer_LV.append(l)
-
-                    #check if the formula has any parameters(variables)
-                    flag = False
-                    for v in functions[taglist[4]][1]:
-                        if v in LV:
-                            flag = True
-
-                    buffer_dic = {}
-                    i = 0
-
-                    for index in range(constant_acc):
-                        buffer_dic[buffer_LV[index]] = float(constants[index])
-                        i = 1
-
-                    if not flag:
-                        freeflow_cost = exp.evaluate(buffer_dic)
-                        cost_formula = str(freeflow_cost)
-
-                    elif is_number(functions[taglist[4]][0]):
-                        freeflow_cost = float(functions[taglist[4]][0])
-                        cost_fomula = functions[taglist[4]][0]
-
-                    else:
-                        exp = exp.simplify(buffer_dic)
-                        cost_formula = exp.toString()
-                        exp = Parser()
-                        exp = exp.parse(cost_formula)
-                        freeflow_cost = exp.evaluate({'f': 0})  # Hardcoded
-
-                    edges.append(Edge(taglist[2], taglist[3],
-                                      cost_formula, freeflow_cost))
-
-                else:
-                    cost_formula = ""
-                    freeflow_cost = 0
-                    parser = Parser()
-                    if is_number(functions[taglist[4]][0]):
-                        cost_formula = functions[taglist[4]][0]
-                        freeflow_cost = float(functions[taglist[4]][0])
-
-                    else:
-                        exp = parser.parse(functions[taglist[4]][0])
-                        cost_formula = exp.toString()
-                        freeflow_cost = exp.evaluate({'f': 0})
-
-                    edges.append(Edge(taglist[2], taglist[3],
-                                      freeflow_cost, cost_formula))
 
             elif taglist[0] == 'edge':
                 constants = []
@@ -533,11 +462,6 @@ class Experiment(object):
 
             elif taglist[0] == 'od':
                 od_list.append((taglist[2], taglist[3], int(taglist[4])))
-
-            line = fname.readline()
-            line = line[:-1]
-        fname.close()
-
         '''
         Print edges but there are too many lines to be printed!!
         for e in E:
