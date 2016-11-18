@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 KSP v1.32
 
@@ -11,7 +12,7 @@ v1.1 (20-Apr-2014) -  Adjusted error related with the creation of root and spur 
 					  were identified in Ortuzar network for AM pair and K=4).
 v1.2 (12-May-2014) -  Call of algorithm was changed from 'main(...)' to 'run(...)', and
 					  parameters 'origin' and 'destination' were replaced by 'OD_list'
-					  (a list of OD-pairs). Furthermore, the list of parameters of the 
+					  (a list of OD-pairs). Furthermore, the list of parameters of the
 					  command line call (__main__) was changed accordingly.
 					  Finally, the output text was changed according to the specification
 					  defined by Dr. Ana Bazzan.
@@ -23,27 +24,27 @@ v1.21 (5-Jun-2014) -  Created the function getKRoutes(graph_file, origin, destin
                       This function runs one OD-pair each time. For multiple OD-pairs,
                       it needs to be called multiple times.
 v1.22 (25-Nov-2014) - Changed the type of edges' length attribute from int to float.
-v1.23 (09-Dez-2015) - Fixed the problem that was allowing the occurrence of loops in 
-                      the paths. Creation of function generateGraphFromList that generates 
-                      the list of nodes and edges from given lists. Creation of a new function 
-                      getKRoutes to generate the K routes of a given OD pair AND the list 
-                      of nodes and vertices (the other version creates such lists from the 
-                      network file). The old version still works but was renamed to 
+v1.23 (09-Dez-2015) - Fixed the problem that was allowing the occurrence of loops in
+                      the paths. Creation of function generateGraphFromList that generates
+                      the list of nodes and edges from given lists. Creation of a new function
+                      getKRoutes to generate the K routes of a given OD pair AND the list
+                      of nodes and vertices (the other version creates such lists from the
+                      network file). The old version still works but was renamed to
                       getKRoutesNetFile. Creation of function pickEdgesListAll to return
-                      all edges arriving and leaving the given node. Changed the way edges 
+                      all edges arriving and leaving the given node. Changed the way edges
                       are printed: now a '|' symbol is used to separate its start and
                       end nodes.
 v1.3 (07-Jun-2016) -  Several adjustments to make the script compliant with the new network
-					  files specification (http://wiki.inf.ufrgs.br/network_files_specification). 
+					  files specification (http://wiki.inf.ufrgs.br/network_files_specification).
 					  Specifically: (i) the script recognises only the new format, (ii) no
-					  OD pairs are required when calling the script (in this case, the routes 
+					  OD pairs are required when calling the script (in this case, the routes
 					  are generated for ALL OD pairs specified in the network file), (iii) the
 					  generateGraph function now also returns the set of OD pairs, (iv) the
 					  edges lengths are now called costs, (v) alterado o tipo arc para dedge,
 					  and (vi) minor issues.
-v1.31 (25-Aug-2016) - Small fixes related to edges names; according to the current network 
+v1.31 (25-Aug-2016) - Small fixes related to edges names; according to the current network
                       specification, links are named with a dash (A-B) rather than a pipe (A|B).
-v1.32 (19-Set-2016) - Small fix related with dedges' name (A-B is named A-B in the forward link 
+v1.32 (19-Set-2016) - Small fix related with dedges' name (A-B is named A-B in the forward link
                       but B-A in the backward one).
 <new versions here>
 
@@ -53,75 +54,85 @@ v1.32 (19-Set-2016) - Small fix related with dedges' name (A-B is named A-B in t
 import argparse
 from py_expression_eval import Parser
 from classes.edge import Edge
-from classes.node import 
+from classes.node import Node
 
 
 # read a text file and generate the graph according to declarations
 def generateGraph(graph_file):
+        """
+            >>> generateGraph('./../../networks/OW10_1/OW.net') #doctest:+NORMALIZE_WHITESPACE
+            (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A-B', 'B-A', 'A-C', \
+             'C-A', 'A-D', 'D-A', 'B-D', 'D-B', 'B-E', 'E-B', 'C-D', 'D-C', 'C-F', 'F-C', 'C-G', 'G-C',\
+             'D-E', 'E-D', 'D-G', 'G-D', 'D-H', 'H-D', 'E-H', 'H-E', 'F-G', 'G-F', 'F-I', 'I-F', 'G-H',\
+             'H-G', 'G-J', 'J-G', 'G-K', 'K-G', 'H-K', 'K-H', 'I-J', 'J-I', 'I-L', 'L-I', 'J-K', 'K-J',\
+             'J-L', 'L-J', 'J-M', 'M-J', 'K-M', 'M-K'], [('A', 'L', 600), ('A', 'M', 400),\
+             ('B', 'L', 300), ('B', 'M', 400)])
+        """
+
 	V = [] # vertices
 	E = [] # edges
 	F = {} # cost functions
 	OD = [] # OD pairs
-	
+
 	lineid = 0
 	for line in open(graph_file, 'r'):
-		
+
 		lineid += 1
-		
+
 		# ignore \n
 		line = line.rstrip()
-		
+
 		# ignore comments
 		hash_pos = line.find('#')
 		if hash_pos > -1:
 			line = line[:hash_pos]
-		
+
 		# split the line
 		taglist = line.split()
 		if len(taglist) == 0:
 			continue
-		
+
 		if taglist[0] == 'function':
-			
+
 			# process the params
 			params = taglist[2][1:-1].split(',')
 			if len(params) > 1:
 				raise Exception('Cost functions with more than one parameter are not yet acceptable! (parameters defined: %s)' % str(params)[1:-1])
-			
+
 			# process the function
 			function = Parser().parse(taglist[3])
-			
+
 			# process the constants
 			constants = function.variables()
 			if params[0] in constants: # the parameter must be ignored
-				constants.remove(params[0]) 
-			
+				constants.remove(params[0])
+
 			# store the function
 			F[taglist[1]] = [params[0], constants, function]
-			
+
 		elif taglist[0] == 'node':
 			V.append(Node(taglist[1]))
-			
+
 		elif taglist[0] == 'dedge' or taglist[0] == 'edge': # dedge is a directed edge
-			
+
 			# process the cost
 			function = F[taglist[4]] # get the corresponding function
 			param_values = dict(zip(function[1], map(float, taglist[5:]))) # associate constants and values specified in the line (in order of occurrence)
 			param_values[function[0]] = 0.0 # add the parameter with value 0
 			cost = function[2].evaluate(param_values) # calculate the cost
-			
+
 			# create the edge(s)
 			E.append(Edge(taglist[1], taglist[2], taglist[3], cost))
 			if taglist[0] == 'edge':
 				E.append(Edge('%s-%s'%(taglist[3], taglist[2]), taglist[3], taglist[2], cost))
-			
+
 		elif taglist[0] == 'od':
-			OD.append(taglist[1])
-		
+			OD.append((taglist[2], taglist[3], int(taglist[4])))
+
 		else:
 			raise Exception('Network file does not comply with the specification! (line %d: "%s")' % (lineid, line))
-	
-	
+
+
 	return V, E, OD
 
 # generate the graph from a list of nodes* and a list of edges**
@@ -131,18 +142,18 @@ def generateGraph(graph_file):
 def generateGraphFromList(listNodes, listEdges, generateBackwardEdges=False):
 	V = []
 	E = []
-	
+
 	# generate the list of nodes
 	for v in listNodes:
 		V.append(Node(v))
-	
+
 	# generate the list of edges
 	for e in listEdges:
 		E.append(Edge(e[0], e[1], e[2]))
 		# generate backward edges
 		if generateBackwardEdges:
 			E.append(Edge(e[1], e[0], e[2]))
-	
+
 	return V, E
 
 # reset graph's variables to default
@@ -184,10 +195,10 @@ def pickEdgesListAll(u, E):
 
 # Dijkstra's shortest path algorithm
 def findShortestPath(N, E, origin, destination, ignoredEdges):
-	
+
 	# reset the graph (so as to discard information from previous runs)
 	resetGraph(N, E)
-	
+
 	# set origin node distance to zero, and get destination node
 	dest = None
 	for node in N:
@@ -195,18 +206,18 @@ def findShortestPath(N, E, origin, destination, ignoredEdges):
 			node.dist = 0
 		if node.name == destination:
 			dest = node
-	
+
 	u = pickSmallestNode(N)
 	while u != None:
 		u.flag = 1
 		uv = pickEdgesList(u, E)
 		n = None
 		for edge in uv:
-			
+
 			# avoid ignored edges
 			if edge in ignoredEdges:
 				continue
-			
+
 			# take the node n
 			for node in N:
 				if node.name == edge.end:
@@ -215,12 +226,12 @@ def findShortestPath(N, E, origin, destination, ignoredEdges):
 			if n.dist > u.dist + edge.cost:
 				n.dist = u.dist + edge.cost
 				n.prev = u
-		
+
 		u = pickSmallestNode(N)
 		# stop when destination is reached
 		if u == dest:
 			break
-	
+
 	# generate the final path
 	S = []
 	u = dest
@@ -228,7 +239,7 @@ def findShortestPath(N, E, origin, destination, ignoredEdges):
 		S.insert(0,u)
 		u = u.prev
 	S.insert(0,u)
-	
+
 	return S
 
 # generate a string from the path S in a specific format
@@ -258,40 +269,40 @@ def runKShortestPathsStep(V, E, origin, destination, k, A, B):
 	# Step 0: iteration 1
 	if k == 1:
 		A.append(findShortestPath(V, E, origin, destination, []))
-		
+
 	# Step I: iterations 2 to K
 	else:
-		lastPath = A[-1] 
+		lastPath = A[-1]
 		for i in range(0, len(lastPath)-1):
 			# Step I(a)
 			spurNode = lastPath[i]
 			rootPath = lastPath[0:i+1]
 			toIgnore = []
-			
+
 			for path in A:
 				if path[0:i+1] == rootPath:
 					ed = getEdge(E, spurNode.name, path[i+1].name)
 					toIgnore.append(ed)
-			
+
 			# ignore the edges passing through nodes already in rootPath (except for the spurNode)
-			for noder in rootPath[:-1]: 
+			for noder in rootPath[:-1]:
 				edgesn = pickEdgesListAll(noder, E)
 				for ee in edgesn:
 					toIgnore.append(ee)
-			
+
 			# Step I(b)
 			spurPath = findShortestPath(V, E, spurNode.name, destination, toIgnore)
 			if spurPath[0] != spurNode:
 				continue
-			
+
 			# Step I(c)
 			totalPath = rootPath + spurPath[1:]
 			B.append(totalPath)
-		
+
 		# handle the case where no spurs (new paths) are available
 		if not B:
 			return False
-			
+
 		# Step II
 		bestInB = None
 		bestInBcost = 999999999
@@ -303,17 +314,17 @@ def runKShortestPathsStep(V, E, origin, destination, k, A, B):
 		A.append(bestInB)
 		while bestInB in B:
 			B.remove(bestInB)
-		
+
 	return True
 
 # Yen's K shortest loopless paths algorithm
 def KShortestPaths(V, E, origin, destination, K):
 	# the K shortest paths
 	A = []
-	
+
 	# potential shortest paths
 	B = []
-	
+
 	for k in xrange(1,K+1):
 		try:
 			if not runKShortestPathsStep(V, E, origin, destination, k, A, B):
@@ -321,7 +332,7 @@ def KShortestPaths(V, E, origin, destination, K):
 		except:
 			print 'Problem on generating more paths! Only %d paths were found!' % (k-1)
 			break
-		
+
 	return A
 
 # calculate path S's cost
@@ -332,29 +343,29 @@ def calcPathCost(S, E):
 		if prev != None:
 			cost += getEdge(E, prev.name, node.name).cost
 		prev = node
-	
+
 	return cost
 
 # main procedure for many OD-pairs
 def run(graph_file, K, OD_pairs=None):
-	
+
 	# read graph from file
 	N, E, OD = generateGraph(graph_file)
-	
-	# process the list of OD-pairs (if no OD pair was defined by the 
+
+	# process the list of OD-pairs (if no OD pair was defined by the
 	# user, then all OD pairs from the network file are considered)
 	if OD_pairs != None:
 		OD = OD_pairs.split(';')
 	for i in xrange(0,len(OD)):
 		OD[i] = OD[i].split('|')
-	
+
 	# find K shortest paths of each OD-pair
 	print 'ksptable = ['
 	lastod = len(OD)-1
 	for iod, (o, d) in enumerate(OD):
 		# find K shortest paths for this specific OD-pair
 		S = KShortestPaths(N, E, o, d, K)
-		
+
 		# print the result for this specific OD-pair
 		print '\t[ # ' + str(o) + '|' + str(d) + ' flow'
 		last = len(S)-1
@@ -370,63 +381,74 @@ def run(graph_file, K, OD_pairs=None):
 	print ']'
 
 # return a list with the K shortest paths for the given origin-destination pair,
-# given a network file (this function was created to be called externally by 
+# given a network file (this function was created to be called externally by
 # another applications)
 def getKRoutesNetFile(graph_file, origin, destination, K):
-	
+
 	lout = []
-	
+
 	# read graph from file
 	N, E, _ = generateGraph(graph_file)
-	
+
 	# find K shortest paths for this specific OD-pair
 	S = KShortestPaths(N, E, origin, destination, K)
-	
+
 	for path in S:
-		# store the path (in list of strings format) and cost to the out list 
+		# store the path (in list of strings format) and cost to the out list
 		lout.append([pathToListOfString(path, E), calcPathCost(path, E)])
-		
+
 	return lout
 
 # return a list with the K shortest paths for the given origin-destination pair,
-# given the lists of nodes and edges (this function was created to be called 
+# given the lists of nodes and edges (this function was created to be called
 # externally by another applications)
 def getKRoutes(N, E, origin, destination, K):
-	
+
 	lout = []
-	
+
 	# find K shortest paths for this specific OD-pair
 	S = KShortestPaths(N, E, origin, destination, K)
-	
+
 	for path in S:
-		# store the path (in list of strings format) and cost to the out list 
+		# store the path (in list of strings format) and cost to the out list
 		lout.append([pathToListOfString(path, E), calcPathCost(path, E)])
-		
+
 	return lout
-	
+
 # initializing procedure
+#if __name__ == '__main__':
+
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='KSP v1.31\nCompute the K shortest loopless paths between two nodes of a given graph, using Yen\'s algorithm [1]. Complete instructions available at [2].',
-		epilog='GRAPH FILE FORMATTING INSTRUCTIONS' +
-		'\nSee [3] for complete instructions.'+
-		'\n\nREFERENCES' +
-		'\n[1] Yen, J.Y.: Finding the k shortest loopless paths in a network. Management Science 17(11) (1971) 712-716.' +
-		'\n[2] http://wiki.inf.ufrgs.br/K_Shortest_Loopless_Paths.' +
-		'\n[3] http://wiki.inf.ufrgs.br/network_files_specification.' +
-		'\n\nAUTHOR' +
-		'\nCreated in February 10, 2014, by Gabriel de Oliveira Ramos <goramos@inf.ufrgs.br>.',
-		formatter_class=argparse.RawTextHelpFormatter)
-	
-	parser.add_argument('-f', dest='file', required=True,
-						help='the graph file')
-	parser.add_argument('-k', dest='K', type=int, required=True,
-						help='number of shortest paths to find')
-	parser.add_argument('-l', dest='OD_list', required=False,
-						help='list of OD-pairs, in the format \'O|D;O|D;[and so on]\', where O are valid origin nodes, and D are valid destination nodes')
-	args = parser.parse_args()
-	
-	graph_file = args.file
-	OD_list = args.OD_list
-	K = args.K
-	
-	run(graph_file, K, OD_list)
+    """"
+    To run the tests you should call from the terminal: python Experiment.py
+
+    If the tests succeed, nothing should happen.  Else it will show the error
+    and where it is on the file.
+    """
+    import doctest
+    doctest.testmod()
+
+#	parser = argparse.ArgumentParser(description='KSP v1.31\nCompute the K shortest loopless paths between two nodes of a given graph, using Yen\'s algorithm [1]. Complete instructions available at [2].',
+#		epilog='GRAPH FILE FORMATTING INSTRUCTIONS' +
+#		'\nSee [3] for complete instructions.'+
+#		'\n\nREFERENCES' +
+#		'\n[1] Yen, J.Y.: Finding the k shortest loopless paths in a network. Management Science 17(11) (1971) 712-716.' +
+#		'\n[2] http://wiki.inf.ufrgs.br/K_Shortest_Loopless_Paths.' +
+#		'\n[3] http://wiki.inf.ufrgs.br/network_files_specification.' +
+#		'\n\nAUTHOR' +
+#		'\nCreated in February 10, 2014, by Gabriel de Oliveira Ramos <goramos@inf.ufrgs.br>.',
+#		formatter_class=argparse.RawTextHelpFormatter)
+
+#	parser.add_argument('-f', dest='file', required=True,
+#						help='the graph file')
+#	parser.add_argument('-k', dest='K', type=int, required=True,
+#						help='number of shortest paths to find')
+#	parser.add_argument('-l', dest='OD_list', required=False,
+#						help='list of OD-pairs, in the format \'O|D;O|D;[and so on]\', where O are valid origin nodes, and D are valid destination nodes')
+#	args = parser.parse_args()
+
+#	graph_file = args.file
+#	OD_list = args.OD_list
+#	K = args.K
+
+#	run(graph_file, K, OD_list)
