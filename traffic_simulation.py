@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Takes care of calling the config and handling arguments from the command line.
 """

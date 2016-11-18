@@ -2,7 +2,7 @@
 This module serves runs the configurations and arguments necessary to the experiments.
 """
 from multiprocessing import Pool
-import modules.experiment.Experiment as exp
+import modules.experiment.experiment as exp
 
 """
 These attributions need to be tested to see if they're really necessary.

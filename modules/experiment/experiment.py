@@ -10,8 +10,8 @@ import string
 #Third-party module
 from py_expression_eval import Parser
 #Local modules
-import modules.genetic_algorithm.genetic_algorithm as GA
-import modules.q_learning.q_learning as QL
+from modules.genetic_algorithm.genetic_algorithm import *
+from modules.q_learning.q_learning import *
 import modules.ksp.function as KSP
 
 SF_NETWORK_NAME = "SF"
