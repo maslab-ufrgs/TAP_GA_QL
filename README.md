@@ -1,5 +1,14 @@
 Script to run the simulation of drivers going from different points in the
-OW10_1 and SF networks
+OW and SF networks
+
+Can get other networks from
+===========================
+*[Networks](https://github.com/maslab-ufrgs/network-files)
+To add:
+1. Download from the link above the desired network.
+2. Run the validator.py script from the link above on the desired network.
+3. If the file passes the test, then create a folder on the networks/ folder with the same name as the network file.
+4. To run just use the --net NETWORK_NAME argument.
 
 Warning
 =======
