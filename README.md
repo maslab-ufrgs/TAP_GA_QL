@@ -11,6 +11,7 @@ To add:
 2. Run the validator.py script from the link above on the desired network.
 3. If the file passes the test, then create a folder on the networks/ folder with the same name as the network file.
 4. To run just use the --net NETWORK_NAME argument.
+Note: The simulator currently only work with edges, it doesn't work with degdes.
 
 Warning
 =======
