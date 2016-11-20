@@ -3,7 +3,7 @@ OW and SF networks
 
 Can get other networks from
 ===========================
-*[Networks](https://github.com/maslab-ufrgs/network-files)
+ * [Networks](https://github.com/maslab-ufrgs/network-files)
 To add:
 1. Download from the link above the desired network.
 2. Run the validator.py script from the link above on the desired network.
