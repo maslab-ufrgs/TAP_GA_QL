@@ -18,7 +18,7 @@ Warning
 =======
 
 > The cost functions used for edge travel time avaliation are tied to the network being run (SF or OW10_1). If you are 
-> going to use other networks, you most likely want to edit the calculateTravelTime function in the Experiment.py file.
+> going to use other networks, you most likely want to edit the calculateTravelTime function in the experiment.py module.
 
 Dependencies
 ============
