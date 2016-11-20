@@ -6,6 +6,7 @@ Can get other networks from
  * [Networks](https://github.com/maslab-ufrgs/network-files)
  
 To add:
+
 1. Download from the link above the desired network.
 2. Run the validator.py script from the link above on the desired network.
 3. If the file passes the test, then create a folder on the networks/ folder with the same name as the network file.
