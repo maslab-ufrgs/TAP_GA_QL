@@ -56,7 +56,7 @@ prs.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
 prs.add_argument("--repetitions", type=int, default=1,
                help="How many times it should be repeated.\n")
 
-prs.add_argument("--net", type=str, default='OW10_1',
+prs.add_argument("--net", type=str, default='OW',
                help="The name of the network to be used.\n")
 
 prs.add_argument("--experimentType", type=int, choices=[1, 2, 3, 4], default=1,

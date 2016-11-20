@@ -14,7 +14,7 @@ p_pair_od = False
 p_drivers_route = False
 p_interval = 1
 QL_TABLE_STATE = "zero"
-network_name = "OW10_1"
+network_name = "OW"
 generations = 10
 population = 100
 repetitions = 1
@@ -94,8 +94,8 @@ def run_arg(*args):
           + "\tk: %s\n\tInterval: %s") % tuple(arg_0))
     for repetition in range(repetitions):
         run_type(k, group_size, alpha, decay, crossover, mutation, interval)
-        print(("Configuration complete:\n\tGrouping: %s Alpha: %s\n\tDecay: %s Crossover: %s\n\tMutation: %s"\
-              + " k: %s\n\tInterval: %s") % tuple(arg_0))
+        print(("Configuration complete:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
+              + "\tk: %s\n\tInterval: %s") % tuple(arg_0))
         print("Repetition %s/%s" % (repetition+1, repetitions))
 
 def run(number_of_processes=4):
