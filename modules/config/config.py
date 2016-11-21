@@ -7,17 +7,17 @@ import modules.experiment.experiment as exp
 """
 These attributions need to be tested to see if they're really necessary.
 """
-flow = 0
-p_travel_time = False
-p_drivers_link = False
-p_pair_od = False
-p_drivers_route = False
-p_interval = 1
+FLOW = 0
+P_TRAVEL_TIME = False
+P_DRIVERS_LINK = False
+P_PAIR_OD = False
+P_DRIVERS_ROUTE = False
+P_INTERVAL = 1
 QL_TABLE_STATE = "zero"
-network_name = "OW"
-generations = 10
-population = 100
-repetitions = 1
+NETWORK_NAME = "OW"
+GENERATIONS = 10
+POPULATION = 100
+REPETITIONS = 1
 
 ##ExperimentType
 #1: QL only
@@ -25,46 +25,46 @@ repetitions = 1
 #3: GA<-QL
 #4: GA<->QL
 
-experiment_type = 1
-elite_size = 5
-group_sizes = [1]
-alphas = [.9]
-decays = [.99]
-crossovers = [.2]
-mutations = [.001]
-ks = [8]
-GA_QL_interval = [10]
+EXPERIMENT_TYPE = 1
+ELITE_SIZE = 5
+GROUP_SIZES = [1]
+ALPHAS = [.9]
+DECAYS = [.99]
+CROSSOVERS = [.2]
+MUTATIONS = [.001]
+KS = [8]
+GA_QL_INTERVAL = [10]
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval):
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-    network = "networks/" + str(network_name) + "/" + str(network_name) + ".net"
+    network = "networks/" + str(NETWORK_NAME) + "/" + str(NETWORK_NAME) + ".net"
 
-    ex = exp.Experiment(k, network, group_size, network_name, p_travel_time=p_travel_time,
-                        p_drivers_link=p_drivers_link, p_pair_od=p_pair_od,
-                        p_interval=p_interval, p_drivers_route=p_drivers_route,
+    ex = exp.Experiment(k, network, group_size, NETWORK_NAME, flow=flow, p_travel_time=P_TRAVEL_TIME,
+                        p_drivers_link=P_DRIVERS_LINK, p_pair_od=P_PAIR_OD,
+                        p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE)
 
-    if experiment_type == 1: # QL only
+    if EXPERIMENT_TYPE == 1: # QL only
         print("Running QL Only")
-        ex.run_ql(generations, alpha, decay)
+        ex.run_ql(GENERATIONS, alpha, decay)
 
-    elif experiment_type == 2: #GA only
+    elif EXPERIMENT_TYPE == 2: #GA only
         print("Running GA Only")
         print(mutation)
-        ex.run_ga_ql(False, False, generations, population, crossover,
-                     mutation, elite_size, None, None, None)
+        ex.run_ga_ql(False, False, GENERATIONS, POPULATION, crossover,
+                     mutation, ELITE_SIZE, None, None, None)
 
-    elif experiment_type == 3:#GA<-QL
+    elif EXPERIMENT_TYPE == 3:#GA<-QL
         print("Running GA<-QL")
-        ex.run_ga_ql(True, False, generations, population, crossover,
-                     mutation, elite_size, alpha, decay, None)
+        ex.run_ga_ql(True, False, GENERATIONS, POPULATION, crossover,
+                     mutation, ELITE_SIZE, alpha, decay, None)
 
-    elif experiment_type == 4:#GA<->QL
+    elif EXPERIMENT_TYPE == 4:#GA<->QL
         print("Running GA<->QL")
-        ex.run_ga_ql(True, True, generations, population, crossover,
-                     mutation, elite_size, alpha, decay, interval)
+        ex.run_ga_ql(True, True, GENERATIONS, POPULATION, crossover,
+                     mutation, ELITE_SIZE, alpha, decay, interval)
 
 def build_args():
     """
@@ -73,14 +73,15 @@ def build_args():
     """
     print("Building the experiment configurations list..")
     args = []
-    for g in group_sizes:
-        for a in alphas:
-            for d in decays:
-                for c in crossovers:
-                    for m in mutations:
-                        for k in ks:
-                            for i in GA_QL_interval:
-                                args.append([g,a,d,c,m,k,i])
+    for g in GROUP_SIZES:
+        for a in ALPHAS:
+            for d in DECAYS:
+                for c in CROSSOVERS:
+                    for m in MUTATIONS:
+                        for k in KS:
+                            for i in GA_QL_INTERVAL:
+                                for flw in FLOW:
+                                    args.append([g,a,d,c,m,k,i,flw])
     return args
 
 def run_arg(*args):
@@ -88,15 +89,15 @@ def run_arg(*args):
     args: list of arguments
     """
     arg_0 = args[0]
-    assert len(arg_0) == 7
-    group_size, alpha, decay, crossover, mutation, k, interval = arg_0
+    assert len(arg_0) == 8
+    group_size, alpha, decay, crossover, mutation, k, interval, flow = arg_0
     print(("Running the configuration:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
-          + "\tk: %s\n\tInterval: %s") % tuple(arg_0))
-    for repetition in range(repetitions):
-        run_type(k, group_size, alpha, decay, crossover, mutation, interval)
+            + "\tk: %s\n\tInterval: %s\tFlow: %s") % tuple(arg_0))
+    for repetition in range(REPETITIONS):
+        run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow)
         print(("Configuration complete:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
-              + "\tk: %s\n\tInterval: %s") % tuple(arg_0))
-        print("Repetition %s/%s" % (repetition+1, repetitions))
+              + "\tk: %s\n\tInterval: %s\tFlow: %s") % tuple(arg_0))
+        print("Repetition %s/%s" % (repetition+1, REPETITIONS))
 
 def run(number_of_processes=4):
     print("Running experiment with %s processors.." % number_of_processes)

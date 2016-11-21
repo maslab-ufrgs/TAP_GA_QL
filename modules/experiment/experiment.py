@@ -298,7 +298,7 @@ class Experiment(object):
     '''
 
     def __init__(self, k, net_file, group_size, net_name,
-                 p_travel_time=False, p_drivers_link=False,
+                 flow=0, p_travel_time=False, p_drivers_link=False,
                  p_pair_od=False, p_interval=1,
                  p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
 
@@ -335,9 +335,10 @@ class Experiment(object):
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
         self.network_name = net_name
         self.edges = {}
-        self.init_network_data(self.k, net_file, self.group_size)
+        self.flow = flow
+        self.init_network_data(self.k, net_file, self.group_size, self.flow)
 
-    def generate_graph(self, graph_file):
+    def generate_graph(self, graph_file, flow):
         """
         Reads the .net file and return it's infos.
         The infos are:
@@ -470,7 +471,7 @@ class Experiment(object):
 
         return vertices, edges, od_list
 
-    def init_network_data(self, k, network_file, group_size):
+    def init_network_data(self, k, network_file, group_size, flow):
         """
         Initialize the network data.
 
@@ -495,9 +496,7 @@ class Experiment(object):
             self.capacities = self.parseCapacityFile(capacitiesFile)
         """
 
-        self.Vo, self.Eo, odInputo = self.generate_graph(network_file)
- #       self.Vo, self.Eo, odInputo = functions.generateGraph(network_file)
-
+        self.Vo, self.Eo, odInputo = self.generate_graph(network_file, flow)
 
         for tup_od in odInputo:
             if tup_od[2] % self.group_size != 0:
@@ -762,7 +761,7 @@ class Experiment(object):
 
         headerstr = '#Parameters:' + ' k = ' + str(self.k) + ' alpha = ' + str(self.alpha) \
             + ' decay = ' + str(self.decay) + ' number of drivers = ' + str(nd) \
-            + ' group_size = '+ str(self.group_size)\
+            + ' group_size = ' + str(self.group_size) + ' flow = ' + str(self.flow)\
             + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr

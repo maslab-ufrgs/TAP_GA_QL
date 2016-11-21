@@ -76,31 +76,31 @@ prs.add_argument("--number-of-processes", type=int, default=1,
 prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random'], \
                default='zero', help="How to initiate the Q-Table.\n")
 
-prs.add_argument("-n", "--flow", type=int, default=0, help="Number of drivers used to evaluate the link costs.\n")
+prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], help="List of numbers of drivers used to evaluate the link costs.\n")
 
 args = prs.parse_args()
 
-config.network_name = args.net
-config.p_travel_time = args.printTravelTime
-config.p_drivers_per_link = args.printDriversPerLink
-config.p_pair_od = args.printPairOD
-config.p_interval = args.printInterval
-config.p_drivers_per_route = args.printDriversPerRoute
+config.NETWORK_NAME = args.net
+config.P_TRAVEL_TIME = args.printTravelTime
+config.P_DRIVERS_LINK = args.printDriversPerLink
+config.P_PAIR_OD = args.printPairOD
+config.P_INTERVAL = args.printInterval
+config.P_DRIVERS_ROUTE = args.printDriversPerRoute
 
-config.generations = args.generations
-config.population = args.population
-config.repetitions = args.repetitions
+config.GENERATIONS = args.generations
+config.POPULATION = args.population
+config.REPETITIONS = args.repetitions
 
-config.experiment_type = args.experimentType
-config.elite_size = args.elite_size
-config.group_sizes = args.grouping
-config.alphas = args.alphas
-config.decays = args.decays
-config.crossovers = args.crossovers
-config.mutations = args.mutations
-config.ks = args.ks
-config.GA_QL_interval = args.exchangeGAQL
+config.EXPERIMENT_TYPE = args.experimentType
+config.ELITE_SIZE = args.elite_size
+config.GROUP_SIZES = args.grouping
+config.ALPHAS = args.alphas
+config.DECAYS = args.decays
+config.CROSSOVERS = args.crossovers
+config.MUTATIONS = args.mutations
+config.KS = args.ks
+config.GA_QL_INTERVAL = args.exchangeGAQL
 config.QL_TABLE_STATE = args.ql_table_initiation
-config.flow = args.flow
+config.FLOW = args.flow
 
 config.run(number_of_processes=args.number_of_processes)
