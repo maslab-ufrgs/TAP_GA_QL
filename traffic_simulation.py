@@ -20,6 +20,9 @@ prs.add_argument("--printDriversPerRoute", action="store_true", default=False,
 prs.add_argument("-d", "--printDriversPerLink", action="store_true", default=False,
                help="Print the number of drivers in each link in the output file.\n")
 
+prs.add_argument("--printEdges", action="store_true", default=False,
+               help="Print the edges of the graph.\n")
+
 prs.add_argument("-o", "--printPairOD", action="store_true", default=False,
                help="Print the average travel time for in the header in the output file.\n")
 
@@ -102,5 +105,6 @@ config.KS = args.ks
 config.GA_QL_INTERVAL = args.exchangeGAQL
 config.QL_TABLE_STATE = args.ql_table_initiation
 config.FLOW = args.flow
+config.PRINT_EDGES = args.printEdges
 
 config.run(number_of_processes=args.number_of_processes)

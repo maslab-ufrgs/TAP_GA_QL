@@ -297,7 +297,7 @@ class Experiment(object):
     <class '__main__.Experiment'>
     '''
 
-    def __init__(self, k, net_file, group_size, net_name,
+    def __init__(self, k, net_file, group_size, net_name, print_edges,
                  flow=0, p_travel_time=False, p_drivers_link=False,
                  p_pair_od=False, p_interval=1,
                  p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
@@ -336,9 +336,9 @@ class Experiment(object):
         self.network_name = net_name
         self.edges = {}
         self.flow = flow
-        self.init_network_data(self.k, net_file, self.group_size, self.flow)
+        self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
 
-    def generate_graph(self, graph_file, flow):
+    def generate_graph(self, graph_file, print_edges = False, flow = 0):
         """
         Reads the .net file and return it's infos.
         The infos are:
@@ -434,8 +434,9 @@ class Experiment(object):
                         exp = exp.simplify(buffer_dic)
                         cost_formula = exp.toString()
                         exp = Parser()
-                        exp = exp.parse(cost_formula)
-                        freeflow_cost = exp.evaluate({'f': 0})  # Hardcoded
+                        cost_formula2 = "(" + cost_formula + ") + flow"
+                        exp = exp.parse(cost_formula2)
+                        freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # Hardcoded
 
                     edges.append(Edge(taglist[2], taglist[3],
                                       freeflow_cost, cost_formula))
@@ -453,7 +454,9 @@ class Experiment(object):
                     else:
                         exp = parser.parse(functions[taglist[4]][0])
                         cost_formula = exp.toString()
-                        freeflow_cost = exp.evaluate({'f': 0})  # hardcoded
+                        cost_formula2 = "(" + cost_formula + ") + flow"
+                        exp = exp.parse(cost_formula2)
+                        freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # hardcoded
 
                     edges.append(Edge(taglist[2], taglist[3],
                                       freeflow_cost, cost_formula))
@@ -464,14 +467,16 @@ class Experiment(object):
                 od_list.append((taglist[2], taglist[3], int(taglist[4])))
         '''
         Print edges but there are too many lines to be printed!!
-        for e in E:
-            print("Edge " + str(e.start) + "-"
-                  + str(e.end) + " has length: " + str(e.length))
         '''
+        if print_edges:
+            for e in edges:
+                print("Edge " + str(e.start) + "-"
+                      + str(e.end) + " has length: " + str(e.length))
+
 
         return vertices, edges, od_list
 
-    def init_network_data(self, k, network_file, group_size, flow):
+    def init_network_data(self, k, network_file, group_size, flow, print_edges):
         """
         Initialize the network data.
 
@@ -496,7 +501,7 @@ class Experiment(object):
             self.capacities = self.parseCapacityFile(capacitiesFile)
         """
 
-        self.Vo, self.Eo, odInputo = self.generate_graph(network_file, flow)
+        self.Vo, self.Eo, odInputo = self.generate_graph(network_file, print_edges = print_edges, flow = flow)
 
         for tup_od in odInputo:
             if tup_od[2] % self.group_size != 0:

@@ -7,6 +7,7 @@ import modules.experiment.experiment as exp
 """
 These attributions need to be tested to see if they're really necessary.
 """
+PRINT_EDGES = False
 FLOW = 0
 P_TRAVEL_TIME = False
 P_DRIVERS_LINK = False
@@ -41,7 +42,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow):
     """
     network = "networks/" + str(NETWORK_NAME) + "/" + str(NETWORK_NAME) + ".net"
 
-    ex = exp.Experiment(k, network, group_size, NETWORK_NAME, flow=flow, p_travel_time=P_TRAVEL_TIME,
+    ex = exp.Experiment(k, network, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
                         p_drivers_link=P_DRIVERS_LINK, p_pair_od=P_PAIR_OD,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE)
