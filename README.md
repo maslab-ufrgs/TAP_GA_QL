@@ -97,6 +97,7 @@ optional arguments:
   -d, --printDriversPerLink
                         Print the number of drivers in each link in the output
                         file (default: False)
+  --printEdges          Print the edges of the graph. (default: False)
   -o, --printPairOD     Print the average travel time for in the header in the
                         output file (default: False)
   --printDriversPerRoute     
