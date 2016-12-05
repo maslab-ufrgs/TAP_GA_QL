@@ -390,7 +390,7 @@ class Experiment(object):
             elif taglist[0] == 'node':
                 vertices.append(Node(taglist[1]))
 
-            elif taglist[0] == 'edge':
+            elif taglist[0] == 'dedge' or taglist[0] == 'edge':
                 constants = []
                 cost_formula = ""
                 freeflow_cost = 0
@@ -440,8 +440,9 @@ class Experiment(object):
 
                     edges.append(Edge(taglist[2], taglist[3],
                                       freeflow_cost, cost_formula))
-                    edges.append(Edge(taglist[3], taglist[2],
-                                      freeflow_cost, cost_formula))
+                    if taglist[0] == 'edge':
+                        edges.append(Edge(taglist[3], taglist[2],
+                                          freeflow_cost, cost_formula))
 
                 else:
                     cost_formula = ""
