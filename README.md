@@ -16,13 +16,15 @@ Warning
 =======
 
 > The cost functions used for edge travel time avaliation are tied to the network being run (SF or OW10_1). If you are 
-> going to use other networks, you most likely want to edit the calculateTravelTime function in the experiment.py module.
+> going to use other networks, you most likely want to edit the calculateEdgesTravelTimesNew function in the experiment.py module.
 
 Dependencies
 ============
  * [Python 2.7](https://www.python.org/downloads/)
  * [Pyevolve](https://sourceforge.net/projects/pyevolve/)
  * [Python Mathematical Expression Evaluator](https://pypi.python.org/pypi/py_expression_eval)
+ * [matplotlib](http://matplotlib.org/)
+ * [NumPy](http://www.numpy.org/)
 
 Usage
 =====
@@ -143,4 +145,6 @@ optional arguments:
                         experiment configurations (default: 1)
   --ql-table-initiation {zero,coupling,random}
                         Defines what values the QL-table will be initiated with.(default: zero)
+  -epl EPSILON [EPSILON ...], --epsilon EPSILON [EPSILON ...]
+                        List of epsilons for Q-Learning. (default: [1])
 ```
