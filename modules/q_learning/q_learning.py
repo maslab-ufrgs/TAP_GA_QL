@@ -7,13 +7,13 @@ Created on Thu Jun 18 19:51:35 2015
 import random
 
 class QL():
-    def __init__(self, experiment,drivers, k, decay,alpha,tableFill,iniTable = "zero"):
-        self.experiment = experiment 
-        self.epsilon = 1
+    def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"):
+        self.experiment = experiment
+        self.epsilon = epsilon
         self.alpha = alpha
         self.decay = decay
-        self.k = k        
-        ##init qtable       
+        self.k = k
+        ##init qtable
 	self.qtable = []
 	self.ODtable = {}
 	self.drivers = drivers
@@ -26,28 +26,26 @@ class QL():
 	elif iniTable == "coupling": #New way to fill the table
 		print "Generating Q-Table with mean coupling."
 		for d in drivers:
-			string = []			
+			string = []
 			for r in range(len(d.od.paths)):
-						
 				string.append(-1*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
-				              		
 			self.qtable.append(string)
 	elif iniTable == "random":
 		print "Generating Q-Table with random values."
-		MAX = 0		
+		MAX = 0
 		for key in self.tableFill:
 			for t in self.tableFill[key]:
 				if MAX <= t:
 					MAX = t
 		for i in range(self.numdrivers):
-			string = []			
+			string = []
 			for t in range(self.k):
-				string.append(-1*(random.uniform(0,round(MAX)))) 		
+				string.append(-1*(random.uniform(0,round(MAX))))
 			self.qtable.append(string)
-    
+
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
-    ##list of routes (one for each driver)    
+    ##list of routes (one for each driver)
     def runEpisode(self):
         actions=[]
         #for each driver, select its list of actions in qtable
@@ -88,16 +86,16 @@ class QL():
         self.epsilon = self.epsilon * self.decay
         average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions,average_tt_time)
-    
+
     def runEpisodeWithAction(self,actions):
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
-        
+
         #updates qtable. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
             #print 'reward: '+str(reward)+"\n"
             self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
-        
+
         #updates epsilon
         self.epsilon = self.epsilon * self.decay
         average_tt_time = sum(traveltimes)/self.numdrivers

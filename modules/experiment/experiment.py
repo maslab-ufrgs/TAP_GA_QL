@@ -299,7 +299,7 @@ class Experiment(object):
 
     def __init__(self, k, net_file, group_size, net_name, print_edges,
                  flow=0, p_travel_time=False, p_drivers_link=False,
-                 p_pair_od=False, p_interval=1,
+                 p_pair_od=False, p_interval=1, epsilon=1,
                  p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
 
         """
@@ -326,6 +326,7 @@ class Experiment(object):
         """
 
         self.k = k
+        self.epsilon = epsilon
         self.group_size = group_size
         self.printDriversPerLink = p_drivers_link
         self.printTravelTime = p_travel_time
@@ -338,7 +339,7 @@ class Experiment(object):
         self.flow = flow
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
 
-    def generate_graph(self, graph_file, print_edges = False, flow = 0):
+    def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
         Reads the .net file and return it's infos.
         The infos are:
@@ -768,7 +769,7 @@ class Experiment(object):
         headerstr = '#Parameters:' + ' k = ' + str(self.k) + ' alpha = ' + str(self.alpha) \
             + ' decay = ' + str(self.decay) + ' number of drivers = ' + str(nd) \
             + ' group_size = ' + str(self.group_size) + ' flow = ' + str(self.flow)\
-            + '\n#Episode AVG_TT ' + self.nodes_string()
+            + ' epsilon = ' + str(self.epsilon) + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr
 
@@ -834,7 +835,7 @@ class Experiment(object):
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, TABLE_FILL,
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, TABLE_FILL, self.epsilon,
                      self.TABLE_INITIAL_STATE)  # Change for "coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
@@ -870,7 +871,7 @@ class Experiment(object):
         self.decay = decay
         if(useQL):
             self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,
-                         TABLE_FILL, self.TABLE_INITIAL_STATE)
+                         TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)

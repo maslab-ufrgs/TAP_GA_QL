@@ -35,15 +35,16 @@ CROSSOVERS = [.2]
 MUTATIONS = [.001]
 KS = [8]
 GA_QL_INTERVAL = [10]
+EPSILON = [1]
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow):
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, epsilon):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
     network = "networks/" + str(NETWORK_NAME) + "/" + str(NETWORK_NAME) + ".net"
 
     ex = exp.Experiment(k, network, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
-                        p_drivers_link=P_DRIVERS_LINK, p_pair_od=P_PAIR_OD,
+                        p_drivers_link=P_DRIVERS_LINK, p_pair_od=P_PAIR_OD, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE)
 
@@ -82,7 +83,8 @@ def build_args():
                         for k in KS:
                             for i in GA_QL_INTERVAL:
                                 for flw in FLOW:
-                                    args.append([g,a,d,c,m,k,i,flw])
+                                    for en in EPSILON:
+                                        args.append([g,a,d,c,m,k,i,flw,en])
     return args
 
 def run_arg(*args):
@@ -90,14 +92,14 @@ def run_arg(*args):
     args: list of arguments
     """
     arg_0 = args[0]
-    assert len(arg_0) == 8
-    group_size, alpha, decay, crossover, mutation, k, interval, flow = arg_0
+    assert len(arg_0) == 9
+    group_size, alpha, decay, crossover, mutation, k, interval, flow, epsilon = arg_0
     print(("Running the configuration:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
-            + "\tk: %s\n\tInterval: %s\tFlow: %s") % tuple(arg_0))
+            + "\tk: %s\n\tInterval: %s\tFlow: %s\n\tEpsilon: %s") % tuple(arg_0))
     for repetition in range(REPETITIONS):
-        run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow)
+        run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, epsilon)
         print(("Configuration complete:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
-              + "\tk: %s\n\tInterval: %s\tFlow: %s") % tuple(arg_0))
+                + "\tk: %s\n\tInterval: %s\tFlow: %s\n\tEpsilon: %s") % tuple(arg_0))
         print("Repetition %s/%s" % (repetition+1, REPETITIONS))
 
 def run(number_of_processes=4):

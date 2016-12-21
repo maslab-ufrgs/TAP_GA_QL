@@ -81,6 +81,9 @@ prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling',
 
 prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], help="List of numbers of drivers used to evaluate the link costs.\n")
 
+prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1], \
+                help="List of epsilons for Q-Learning.\n")
+
 args = prs.parse_args()
 
 config.NETWORK_NAME = args.net
@@ -106,5 +109,6 @@ config.GA_QL_INTERVAL = args.exchangeGAQL
 config.QL_TABLE_STATE = args.ql_table_initiation
 config.FLOW = args.flow
 config.PRINT_EDGES = args.printEdges
+config.EPSILON = args.epsilon
 
 config.run(number_of_processes=args.number_of_processes)
