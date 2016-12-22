@@ -10,6 +10,7 @@ prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpForma
                               Traffic Assignment Problem v7.3.2
                               Script to run the simulation of
                               drivers going from different points in a given network""")
+prs.add_argument('-f', dest='file', required=True, help='The network file.\n')
 
 prs.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file.\n")
@@ -59,9 +60,6 @@ prs.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
 prs.add_argument("--repetitions", type=int, default=1,
                help="How many times it should be repeated.\n")
 
-prs.add_argument("--net", type=str, default='OW',
-               help="The name of the network to be used.\n")
-
 prs.add_argument("--experimentType", type=int, choices=[1, 2, 3, 4], default=1,
                help="""
                1 - QL only;
@@ -87,7 +85,7 @@ prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1], \
 
 args = prs.parse_args()
 
-config.NETWORK_NAME = args.net
+config.FILE = args.file
 config.P_TRAVEL_TIME = args.printTravelTime
 config.P_DRIVERS_LINK = args.printDriversPerLink
 config.P_OD_PAIR = args.printODpair

@@ -2,6 +2,7 @@
 This module serves runs the configurations and arguments necessary to the experiments.
 """
 from multiprocessing import Pool
+from os.path import basename, splitext
 import modules.experiment.experiment as exp
 
 """
@@ -19,6 +20,7 @@ NETWORK_NAME = "OW"
 GENERATIONS = 10
 POPULATION = 100
 REPETITIONS = 1
+FILE = ""
 
 ##ExperimentType
 #1: QL only
@@ -41,9 +43,10 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, e
     """
     Call the apropriate script to run the experiment based on experiment type
     """
-    network = "networks/" + str(NETWORK_NAME) + "/" + str(NETWORK_NAME) + ".net"
+    NETWORK_NAME = basename(FILE)
+    NETWORK_NAME = splitext(NETWORK_NAME)[0]
 
-    ex = exp.Experiment(k, network, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
+    ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE)
