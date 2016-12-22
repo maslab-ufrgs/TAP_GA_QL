@@ -4,13 +4,6 @@ OW and SF networks
 Can get other networks from
 ===========================
  * [Networks](https://github.com/maslab-ufrgs/network-files)
- 
-To add:
-
-1. Download from the link above the desired network.
-2. Run the validator.py script from the link above on the desired network.
-3. If the file passes the test, then create a folder on the networks/ folder with the same name as the network file.
-4. To run just use the --net NETWORK_NAME argument.
 
 Warning
 =======
@@ -30,11 +23,11 @@ Usage
 =====
 
 ```sh
-python traffic_simulation.py [OPTIONS]
+python route_choice.py [OPTIONS]
 ```
 Or:
 ```sh
-./traffic_simulation.py [OPTIONS]
+./route_choice.py [OPTIONS]
 ```
 
 All the options have usable defaults so check them before running a experiment.
@@ -42,7 +35,7 @@ All the options have usable defaults so check them before running a experiment.
 Use:
 
 ```sh
-python traffic_simulation.py -h
+python route_choice.py -h
 ```
 
 To list all the options.
@@ -61,29 +54,32 @@ Examples
 
 * Run an experiment with the *SF* network and prints the travel time
   for the each pair of Origin and Destination
+  
+* First get the SF network file from the link above.
 
 ```sh
-python traffic_simulation.py --network "SF" --printPairOD
+python route_choice.py -f /path/to/SF.net --printPairOD
 ```
 
-* Run an experiment with the *OW10_1* network printing the link's travel time at every
+* Run an experiment with the *OW* network printing the link's travel time at every
 100 generations with the mutations of 0.003 and 0.03
 
+* First get the OW network file from the link above.
 ```sh
-python traffic_simulation.py --printTravelTime --printInterval 100 --mutations 0.003 0.03
+python route_choice.py -f /path/to/OW.net --printTravelTime --printInterval 100 --mutations 0.003 0.03
 ```
 
 * Run an experiment with the *SF* network using alphas 0.3 and 0.4,
 decays 0.9 and 0.99 and 1000 generations.
 
 ```sh
-python traffic_simulation.py --network "SF" --alphas 0.3 0.4 --decays 0.9 0.99 --generations 1000
+python route_choice.py -f /path/to/SF.net --alphas 0.3 0.4 --decays 0.9 0.99 --generations 1000
 ```
 
-* Run an QL experiment with the *OW10_1* network initiating the QL-table with random values.
+* Run an QL experiment with the *OW* network initiating the QL-table with random values.
 
 ```sh
-python traffic_simulation.py --network "OW10_1" --experimentType 1 --ql-table-initiation random
+python route_choice.py -f /path/to/OW.net --experimentType 1 --ql-table-initiation random
 ```
 
 Options
@@ -92,59 +88,63 @@ Options
 ```
 optional arguments:
   -h, --help            show this help message and exit
+  -f FILE               The network file. (default: None)
   --printTravelTime     Print link's travel time at each iteration in the
-                        output file (default: False)
+                        output file. (default: False)
+  --printDriversPerRoute
+                        Print the amount of drivers per route of each OD
+                        pair(Warning:QL only!). (default: False)
   -d, --printDriversPerLink
                         Print the number of drivers in each link in the output
-                        file (default: False)
+                        file. (default: False)
   --printEdges          Print the edges of the graph. (default: False)
-  -o, --printPairOD     Print the average travel time for in the header in the
-                        output file (default: False)
-  --printDriversPerRoute     
-                        Prints the amount of drivers per route of each OD pair(default:False)
+  -o, --printODpair     Print the average travel time for in the header in the
+                        output file. (default: False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
-                        output file (default: 1)
+                        output file. (default: 1)
   -g GENERATIONS, --generations GENERATIONS
-                        Maximum mumber of generations in each configuration
+                        Maximum mumber of generations in each configuration.
                         (default: 400)
   -p POPULATION, --population POPULATION
-                        Size of population for the genetic algorithm (default:
-                        100)
+                        Size of population for the genetic algorithm.
+                        (default: 100)
   --grouping GROUPING [GROUPING ...]
-                        List of group sizes for drivers in each configuration
-                        (default: [100])
+                        List of group sizes for drivers in each configuration.
+                        (default: [1])
   -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
-                        List of learning rates in each configuration (default:
-                        [0.9])
+                        List of learning rates in each configuration.
+                        (default: [0.9])
   --decays DECAYS [DECAYS ...]
-                        List of decays in each configuration (default: [0.99])
+                        List of decays in each configuration. (default:
+                        [0.99])
   -c CROSSOVERS [CROSSOVERS ...], --crossovers CROSSOVERS [CROSSOVERS ...]
                         List of rate of crossover in the population in each
-                        configuration (default: [0.2])
+                        configuration. (default: [0.2])
   -m MUTATIONS [MUTATIONS ...], --mutations MUTATIONS [MUTATIONS ...]
-                        List of rate of mutations in each configuration
+                        List of rate of mutations in each configuration.
                         (default: [0.001])
   --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
-                        (K-ShortestPath) Algorithm (default: [8])
-  --intervals INTERVALS [INTERVALS ...]
-                        List of intervals that signal the frequency the QL
-                        values are supposed to be fed into GA (default:
-                        [None])
+                        (K-ShortestPath) Algorithm. (default: [8])
+  --exchangeGAQL EXCHANGEGAQL [EXCHANGEGAQL ...]
+                        Frequency with which the GA sends its best solution to
+                        the QL. (default: [10])
   --repetitions REPETITIONS
-                        How many times it should be repeated (default: 1)
-  --net [NETWORK_NAME]  Which network should be used (default: OW10_1)
+                        How many times it should be repeated. (default: 1)
   --experimentType {1,2,3,4}
-                        1 - QL only 2 - GA only 3 - QL builds solution for GA
-                        4 - GA and QL exchange solutions (default: 1)
+                        1 - QL only; 2 - GA only; 3 - QL builds solution for
+                        GA; 4 - GA and QL exchange solutions. (default: 1)
   -e ELITE_SIZE, --elite_size ELITE_SIZE
                         How many elite individuals should be kept after each
-                        generation (default: 5)
+                        generation. (default: 5)
   --number-of-processes NUMBER_OF_PROCESSES
                         How many parallel processes should be used to run the
-                        experiment configurations (default: 1)
+                        experiment configurations. (default: 1)
   --ql-table-initiation {zero,coupling,random}
-                        Defines what values the QL-table will be initiated with.(default: zero)
+                        How to initiate the Q-Table. (default: zero)
+  -n FLOW [FLOW ...], --flow FLOW [FLOW ...]
+                        List of numbers of drivers used to evaluate the link
+                        costs. (default: [0])
   -epl EPSILON [EPSILON ...], --epsilon EPSILON [EPSILON ...]
                         List of epsilons for Q-Learning. (default: [1])
 ```
