@@ -14,8 +14,6 @@ from modules.genetic_algorithm.genetic_algorithm import *
 from modules.q_learning.q_learning import *
 import modules.ksp.function as KSP
 
-SF_NETWORK_NAME = "SF"
-
 """
     This is a hardcoded coupling data for an specific experiment with k=5 and
     it is used when the flag --ql-table-initiation is initiated with
@@ -299,7 +297,7 @@ class Experiment(object):
 
     def __init__(self, k, net_file, group_size, net_name, print_edges,
                  flow=0, p_travel_time=False, p_drivers_link=False,
-                 p_pair_od=False, p_interval=1, epsilon=1,
+                 p_od_pair=False, p_interval=1, epsilon=1,
                  p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
 
         """
@@ -312,7 +310,7 @@ class Experiment(object):
         net_name: string = The name of the network to be used (default: OW10_1)
         p_travel_time: boolean = Print link's travel time of the iteration on the file
         p_drivers_link: boolean = Print the number of drivers in each link in the output file
-        p_pair_od: boolean = Print the average travel time for in the header in the output file
+        p_od_pair: boolean = Print the average travel time for in the header in the output file
         p_interval: integer = Interval by which the messages are written in the output file
         p_drivers_route: boolean = Print the amount of drivers per route of each OD pair
         TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
@@ -330,7 +328,7 @@ class Experiment(object):
         self.group_size = group_size
         self.printDriversPerLink = p_drivers_link
         self.printTravelTime = p_travel_time
-        self.printPairOD = p_pair_od
+        self.printODpair = p_od_pair
         self.printInterval = p_interval
         self.printDriversPerRoute = p_drivers_route
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
@@ -498,7 +496,7 @@ class Experiment(object):
 
         """
         As for now it is not importing the capacities file
-        if self.network_name == SF_NETWORK_NAME:
+        if self.network_name == "SF":
             print("Parsing capacity file: %s" % capacitiesFile)
             self.capacities = self.parseCapacityFile(capacitiesFile)
         """
@@ -678,7 +676,7 @@ class Experiment(object):
             else:
                 self.outputFile.write(str(step_number) + " " + str(qlTT))
 
-            if self.printPairOD:
+            if self.printODpair:
                 ttByOD = self.travelTimeByOD(stepSolution)
                 self.outputFile.write(self.build_od_pair_data(ttByOD))
 
@@ -715,7 +713,7 @@ class Experiment(object):
             String of edges of the graph that will be printed or stored in the file.
         """
         nodes_string = ''
-        if self.printPairOD:
+        if self.printODpair:
             for od in self.ODlist:
                 nodes_string += "tt_%s|%s " % (od.o, od.d)
         if(self.printTravelTime):

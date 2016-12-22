@@ -7,7 +7,7 @@ from modules.config import config
 
 prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                               description="""
-                              Traffic Assignment Problem v7.0
+                              Traffic Assignment Problem v7.3.2
                               Script to run the simulation of
                               drivers going from different points in a given network""")
 
@@ -23,7 +23,7 @@ prs.add_argument("-d", "--printDriversPerLink", action="store_true", default=Fal
 prs.add_argument("--printEdges", action="store_true", default=False,
                help="Print the edges of the graph.\n")
 
-prs.add_argument("-o", "--printPairOD", action="store_true", default=False,
+prs.add_argument("-o", "--printODpair", action="store_true", default=False,
                help="Print the average travel time for in the header in the output file.\n")
 
 prs.add_argument("-i", "--printInterval", type=int, default=1,
@@ -79,7 +79,8 @@ prs.add_argument("--number-of-processes", type=int, default=1,
 prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random'], \
                default='zero', help="How to initiate the Q-Table.\n")
 
-prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], help="List of numbers of drivers used to evaluate the link costs.\n")
+prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], \
+                help="List of numbers of drivers used to evaluate the link costs.\n")
 
 prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1], \
                 help="List of epsilons for Q-Learning.\n")
@@ -89,7 +90,7 @@ args = prs.parse_args()
 config.NETWORK_NAME = args.net
 config.P_TRAVEL_TIME = args.printTravelTime
 config.P_DRIVERS_LINK = args.printDriversPerLink
-config.P_PAIR_OD = args.printPairOD
+config.P_OD_PAIR = args.printODpair
 config.P_INTERVAL = args.printInterval
 config.P_DRIVERS_ROUTE = args.printDriversPerRoute
 
