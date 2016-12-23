@@ -14,11 +14,6 @@ from modules.genetic_algorithm.genetic_algorithm import *
 from modules.q_learning.q_learning import *
 import modules.ksp.function as KSP
 
-"""
-    This is a hardcoded coupling data for an specific experiment with k=5 and
-    it is used when the flag --ql-table-initiation is initiated with
-    "coupling".  In the future this is needed to be read from a file.
-"""
 
 class Driver(object):
     '''
@@ -278,6 +273,27 @@ def is_number(arg):
     except ValueError:
         return False
 
+def generate_table_fill(coupling_file):
+    """
+    In:
+    coupling_file:string = path to coupling file.
+
+    Out:
+    table_fill:dictionary = table fill.
+    """
+    table_fill = {}
+    for line in open(coupling_file, 'r'):
+        if line.strip() != '':
+            line = line.split()
+            if '#' not in line[0]:
+                list_values = []
+                for value in line:
+                    if value != line[0]:
+                        list_values.append(float(value))
+                table_fill[line[0]] = list_values
+
+    return table_fill
+
 
 class Experiment(object):
     '''
@@ -331,33 +347,7 @@ class Experiment(object):
         self.flow = flow
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         if TABLE_INITIAL_STATE == 'coupling':
-            self.TABLE_FILL = self.generate_table_fill(table_fill_file)
-
-    def generate_table_fill(self, coupling_file):
-        """
-        In:
-        coupling_file:string = path to coupling file.
-
-        Out:
-        table_fill:dictionary = table fill.
-        """
-        table_fill = {}
-        for line in open(coupling_file, 'r'):
-            if line.strip() != '':
-                line = line.split()
-                if len(line) == 3 and line[0] == 'k':
-                    ktemp = int(line[2])
-                    if ktemp != self.k:
-                        raise ValueError('The K specified in the table fill file and the k used in' \
-                                         + ' the parameter are different!')
-                elif '#' not in line[0] and line[0] != 'k':
-                    list_values = []
-                    for value in line:
-                        if value != line[0]:
-                            list_values.append(float(value))
-                    table_fill[line[0]] = list_values
-
-        return table_fill
+            self.TABLE_FILL = generate_table_fill(table_fill_file)
 
     def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
