@@ -89,6 +89,7 @@ Options
 optional arguments:
   -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
+  -tff TABLE_FILL_FILE  Table fill file. (default: None)
   --printTravelTime     Print link's travel time at each iteration in the
                         output file. (default: False)
   --printDriversPerRoute
