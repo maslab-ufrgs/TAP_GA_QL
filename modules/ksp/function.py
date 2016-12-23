@@ -194,4 +194,3 @@ def pickEdgesListAll(u, E):
 		if edge.start == u.name or edge.end == u.name:
 			uv.append(edge)
 	return uv
-

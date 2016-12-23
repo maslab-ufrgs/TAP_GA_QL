@@ -21,6 +21,7 @@ GENERATIONS = 10
 POPULATION = 100
 REPETITIONS = 1
 FILE = ""
+TABLE_FILL_FILE = ""
 
 ##ExperimentType
 #1: QL only
@@ -47,7 +48,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, e
     NETWORK_NAME = splitext(NETWORK_NAME)[0]
 
     ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
-                        p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
+                        table_fill_file=TABLE_FILL_FILE, p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE)
 

@@ -12,6 +12,8 @@ prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpForma
                               drivers going from different points in a given network""")
 prs.add_argument('-f', dest='file', required=True, help='The network file.\n')
 
+prs.add_argument('-tff', dest='table_fill_file', help="Table fill file.\n")
+
 prs.add_argument("--printTravelTime", action="store_true", default=False,
                help="Print link's travel time at each iteration in the output file.\n")
 
@@ -85,6 +87,9 @@ prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1], \
 
 args = prs.parse_args()
 
+if(args.table_fill_file is None and 'coupling' == args.ql_table_initiation):
+    prs.error("The 'coupling' argument requires a file to be read")
+
 config.FILE = args.file
 config.P_TRAVEL_TIME = args.printTravelTime
 config.P_DRIVERS_LINK = args.printDriversPerLink
@@ -109,5 +114,6 @@ config.QL_TABLE_STATE = args.ql_table_initiation
 config.FLOW = args.flow
 config.PRINT_EDGES = args.printEdges
 config.EPSILON = args.epsilon
+config.TABLE_FILL_FILE = args.table_fill_file
 
 config.run(number_of_processes=args.number_of_processes)

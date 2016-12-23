@@ -20,12 +20,6 @@ import modules.ksp.function as KSP
     "coupling".  In the future this is needed to be read from a file.
 """
 
-TABLE_FILL = {"A|L": [36.84, 39.47, 23.68, 30.70, 31.58],
-              "A|M": [31.58, 37.89, 32.63, 22.37, 35.53],
-              "B|L": [27.37, 27.63, 32.46, 33.68, 21.05],
-              "B|M": [21.05, 27.63, 20.00, 18.95, 28.42]}
-
-
 class Driver(object):
     '''
     Represents a driver in the network.
@@ -295,7 +289,7 @@ class Experiment(object):
     <class '__main__.Experiment'>
     '''
 
-    def __init__(self, k, net_file, group_size, net_name, print_edges,
+    def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file='',
                  flow=0, p_travel_time=False, p_drivers_link=False,
                  p_od_pair=False, p_interval=1, epsilon=1,
                  p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
@@ -336,6 +330,29 @@ class Experiment(object):
         self.edges = {}
         self.flow = flow
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
+        if TABLE_INITIAL_STATE == 'coupling':
+            self.TABLE_FILL = self.generate_table_fill(table_fill_file)
+
+    def generate_table_fill(self, coupling_file):
+        """
+        coupling_file:string = path to coupling file.
+        """
+        table_fill = {}
+        for line in open(coupling_file, 'r'):
+            line = line.split()
+            if len(line) == 3 and line[0] == 'k':
+                ktemp = int(line[2])
+                if ktemp != self.k:
+                    raise ValueError('The K specified in the table fill file and the k used in' \
+                                     + ' the parameter are different!')
+            elif '#' not in line[0] and line[0] != 'k':
+                list_values = []
+                for value in line:
+                    if value != line[0]:
+                        list_values.append(float(value))
+                table_fill[line[0]] = list_values
+
+        return table_fill
 
     def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
@@ -833,7 +850,7 @@ class Experiment(object):
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, TABLE_FILL, self.epsilon,
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL, self.epsilon,
                      self.TABLE_INITIAL_STATE)  # Change for "coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
@@ -869,7 +886,7 @@ class Experiment(object):
         self.decay = decay
         if(useQL):
             self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,
-                         TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE)
+                         self.TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)
