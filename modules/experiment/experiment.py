@@ -335,22 +335,27 @@ class Experiment(object):
 
     def generate_table_fill(self, coupling_file):
         """
+        In:
         coupling_file:string = path to coupling file.
+
+        Out:
+        table_fill:dictionary = table fill.
         """
         table_fill = {}
         for line in open(coupling_file, 'r'):
-            line = line.split()
-            if len(line) == 3 and line[0] == 'k':
-                ktemp = int(line[2])
-                if ktemp != self.k:
-                    raise ValueError('The K specified in the table fill file and the k used in' \
-                                     + ' the parameter are different!')
-            elif '#' not in line[0] and line[0] != 'k':
-                list_values = []
-                for value in line:
-                    if value != line[0]:
-                        list_values.append(float(value))
-                table_fill[line[0]] = list_values
+            if line.strip() != '':
+                line = line.split()
+                if len(line) == 3 and line[0] == 'k':
+                    ktemp = int(line[2])
+                    if ktemp != self.k:
+                        raise ValueError('The K specified in the table fill file and the k used in' \
+                                         + ' the parameter are different!')
+                elif '#' not in line[0] and line[0] != 'k':
+                    list_values = []
+                    for value in line:
+                        if value != line[0]:
+                            list_values.append(float(value))
+                    table_fill[line[0]] = list_values
 
         return table_fill
 
