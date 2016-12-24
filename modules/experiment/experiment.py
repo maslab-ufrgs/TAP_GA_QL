@@ -346,6 +346,7 @@ class Experiment(object):
         self.edges = {}
         self.flow = flow
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
+        self.TABLE_FILL = {}
         if TABLE_INITIAL_STATE == 'coupling':
             self.TABLE_FILL = generate_table_fill(table_fill_file)
 
