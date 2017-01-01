@@ -87,65 +87,69 @@ Options
 
 ```
 optional arguments:
-  -h, --help            show this help message and exit
+   -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
-  -tff TABLE_FILL_FILE  Table fill file. (default: None)
+  --experimentType {1,2,3,4}
+                        1 - QL only; 2 - GA only; 3 - QL builds solution for
+                        GA; 4 - GA and QL exchange solutions. (default: 1)
+  --repetitions REPETITIONS
+                        How many times it should be repeated. (default: 1)
+  --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
+                        (K-ShortestPath) Algorithm. (default: [8])
+  -g GENERATIONS, --generations GENERATIONS
+                        Generations\episodes in each configuration. (default:
+                        100)
+  --grouping GROUPING [GROUPING ...]
+                        List of group sizes for drivers in each configuration.
+                        This parameter is useful when the number of
+                        trips/drivers is huge; it sets how many drivers form a
+                        group; in a group all drivers/trips use the same OD
+                        pair, i.e., the granularity of the route choice can be
+                        individual based or group based. (default: [1])
   --printTravelTime     Print link's travel time at each iteration in the
                         output file. (default: False)
   --printDriversPerRoute
-                        Print the amount of drivers per route of each OD
-                        pair(Warning:QL only!). (default: False)
+                        Print the amount of drivers per route for each OD
+                        pair(Warning:QL only! Also, note that the number of OD
+                        pairs can be very large!). (default: False)
   -d, --printDriversPerLink
                         Print the number of drivers in each link in the output
                         file. (default: False)
-  --printEdges          Print the edges of the graph. (default: False)
-  -o, --printODpair     Print the average travel time for in the header in the
+  --printEdges          Print the travel time per edge. (default: False)
+  -o, --printODpair     Print the average travel time in the header in the
                         output file. (default: False)
   -i PRINTINTERVAL, --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
                         output file. (default: 1)
-  -g GENERATIONS, --generations GENERATIONS
-                        Maximum mumber of generations in each configuration.
-                        (default: 400)
+  -e ELITE_SIZE, --elite_size ELITE_SIZE
+                        How many elite individuals should be kept after each
+                        generation. (default: 5)
   -p POPULATION, --population POPULATION
                         Size of population for the genetic algorithm.
                         (default: 100)
-  --grouping GROUPING [GROUPING ...]
-                        List of group sizes for drivers in each configuration.
-                        (default: [1])
-  -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
-                        List of learning rates in each configuration.
-                        (default: [0.9])
-  --decays DECAYS [DECAYS ...]
-                        List of decays in each configuration. (default:
-                        [0.99])
   -c CROSSOVERS [CROSSOVERS ...], --crossovers CROSSOVERS [CROSSOVERS ...]
                         List of rate of crossover in the population in each
                         configuration. (default: [0.2])
   -m MUTATIONS [MUTATIONS ...], --mutations MUTATIONS [MUTATIONS ...]
                         List of rate of mutations in each configuration.
                         (default: [0.001])
-  --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
-                        (K-ShortestPath) Algorithm. (default: [8])
   --exchangeGAQL EXCHANGEGAQL [EXCHANGEGAQL ...]
                         Frequency with which the GA sends its best solution to
                         the QL. (default: [10])
-  --repetitions REPETITIONS
-                        How many times it should be repeated. (default: 1)
-  --experimentType {1,2,3,4}
-                        1 - QL only; 2 - GA only; 3 - QL builds solution for
-                        GA; 4 - GA and QL exchange solutions. (default: 1)
-  -e ELITE_SIZE, --elite_size ELITE_SIZE
-                        How many elite individuals should be kept after each
-                        generation. (default: 5)
-  --number-of-processes NUMBER_OF_PROCESSES
-                        How many parallel processes should be used to run the
-                        experiment configurations. (default: 1)
+  -tff TABLE_FILL_FILE  Table fill file. (default: None)
   --ql-table-initiation {zero,coupling,random}
                         How to initiate the Q-Table. (default: zero)
   -n FLOW [FLOW ...], --flow FLOW [FLOW ...]
                         List of numbers of drivers used to evaluate the link
-                        costs. (default: [0])
+                        costs, when the KSP is computed (default: [0])
   -epl EPSILON [EPSILON ...], --epsilon EPSILON [EPSILON ...]
-                        List of epsilons for Q-Learning. (default: [1])
+                        List of epsilons(exploration/exploitation rate) for
+                        Q-Learning. (default: [1.0])
+  -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
+                        List of learning rates in each configuration.
+                        (default: [0.5])
+  --decays DECAYS [DECAYS ...]
+                        List of decays in each configuration; this sets the
+                        value by which epsilon is multiplied at each QL
+                        episode. (default: [0.99])
 ```
