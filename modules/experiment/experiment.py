@@ -507,13 +507,6 @@ class Experiment(object):
         self.ODheader = ""
         self.ODtable = {}
 
-        """
-        As for now it is not importing the capacities file
-        if self.network_name == "SF":
-            print("Parsing capacity file: %s" % capacitiesFile)
-            self.capacities = self.parseCapacityFile(capacitiesFile)
-        """
-
         self.Vo, self.Eo, odInputo = self.generate_graph(network_file, print_edges = print_edges, flow = flow)
 
         for tup_od in odInputo:
@@ -591,21 +584,6 @@ class Experiment(object):
             self.ODtable[str(od_pair)] = [0] * self.k
 
         return self.ODtable
-
-    def parseCapacityFile(self, path):
-        """
-        Not used for now. v6.1.5
-
-        Parses the capacity file.
-        """
-        links = {}
-        for line in open(path, 'r'):
-            line = line.replace('\n', '')
-            items = line.split(' ')
-            if len(items) == 4:
-                links[items[1] + "|" + items[2]] = float(items[3])
-
-        return links
 
     def genCallBack(self, ga_engine):
         """
@@ -777,10 +755,10 @@ class Experiment(object):
             + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
             + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = '#Parameters:' + ' k = ' + str(self.k) + ' alpha = ' + str(self.alpha) \
-            + ' decay = ' + str(self.decay) + ' number of drivers = ' + str(nd) \
-            + ' group_size = ' + str(self.group_size) + ' flow = ' + str(self.flow)\
-            + ' epsilon = ' + str(self.epsilon) + '\n#Episode AVG_TT ' + self.nodes_string()
+        headerstr = '#Parameters:' + '\n\tk = ' + str(self.k) + '\tAlpha = ' + str(self.alpha) \
+            + '\n\tDecay = ' + str(self.decay) + '\tNumber of drivers = ' + str(nd) \
+            + '\n\tGroup size = ' + str(self.group_size) + '\tTable init = ' + str(self.TABLE_INITIAL_STATE) \
+            + '\n\tEpsilon = ' + str(self.epsilon) + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr
 
@@ -859,7 +837,6 @@ class Experiment(object):
         self.outputFile.write(headerstr + '\n')
 
         for episode in range(num_episodes):
-            print "episode " +str(episode)
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode, instance, qlTT=value)
 

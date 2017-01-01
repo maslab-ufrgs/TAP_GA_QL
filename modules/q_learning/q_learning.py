@@ -14,34 +14,34 @@ class QL():
         self.decay = decay
         self.k = k
         ##init qtable
-	self.qtable = []
-	self.ODtable = {}
-	self.drivers = drivers
-	self.tableFill = tableFill
+        self.qtable = []
+        self.ODtable = {}
+        self.drivers = drivers
+        self.tableFill = tableFill
         self.numdrivers=len(drivers)
         if iniTable == "zero":
-        	print "Generating Q-Table with zeros."
-        	for i in range(self.numdrivers):
-            		self.qtable.append([0.0]*k)
-	elif iniTable == "coupling": #New way to fill the table
-		print "Generating Q-Table with mean coupling."
-		for d in drivers:
-			string = []
-			for r in range(len(d.od.paths)):
-				string.append(-1*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
-			self.qtable.append(string)
-	elif iniTable == "random":
-		print "Generating Q-Table with random values."
-		MAX = 0
-		for key in self.tableFill:
-			for t in self.tableFill[key]:
-				if MAX <= t:
-					MAX = t
-		for i in range(self.numdrivers):
-			string = []
-			for t in range(self.k):
-				string.append(-1*(random.uniform(0,round(MAX))))
-			self.qtable.append(string)
+            print "Generating Q-Table with zeros."
+            for i in range(self.numdrivers):
+                self.qtable.append([0.0]*k)
+        elif iniTable == "coupling": #New way to fill the table
+            print "Generating Q-Table with mean coupling."
+            for d in drivers:
+                string = []
+                for r in range(len(d.od.paths)):
+                    string.append((-1.0)*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
+                self.qtable.append(string)
+        elif iniTable == "random":
+            print "Generating Q-Table with random values."
+            MAX = 0
+            for key in self.tableFill:
+                for t in self.tableFill[key]:
+                    if MAX <= t:
+                        MAX = t
+            for i in range(self.numdrivers):
+                string = []
+                for t in range(self.k):
+                    string.append((-1.0)*(random.uniform(0,round(MAX))))
+                self.qtable.append(string)
 
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
@@ -66,22 +66,22 @@ class QL():
                 if len(array_of_pointers2max) == 0:##bloco estava identado
                      raise Exception("error: no max found in qtable for  " + str(a))
                 else:
-                     if len(array_of_pointers2max) == 1: 
+                     if len(array_of_pointers2max) == 1:
                           # this means only one action maximizes
-                          curaction = array_of_pointers2max[0]  
-                     else: 
+                          curaction = array_of_pointers2max[0]
+                     else:
                           # more than one action with max value
                           curaction = random.choice(array_of_pointers2max)
             actions.append(curaction)
-        
+
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
-        
+
         #updates qtable. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
             #print 'reward: '+str(reward)+"\n"
             self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
-        
+
         #updates epsilon
         self.epsilon = self.epsilon * self.decay
         average_tt_time = sum(traveltimes)/self.numdrivers
