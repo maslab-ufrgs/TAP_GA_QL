@@ -1,44 +1,8 @@
 """
 This module serves runs the configurations and arguments necessary to the experiments.
 """
-from multiprocessing import Pool
 from os.path import basename, splitext
 import modules.experiment.experiment as exp
-
-"""
-These attributions need to be tested to see if they're really necessary.
-"""
-PRINT_EDGES = False
-FLOW = 0
-P_TRAVEL_TIME = False
-P_DRIVERS_LINK = False
-P_OD_PAIR = False
-P_DRIVERS_ROUTE = False
-P_INTERVAL = 1
-QL_TABLE_STATE = "zero"
-NETWORK_NAME = "OW"
-GENERATIONS = 10
-POPULATION = 100
-REPETITIONS = 1
-FILE = ""
-TABLE_FILL_FILE = ""
-
-##ExperimentType
-#1: QL only
-#2: GA only
-#3: GA<-QL
-#4: GA<->QL
-
-EXPERIMENT_TYPE = 1
-ELITE_SIZE = 5
-GROUP_SIZES = [1]
-ALPHAS = [.9]
-DECAYS = [.99]
-CROSSOVERS = [.2]
-MUTATIONS = [.001]
-KS = [8]
-GA_QL_INTERVAL = [10]
-EPSILON = [1]
 
 def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, epsilon):
     """
@@ -95,7 +59,7 @@ def run_arg(*args):
     """
     args: list of arguments
     """
-    arg_0 = args[0]
+    arg_0 = args[0][0]
     assert len(arg_0) == 9
     group_size, alpha, decay, crossover, mutation, k, interval, flow, epsilon = arg_0
     print(("Running the configuration:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s\n\tMutation: %s"\
@@ -106,8 +70,7 @@ def run_arg(*args):
                 + "\tk: %s\n\tInterval: %s\tFlow: %s\n\tEpsilon: %s") % tuple(arg_0))
         print("Repetition %s/%s" % (repetition+1, REPETITIONS))
 
-def run(number_of_processes=4):
-    print("Running experiment with %s processors.." % number_of_processes)
-    pool = Pool(processes=number_of_processes)
+def run():
+    print("Starting to run the experiments.\nPlease wait.")
     args = build_args()
-    pool.map(run_arg, args)
+    run_arg(args)

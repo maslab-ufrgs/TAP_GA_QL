@@ -119,4 +119,4 @@ config.PRINT_EDGES = args.printEdges
 config.EPSILON = args.epsilon
 config.TABLE_FILL_FILE = args.table_fill_file
 
-config.run(number_of_processes=args.number_of_processes)
+config.run()
