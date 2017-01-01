@@ -757,8 +757,9 @@ class Experiment(object):
 
         headerstr = '#Parameters:' + '\n\tk = ' + str(self.k) + '\tAlpha = ' + str(self.alpha) \
             + '\n\tDecay = ' + str(self.decay) + '\tNumber of drivers = ' + str(nd) \
-            + '\n\tGroup size = ' + str(self.group_size) + '\tTable init = ' + str(self.TABLE_INITIAL_STATE) \
-            + '\n\tEpsilon = ' + str(self.epsilon) + '\n#Episode AVG_TT ' + self.nodes_string()
+            + '\n\tGroup size = ' + str(self.group_size) + '\tTable init = ' \
+            + str(self.TABLE_INITIAL_STATE) + '\n\tEpsilon = ' + str(self.epsilon) \
+            + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr
 
@@ -776,12 +777,14 @@ class Experiment(object):
                 + '_interval'+ str(self.interval) + '_' + str(localtime()[3]) + 'h' \
                 + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
-                + str(self.population) + ' self.mutation=' + str(self.mutation) \
-                + ' crossover=' + str(self.crossover) + ' elit=' + str(self.elite) \
-                + ' k=' + str(self.k) + ' alpha=' + str(self.alpha) + ' decay=' + str(self.decay) \
-                + ' number of drivers=' + str(self.nd()) + ' groupsize= '+ str(self.group_size) \
-                + ' GA->QL interval=' + str(self.interval) + '\n#generation avg_tt ql_avg_tt ' \
+            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\tPop. = " \
+                + str(self.population) + "\n\tMutation = " + str(self.mutation) \
+                + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
+                + "\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\tDecay = " \
+                + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
+                + str(self.group_size) + "\n\tGA->QL interval=" + str(self.interval) \
+                + "\tEpsilon = " + str(self.epsilon) + "\n\tTable init = " \
+                + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 
         elif(useQL):
@@ -795,12 +798,15 @@ class Experiment(object):
                 + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.group_size) + '_' \
                 + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) +'s'
 
-            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size=' \
-                + str(self.population) + ' mutation=' + str(self.mutation) + ' crossover=' \
-                + str(self.crossover) + ' elit=' + str(self.elite) + ' k=' + str(self.k) \
-                + ' alpha=' + str(self.alpha) + ' decay=' + str(self.decay) \
-                + ' number of drivers=' + str(self.nd()) + ' groupsize= '+ str(self.group_size)\
-                + '\n#generation avg_tt ql_avg_tt ' + self.nodes_string()
+            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\tPop. = " \
+                + str(self.population) + "\n\tMutation = " + str(self.mutation) \
+                + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
+                + "\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\tDecay = " \
+                + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
+                + str(self.group_size) + "\tEpsilon = " + str(self.epsilon) + "\n\tTable init = " \
+                + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
+                + self.nodes_string()
+
         else:
             fmt = './results_gaql_grouped/net_%s/GA/pm%4.4f'
             path2simulationfiles = fmt % (self.network_name, self.mutation)
