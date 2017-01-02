@@ -1,0 +1,6 @@
+#Ex tirado do TABLE_FILL hardcoded na linha 23 em https://github.com/maslab-ufrgs/TAP_GA_QL/blob/master/modules/experiment/experiment.py
+#OD	coupling_1	coupling_2	coupling_3	coupling_4	coupling_5
+A|L	36.84		39.47		23.68		30.70		31.58
+A|M	31.58		37.89		32.63		22.37		35.53
+B|L	27.37		27.63		32.46		33.68		21.05
+B|M	21.05		27.63		20.00		18.95		28.42
