@@ -71,7 +71,7 @@ prs.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
 
 prs.add_argument('-tff', dest='table_fill_file', help="Table fill file.\n")
 
-prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random'], \
+prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random', 'fixed'], \
                  default='zero', help="How to initiate the Q-Table.\n")
 
 prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], \

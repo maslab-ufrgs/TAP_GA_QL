@@ -23,13 +23,13 @@ class GA:
         self.genCallBack = genCallBack
         self.evalFunc = evalFunc
         self.drivers = drivers
-        
+
         ###########sets pyevolve
-        
+
         #create alleles to make a GA model. each driver is represented as an allele
         #each driver can take k different routes which is modelled by the different
-        #values each allele can take   
-        driversAlleles = GAllele.GAlleles()    
+        #values each allele can take
+        driversAlleles = GAllele.GAlleles()
         for dr in drivers:
             lst = GAllele.GAlleleList(range(dr.od.numPaths))
             driversAlleles.add(lst)
@@ -51,17 +51,17 @@ class GA:
         self.ga.setElitism(True)
         self.ga.setElitismReplacement(self.elite)
         self.ga.setSortType(Consts.sortType["raw"])
-    
+
     #initializes genome string
     def initGenome(self,genome,**args):
        driversAlleles = genome.getParam('allele')
        genome.clearList()
        for i in range(genome.genomeSize):
-          genome.append(driversAlleles[i].getRandomAllele())    
-    
+          genome.append(driversAlleles[i].getRandomAllele())
+
     def evolve(self):
         self.ga.evolve(freq_stats=10)
-        
+
     def evalFuncCallback(self,genome):
         genomeString = genome.getInternalList()
         return self.evalFunc(genomeString)

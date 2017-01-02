@@ -273,7 +273,7 @@ def is_number(arg):
     except ValueError:
         return False
 
-def generate_table_fill(coupling_file, k):
+def generate_table_fill_coup(coupling_file, k):
     """
     Read the coupling file contents and create the table fill.
 
@@ -299,6 +299,16 @@ def generate_table_fill(coupling_file, k):
                                    + ' than the k specified in the parameters.')
                 table_fill[line[0]] = list_values
 
+    return table_fill
+
+def generate_table_fill_rand(maxi, mini, k, list_of_od_pairs):
+    table_fill = {}
+    for od in list_of_od_pairs:
+        list_of_vals = []
+        for ks in range(k):
+            random.seed()
+            list_of_vals.append(random.uniform(mini, maxi))
+        table_fill[od] = list_of_vals
     return table_fill
 
 
@@ -352,10 +362,13 @@ class Experiment(object):
         self.network_name = net_name
         self.edges = {}
         self.flow = flow
-        self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         self.TABLE_FILL = {}
+        self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         if TABLE_INITIAL_STATE == 'coupling':
-            self.TABLE_FILL = generate_table_fill(table_fill_file, self.k)
+            self.TABLE_FILL = generate_table_fill_coup(table_fill_file, self.k)
+        if TABLE_INITIAL_STATE == 'random':
+            self.TABLE_FILL = generate_table_fill_rand(mini, maxi, self.k, self.ODL)
+
 
     def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
@@ -512,7 +525,6 @@ class Experiment(object):
         self.ODlist = []
         self.ODL = []
         self.ODheader = ""
-        self.ODtable = {}
 
         self.Vo, self.Eo, odInputo = self.generate_graph(network_file, print_edges = print_edges, flow = flow)
 
@@ -536,11 +548,12 @@ class Experiment(object):
                         self.ODheader = self.ODheader + " " + str(tup_od[0]) \
                             + "to" + str(tup_od[1]) + "_" + str(i + 1)
 
-        for od_pair in self.ODL:
-            list_routes = []
-            for i in range(self.k):
-                list_routes.append(0)
-            self.ODtable[str(od_pair)] = list_routes
+        if self.TABLE_INITIAL_STATE == 'zero':
+            for od_pair in self.ODL:
+                list_routes = []
+                for i in range(self.k):
+                    list_routes.append(0)
+                self.TABLE_FILL[str(od_pair)] = list_routes
 
         #Get the k shortest routes
         #print "getKRoutes"
@@ -588,9 +601,9 @@ class Experiment(object):
 
         """
         for od_pair in self.ODL:
-            self.ODtable[str(od_pair)] = [0] * self.k
+            self.TABLE_FILL[str(od_pair)] = [0] * self.k
 
-        return self.ODtable
+        return self.TABLE_FILL
 
     def genCallBack(self, ga_engine):
         """
@@ -601,7 +614,7 @@ class Experiment(object):
         if self.printDriversPerRoute:
             #Drivers per route
             for od in self.ODL:
-                self.ODtable[str(od)] = [0] * self.k
+                self.TABLE_FILL[str(od)] = [0] * self.k
 
         #gets worst individual
         worstsol = population[len(population) - 1]
@@ -695,14 +708,12 @@ class Experiment(object):
             if self.printDriversPerRoute:
                 self.__clean_od_table()
                 for s in range(len(stepSolution)):
-                    self.ODtable[str(self.drivers[s].od.o)
+                    self.TABLE_FILL[str(self.drivers[s].od.o)
                                  + str(self.drivers[s].od.d)][stepSolution[s]] += 1
-                    #print self.ODtable
                 self.outputFile.write(" ")
                 for keys in self.ODL:  # Now it prints in the correct order
-                    for x in range(len(self.ODtable[keys])):
-                        #string = string + str(ODtable[keys][x])
-                        self.outputFile.write(str(self.ODtable[keys][x]) + " ")
+                    for x in range(len(self.TABLE_FILL[keys])):
+                        self.outputFile.write(str(self.TABLE_FILL[keys][x]) + " ")
 
             self.outputFile.write("\n")
 
