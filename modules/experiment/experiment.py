@@ -275,6 +275,8 @@ def is_number(arg):
 
 def generate_table_fill(coupling_file):
     """
+    Read the coupling file contents and create the table fill.
+
     In:
     coupling_file:string = path to coupling file.
 
@@ -755,9 +757,9 @@ class Experiment(object):
             + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
             + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = '#Parameters:' + '\n\tk = ' + str(self.k) + '\tAlpha = ' + str(self.alpha) \
+        headerstr = '#Parameters:' + '\n\tk = ' + str(self.k) + '\t\tAlpha = ' + str(self.alpha) \
             + '\n\tDecay = ' + str(self.decay) + '\tNumber of drivers = ' + str(nd) \
-            + '\n\tGroup size = ' + str(self.group_size) + '\tTable init = ' \
+            + '\n\tGroup size = ' + str(self.group_size) + '\tQL Table init = ' \
             + str(self.TABLE_INITIAL_STATE) + '\n\tEpsilon = ' + str(self.epsilon) \
             + '\n#Episode AVG_TT ' + self.nodes_string()
 
@@ -777,13 +779,13 @@ class Experiment(object):
                 + '_interval'+ str(self.interval) + '_' + str(localtime()[3]) + 'h' \
                 + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\tPop. = " \
+            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\t\tPop. = " \
                 + str(self.population) + "\n\tMutation = " + str(self.mutation) \
                 + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
-                + "\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\tDecay = " \
+                + "\t\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\t\tDecay = " \
                 + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
                 + str(self.group_size) + "\n\tGA->QL interval=" + str(self.interval) \
-                + "\tEpsilon = " + str(self.epsilon) + "\n\tTable init = " \
+                + "\t\tEpsilon = " + str(self.epsilon) + "\n\tQL Table init = " \
                 + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 
@@ -798,12 +800,12 @@ class Experiment(object):
                 + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.group_size) + '_' \
                 + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) +'s'
 
-            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\tPop. = " \
+            headerstr = "#Parameters:" + "\n\tGen. = " + str(self.generations) + "\t\tPop. = " \
                 + str(self.population) + "\n\tMutation = " + str(self.mutation) \
                 + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
-                + "\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\tDecay = " \
+                + "\t\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\t\tDecay = " \
                 + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
-                + str(self.group_size) + "\tEpsilon = " + str(self.epsilon) + "\n\tTable init = " \
+                + str(self.group_size) + "\n\tEpsilon = " + str(self.epsilon) + "\t\tTable init = " \
                 + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 
