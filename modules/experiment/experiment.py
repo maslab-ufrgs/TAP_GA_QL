@@ -750,7 +750,7 @@ class Experiment(object):
             path2simulationfiles:string = path to file
             headerstr:string = parameters used in the experiment
         """
-        fmt = './results_gaql_grouped/net_%s/QL/decay%4.3f/alpha%3.2f'
+        fmt = "./results_gaql_grouped/net_%s/QL/decay%4.3f/alpha%3.2f"
         path2simulationfiles = fmt % (self.network_name, self.decay, self.alpha)
 
         filename = path2simulationfiles + '/' + self.network_name \
@@ -767,8 +767,8 @@ class Experiment(object):
 
     def createStringArguments(self, useQL, useInt):
         if(useQL and useInt):
-            fmt = './results_gaql_grouped/net_%s/GA<->QL/\
-                   pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s'
+            fmt = "./results_gaql_grouped/net_%s/GA<->QL/" \
+                   + "pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s"
             path2simulationfiles = fmt % (self.network_name, self.mutation,
                                           self.decay, self.alpha, self.interval)
 
@@ -790,7 +790,7 @@ class Experiment(object):
                 + self.nodes_string()
 
         elif(useQL):
-            fmt = './results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f'
+            fmt = "./results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f"
             path2simulationfiles = fmt % (self.network_name, self.mutation,
                                           self.decay, self.alpha)
 
@@ -805,12 +805,12 @@ class Experiment(object):
                 + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
                 + "\t\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\t\tDecay = " \
                 + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
-                + str(self.group_size) + "\n\tEpsilon = " + str(self.epsilon) + "\t\tTable init = " \
+                + str(self.group_size) + "\n\tEpsilon = " + str(self.epsilon) + "\t\tTable init = "\
                 + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 
         else:
-            fmt = './results_gaql_grouped/net_%s/GA/pm%4.4f'
+            fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
             path2simulationfiles = fmt % (self.network_name, self.mutation)
 
             filenamewithtag = path2simulationfiles + '/net' + self.network_name + '_pm'\
