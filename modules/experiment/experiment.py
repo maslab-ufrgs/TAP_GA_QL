@@ -294,7 +294,6 @@ def generate_table_fill(coupling_file, k):
                     if value != line[0]:
                         list_values.append(float(value))
                     count += 1
-                    print count
                 if count != k + 1:
                     raise Exception('The number of k values in the table fill file is different' \
                                    + ' than the k specified in the parameters.')
