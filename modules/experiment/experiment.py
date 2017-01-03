@@ -272,7 +272,7 @@ def is_number(arg):
     except ValueError:
         return False
 
-def generate_table_fill_coup(coupling_file, k):
+def generate_table_fill(coupling_file, k):
     """
     Read the coupling file contents and create the table fill.
 
@@ -288,26 +288,14 @@ def generate_table_fill_coup(coupling_file, k):
             line = line.split()
             if '#' not in line[0]:
                 list_values = []
-                count = 0
                 for value in line:
                     if value != line[0]:
                         list_values.append(float(value))
-                    count += 1
-                if count != k + 1:
+                if len(list_values) != k + 1:
                     raise Exception('The number of k values in the table fill file is different' \
                                    + ' than the k specified in the parameters.')
                 table_fill[line[0]] = list_values
 
-    return table_fill
-
-def generate_table_fill_rand(maxi, mini, k, list_of_od_pairs):
-    table_fill = {}
-    for od in list_of_od_pairs:
-        list_of_vals = []
-        for ks in range(k):
-            random.seed()
-            list_of_vals.append(random.uniform(mini, maxi))
-        table_fill[od] = list_of_vals
     return table_fill
 
 
@@ -367,7 +355,7 @@ class Experiment(object):
         self.fixed = fixed
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         if TABLE_INITIAL_STATE == 'coupling':
-            self.TABLE_FILL = generate_table_fill_coup(table_fill_file, self.k)
+            self.TABLE_FILL = generate_table_fill(table_fill_file, self.k)
 
     def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
