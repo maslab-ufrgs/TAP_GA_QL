@@ -14,7 +14,6 @@ from modules.genetic_algorithm.genetic_algorithm import *
 from modules.q_learning.q_learning import *
 import modules.ksp.function as KSP
 
-
 class Driver(object):
     '''
     Represents a driver in the network.
@@ -325,7 +324,7 @@ class Experiment(object):
     def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file='',
                  flow=0, p_travel_time=False, p_drivers_link=False,
                  p_od_pair=False, p_interval=1, epsilon=1,
-                 p_drivers_route=False, TABLE_INITIAL_STATE='zero'):
+                 p_drivers_route=False, TABLE_INITIAL_STATE='zero', MINI=0.0, MAXI=0.0):
 
         """
         Construct the experiment.
@@ -363,12 +362,11 @@ class Experiment(object):
         self.edges = {}
         self.flow = flow
         self.TABLE_FILL = {}
+        self.mini = MINI
+        self.maxi = MAXI
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         if TABLE_INITIAL_STATE == 'coupling':
             self.TABLE_FILL = generate_table_fill_coup(table_fill_file, self.k)
-        if TABLE_INITIAL_STATE == 'random':
-            self.TABLE_FILL = generate_table_fill_rand(mini, maxi, self.k, self.ODL)
-
 
     def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
         """
@@ -849,7 +847,7 @@ class Experiment(object):
         self.alpha = alpha
         self.decay = decay
         self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL, self.epsilon,
-                     self.TABLE_INITIAL_STATE)  # Change for "coupling" to use TABLE_FILL
+                     self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi)  # Change for "coupling" to use TABLE_FILL
 
         filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filenamewithtag = self.appendTag(filename)
@@ -883,7 +881,8 @@ class Experiment(object):
         self.decay = decay
         if(useQL):
             self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,
-                         self.TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE)
+                         self.TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE, MINI=self.mini,
+                         MAX=self.maxi)
 
         filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
         filenamewithtag = self.appendTag(filename)

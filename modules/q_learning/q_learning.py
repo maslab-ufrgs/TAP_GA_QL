@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 18 19:51:35 2015
-
-@author: thiago
-"""
 import random
 
 class QL():
-    def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"):
+    def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"
+                 , MINI=0, MAX=0):
         self.experiment = experiment
         self.epsilon = epsilon
         self.alpha = alpha
@@ -30,9 +26,9 @@ class QL():
                 for r in range(len(d.od.paths)):
                     string.append((-1.0)*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
                 self.qtable.append(string)
+            print self.qtable
         elif iniTable == "random":
             print "Generating Q-Table with random values."
-            MAX = 0
             for key in self.tableFill:
                 for t in self.tableFill[key]:
                     if MAX <= t:
@@ -40,7 +36,7 @@ class QL():
             for i in range(self.numdrivers):
                 string = []
                 for t in range(self.k):
-                    string.append((-1.0)*(random.uniform(0,round(MAX))))
+                    string.append((-1.0)*(random.uniform(MINI,MAX)))
                 self.qtable.append(string)
 
     ##runs one episode of ql
