@@ -74,11 +74,14 @@ prs.add_argument('-tff', dest='table_fill_file', help="Table fill file.\n")
 prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random', 'fixed'], \
                  default='zero', help="How to initiate the Q-Table.\n")
 
-prs.add_argument("--max", type=float, default=0.0, help="Maximum value for the random"\
+prs.add_argument("--max", type=float, default=0.0, help="Maximum value for the random" \
                  + " initiation. Note that the random value(x) will be x <= max !\n")
 
-prs.add_argument("--min", type=float, default=0.0, help="Maximum value for the random"\
+prs.add_argument("--min", type=float, default=0.0, help="Maximum value for the random" \
                  + " initiation. Note that the random value(x) will be min <= x !\n")
+
+prs.add_argument("--fixed", type=float, default=0.0, help="Fixed value for generating the" \
+                 + " Q table.\n")
 
 prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], \
                  help="List of numbers of drivers used to evaluate the link costs, when the KSP"
@@ -126,5 +129,6 @@ config.EPSILON = args.epsilon
 config.TABLE_FILL_FILE = args.table_fill_file
 config.MINI = args.min
 config.MAXI = args.max
+config.FIXED = args.fixed
 
 config.run()

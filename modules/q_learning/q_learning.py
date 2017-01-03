@@ -3,7 +3,7 @@ import random
 
 class QL():
     def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"
-                 , MINI=0, MAX=0):
+                 , MINI=0, MAX=0, fixed=0.0):
         self.experiment = experiment
         self.epsilon = epsilon
         self.alpha = alpha
@@ -26,7 +26,6 @@ class QL():
                 for r in range(len(d.od.paths)):
                     string.append((-1.0)*(self.tableFill[str(d.od.o)+"|"+str(d.od.d)][r]))
                 self.qtable.append(string)
-            print self.qtable
         elif iniTable == "random":
             print "Generating Q-Table with random values."
             for key in self.tableFill:
@@ -38,6 +37,11 @@ class QL():
                 for t in range(self.k):
                     string.append((-1.0)*(random.uniform(MINI,MAX)))
                 self.qtable.append(string)
+        elif iniTable == "fixed":
+            print "Generating Q-Table with fixed values."
+            for i in range(self.numdrivers):
+                self.qtable.append([fixed]*k)
+        #print self.qtable
 
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
