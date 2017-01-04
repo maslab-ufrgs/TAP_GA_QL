@@ -1,15 +1,6 @@
-Script to run the simulation of drivers going from different points in the
-OW and SF networks
-
 Can get other networks from
 ===========================
  * [Networks](https://github.com/maslab-ufrgs/network-files)
-
-Warning
-=======
-
-> The cost functions used for edge travel time avaliation are tied to the network being run (SF or OW10_1). If you are 
-> going to use other networks, you most likely want to edit the calculateEdgesTravelTimesNew function in the experiment.py module.
 
 Dependencies
 ============
