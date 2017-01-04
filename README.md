@@ -78,7 +78,7 @@ Options
 
 ```
 optional arguments:
-   -h, --help            show this help message and exit
+  -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
   --experimentType {1,2,3,4}
                         1 - QL only; 2 - GA only; 3 - QL builds solution for
@@ -128,8 +128,8 @@ optional arguments:
                         Frequency with which the GA sends its best solution to
                         the QL. (default: [10])
   -tff TABLE_FILL_FILE  Table fill file. (default: None)
-  --ql-table-initiation {zero,coupling,random,fixed}
-                        How to initiate the Q-Table. (default: zero)
+  --ql-table-initiation {coupling,random,fixed}
+                        How to initiate the Q-Table. (default: fixed)
   --max MAX             Maximum value for the random initiation. Note that the
                         random value(x) will be x <= max ! (default: 0.0)
   --min MIN             Maximum value for the random initiation. Note that the
