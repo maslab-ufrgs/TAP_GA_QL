@@ -760,10 +760,10 @@ class Experiment(object):
             + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
             + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = '#Parameters:' + '\n\tk = ' + str(self.k) + '\t\tAlpha = ' + str(self.alpha) \
-            + '\n\tDecay = ' + str(self.decay) + '\tNumber of drivers = ' + str(nd) \
-            + '\n\tGroup size = ' + str(self.group_size) + '\tQL Table init = ' \
-            + str(self.TABLE_INITIAL_STATE) + '\n\tEpsilon = ' + str(self.epsilon) \
+        headerstr = '#Parameters:' + 'k = ' + str(self.k) + ' Alpha = ' + str(self.alpha) \
+            + ' Decay = ' + str(self.decay) + ' Number of drivers = ' + str(nd) \
+            + ' Group size = ' + str(self.group_size) + ' QL Table init = ' \
+            + str(self.TABLE_INITIAL_STATE) + ' Epsilon = ' + str(self.epsilon) \
             + '\n#Episode AVG_TT ' + self.nodes_string()
 
         return filename, path2simulationfiles, headerstr
@@ -782,13 +782,13 @@ class Experiment(object):
                 + '_interval'+ str(self.interval) + '_' + str(localtime()[3]) + 'h' \
                 + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-            headerstr = "#Parameters:" "\n\tGen. = " + str(self.generations) + "\t\tPop. = " \
-                + str(self.population) + "\n\tMutation = " + str(self.mutation) \
-                + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
-                + "\t\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\t\tDecay = " \
-                + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
-                + str(self.group_size) + "\n\tGA->QL interval=" + str(self.interval) \
-                + "\t\tEpsilon = " + str(self.epsilon) + "\n\tQL Table init = " \
+            headerstr = "#Parameters:" " Gen. = " + str(self.generations) + " Pop. = " \
+                + str(self.population) + " Mutation = " + str(self.mutation) \
+                + " Crossover = " + str(self.crossover) + " Elite = " + str(self.elite) \
+                + " k = " + str(self.k) + " Alpha = " + str(self.alpha) + " Decay = " \
+                + str(self.decay) + " Number of drivers = " + str(self.nd()) + " Group size = "\
+                + str(self.group_size) + " GA->QL interval=" + str(self.interval) \
+                + " Epsilon = " + str(self.epsilon) + " QL Table init = " \
                 + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 
@@ -803,12 +803,12 @@ class Experiment(object):
                 + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.group_size) + '_' \
                 + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) +'s'
 
-            headerstr = "#Parameters:" + "\n\tGen. = " + str(self.generations) + "\t\tPop. = " \
-                + str(self.population) + "\n\tMutation = " + str(self.mutation) \
-                + "\tCrossover = " + str(self.crossover) + "\n\tElite = " + str(self.elite) \
-                + "\t\tk = " + str(self.k) + "\n\tAlpha = " + str(self.alpha) + "\t\tDecay = " \
-                + str(self.decay) + "\n\tNumber of drivers = " + str(self.nd()) + "\tGroup size = "\
-                + str(self.group_size) + "\n\tEpsilon = " + str(self.epsilon) + "\t\tTable init = "\
+            headerstr = "#Parameters:" + " Gen. = " + str(self.generations) + " Pop. = " \
+                + str(self.population) + " Mutation = " + str(self.mutation) \
+                + " Crossover = " + str(self.crossover) + " Elite = " + str(self.elite) \
+                + " k = " + str(self.k) + " Alpha = " + str(self.alpha) + " Decay = " \
+                + str(self.decay) + " Number of drivers = " + str(self.nd()) + " Group size = "\
+                + str(self.group_size) + " Epsilon = " + str(self.epsilon) + " Table init = "\
                 + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
                 + self.nodes_string()
 

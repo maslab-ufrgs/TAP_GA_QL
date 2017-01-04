@@ -71,8 +71,8 @@ prs.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
 
 prs.add_argument('-tff', dest='table_fill_file', help="Table fill file.\n")
 
-prs.add_argument("--ql-table-initiation", type=str, choices=['zero', 'coupling', 'random', 'fixed'], \
-                 default='zero', help="How to initiate the Q-Table.\n")
+prs.add_argument("--ql-table-initiation", type=str, choices=['coupling', 'random', 'fixed'], \
+                 default='fixed', help="How to initiate the Q-Table.\n")
 
 prs.add_argument("--max", type=float, default=0.0, help="Maximum value for the random" \
                  + " initiation. Note that the random value(x) will be x <= max !\n")
