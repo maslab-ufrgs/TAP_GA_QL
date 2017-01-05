@@ -135,9 +135,6 @@ optional arguments:
   --min MIN             Maximum value for the random initiation. Note that the
                         random value(x) will be min <= x ! (default: 0.0)
   --fixed FIXED         Fixed value for generating the Q table. (default: 0.0)
-  -n FLOW [FLOW ...], --flow FLOW [FLOW ...]
-                        List of numbers of drivers used to evaluate the link
-                        costs, when the KSP is computed (default: [0])
   -epl EPSILON [EPSILON ...], --epsilon EPSILON [EPSILON ...]
                         List of epsilons(exploration/exploitation rate) for
                         Q-Learning. (default: [1.0])
