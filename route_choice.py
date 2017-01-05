@@ -83,10 +83,6 @@ prs.add_argument("--min", type=float, default=0.0, help="Maximum value for the r
 prs.add_argument("--fixed", type=float, default=0.0, help="Fixed value for generating the" \
                  + " Q table.\n")
 
-prs.add_argument("-n", "--flow", nargs="+", type=int, default=[0], \
-                 help="List of numbers of drivers used to evaluate the link costs, when the KSP"
-                 + " is computed\n")
-
 prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1.0], \
                  help="List of epsilons(exploration/exploitation rate) for Q-Learning.\n")
 
@@ -123,7 +119,7 @@ config.MUTATIONS = args.mutations
 config.KS = args.ks
 config.GA_QL_INTERVAL = args.exchangeGAQL
 config.QL_TABLE_STATE = args.ql_table_initiation
-config.FLOW = args.flow
+config.FLOW = [0]
 config.PRINT_EDGES = args.printEdges
 config.EPSILON = args.epsilon
 config.TABLE_FILL_FILE = args.table_fill_file
