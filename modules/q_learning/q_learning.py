@@ -28,10 +28,6 @@ class QL():
                 self.qtable.append(string)
         elif iniTable == "random":
             print "Generating Q-Table with random values."
-            for key in self.tableFill:
-                for t in self.tableFill[key]:
-                    if MAX <= t:
-                        MAX = t
             for i in range(self.numdrivers):
                 string = []
                 for t in range(self.k):
