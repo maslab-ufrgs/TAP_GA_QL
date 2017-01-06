@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-    Use spaces instead of tabs, or configure your editor to transform tab to 4
-    spaces.
+Use spaces instead of tabs, or configure your editor to transform tab to 4
+spaces.
 """
 #Standard modules
 import os
@@ -452,8 +452,6 @@ def nd(drivers, group_size):
     return len(drivers) * group_size
 
 
-
-
 class Experiment(object):
     '''
     Sets up an experiment.
@@ -675,7 +673,7 @@ class Experiment(object):
 
             if self.printTravelTime:
                 travel_times = ''
-                edges = self.calculateEdgesTravelTimesNew(stepSolution)
+                edges = self.calculate_edges_travel_times(stepSolution)
                 for edge in self.edgeNames:
                     travel_times += str(edges[edge]) + " "
                 self.outputFile.write(travel_times.strip() + " ")
@@ -699,20 +697,6 @@ class Experiment(object):
 
             self.outputFile.write("\n")
 
-    def appendTag(self, filenamewithtag):
-        """
-            Test if there isn't already a file with the desired name,
-            paralellization of experiments may result in filename conflict.
-        """
-        append_number = ''
-        while(os.path.isfile(filenamewithtag + append_number + ".txt")):
-            if(append_number == ''):
-                append_number = "-1"
-            else:
-                append_number = "-" + str(int(append_number[1:]) + 1)
-        filenamewithtag += append_number + ".txt"
-        return filenamewithtag
-
     def createStringArgumentsQL(self, nd):
         """
         Generate filename, generate the path to the file and generate the header infos for the file
@@ -720,15 +704,15 @@ class Experiment(object):
             nd:int = number of drivers without groupsize
         Out:
             filename:string = filename
-            path2simulationfiles:string = path to file
+            path:string = path to file
             headerstr:string = parameters used in the experiment
         """
         fmt = "./results_gaql_grouped/net_%s/QL/decay%4.3f/alpha%3.2f"
-        path2simulationfiles = fmt % (self.network_name, self.decay, self.alpha)
+        path = fmt % (self.network_name, self.decay, self.alpha)
 
-        filename = path2simulationfiles + '/' + self.network_name \
-            + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-            + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
+        filename = path + '/' + self.network_name + '_k' + str(self.k) + '_a' + str(self.alpha) \
+                 + '_d' + str(self.decay) + '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + 'm' + str(localtime()[5]) + 's'
 
         headerstr = "#Parameters:" + "\n#\tAlpha=" + str(self.alpha) + "\tEpsilon=" \
                   + str(self.epsilon) + "\n#\tDecay=" + str(self.decay) + "\tNumber of drivers=" \
@@ -743,7 +727,7 @@ class Experiment(object):
                                                          self.printDriversPerRoute, self.ODlist,
                                                          self.edgeNames, self.ODheader)
 
-        return filename, path2simulationfiles, headerstr
+        return filename, path, headerstr
 
     def createStringArguments(self, useQL, useInt):
         fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
@@ -800,20 +784,20 @@ class Experiment(object):
         self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL, self.epsilon,
                      self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi, fixed=self.fixed)  # Change for "coupling" to use TABLE_FILL
 
-        filename, path2simulationfiles, headerstr = self.createStringArgumentsQL(len(self.drivers))
-        filenamewithtag = self.appendTag(filename)
+        filename, path, headerstr = self.createStringArgumentsQL(len(self.drivers))
+        filename = filename + ".txt"
 
-        if os.path.isdir(path2simulationfiles) is False:
-            os.makedirs(path2simulationfiles)
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
 
-        self.outputFile = open(filenamewithtag, 'w')
+        self.outputFile = open(filename, 'w')
         self.outputFile.write(headerstr + '\n')
 
         for episode in range(num_episodes):
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode, instance, qlTT=value)
 
-        print("Output file location: %s" % filenamewithtag)
+        print("Output file location: %s" % filename)
 
         self.outputFile.close()
 
@@ -835,21 +819,21 @@ class Experiment(object):
                          self.TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE, MINI=self.mini,
                          MAX=self.maxi, fixed=self.fixed)
 
-        filename, path2simulationfiles, headerstr = self.createStringArguments(useQL, useInt)
-        filenamewithtag = self.appendTag(filename)
+        filename, path, headerstr = self.createStringArguments(useQL, useInt)
+        filename = filename + ".txt"
 
         ##creates file
-        if os.path.isdir(path2simulationfiles) is False:
-            os.makedirs(path2simulationfiles)
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
 
-        self.outputFile = open(filenamewithtag, 'w')
+        self.outputFile = open(filename, 'w')
         self.outputFile.write(headerstr + '\n')
 
         self.ga = GA(generations, population, crossover, mutation, elite, self,
                      self.genCallBack, self.calculateAverageTravelTime, self.drivers)
         self.ga.evolve()
 
-        print("Output file location: %s" % filenamewithtag)
+        print("Output file location: %s" % filename)
         self.outputFile.close()
 
     def driversPerLink(self, driverString):
@@ -892,10 +876,10 @@ class Experiment(object):
             d["%s%s" % (od.o, od.d)] = []
         return d
 
-    def travelTimeByOD(self, stringOfActions):
-        edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
+    def travelTimeByOD(self, string_actions):
+        edgesTravelTimes = self.calculate_edges_travel_times(string_actions)
         odTravelTimeDict = self.initTravelTimeByODDict()
-        for driverIdx, action in enumerate(stringOfActions):
+        for driverIdx, action in enumerate(string_actions):
             path = self.drivers[driverIdx].od.paths[action][0]
             traveltime = 0.0
             for edge in path:
@@ -903,31 +887,26 @@ class Experiment(object):
             odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
         return odTravelTimeDict
 
-    def calculateIndividualTravelTime(self, stringOfActions):
+    def calculateIndividualTravelTime(self, string_actions):
         #returns list of travel times for each driver
-        edgesTravelTimes = self.calculateEdgesTravelTimesNew(stringOfActions)
+        edgesTravelTimes = self.calculate_edges_travel_times(string_actions)
         results = []
-        for driverIdx, action in enumerate(stringOfActions):
+        for driverIdx, action in enumerate(string_actions):
             travel_times = self.evaluateActionTravelTime(driverIdx, action, edgesTravelTimes)
             results.append(travel_times)
         return results
 
-    def calculateEdgesTravelTimesNew(self, stringOfActions):
-        """
-        New Version
-        THIS IS THE NEW EVALUATE FUNCTION(THE ONE ABOVE IS NOT USED ANYMORE)
-        EACH EDGE OF THE NETWORK HAS ITS OWN COST FUNCTION NOW.
-        """
+    def calculate_edges_travel_times(self, string_actions):
         edges_travel_times = {}
         #Get the flow of that edge
-        linkOccupancy = self.driversPerLink(stringOfActions)
+        link_occupancy = self.driversPerLink(string_actions)
         #For each edge
         for edge in self.Eo:
             p = Parser()
             exp = p.parse(edge.cost_formula)
             #Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
             edges_travel_times[edge.start + "|" + edge.end] = \
-                edge.eval_cost(linkOccupancy[edge.start + "|" + edge.end])
+                edge.eval_cost(link_occupancy[edge.start + "|" + edge.end])
         return edges_travel_times
 
     def calculateAverageTravelTime(self, stringOfActions):
