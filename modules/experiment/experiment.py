@@ -272,7 +272,7 @@ def is_number(arg):
     except ValueError:
         return False
 
-def generate_table_fill(coupling_file, k):
+def generate_table_fill(coupling_file):
     """
     Read the coupling file contents and create the table fill.
 
@@ -295,6 +295,164 @@ def generate_table_fill(coupling_file, k):
 
     return table_fill
 
+def generate_graph(graph_file, print_edges=False, flow=0):
+    """
+    Reads the .net file and return it's infos.
+    The infos are:
+        function(s)
+        node(s)
+        arc(s)
+        edge(s)
+        od(s)
+
+    It should be following the specification from:
+        https://wiki.inf.ufrgs.br/Network_files_specification
+
+    It returns a list of vertices(V), a list of edges(E) and a list of OD(ODlist)
+
+    Tests:
+    """
+    vertices = []
+    edges = []
+    functions = {}
+    od_list = []
+    for line in open(graph_file, 'r'):
+        taglist = string.split(line)
+        if taglist[0] == 'function':
+            variables = []
+            variables = taglist[2].replace("(", "")
+            variables = variables.replace(")", "")
+            variables = variables.split(",")
+            functions[taglist[1]] = [taglist[3], variables]
+
+        elif taglist[0] == 'node':
+            vertices.append(Node(taglist[1]))
+
+        elif taglist[0] == 'dedge' or taglist[0] == 'edge':
+            constants = []
+            cost_formula = ""
+            freeflow_cost = 0
+            constant_acc = 0
+            if len(taglist) > 5:
+                i = 5
+                while i <= (len(taglist) - 1):
+                    constants.append(taglist[i])
+                    i += 1
+                parser = Parser()
+                ##[4] is function name.[0] is expression
+                exp = parser.parse(functions[taglist[4]][0])
+                LV = exp.variables()
+                buffer_LV = []
+                for l in LV:
+                    if l not in functions[taglist[4]][1]:
+                        constant_acc += 1
+                        buffer_LV.append(l)
+
+                #check if the formula has any parameters(variables)
+                flag = False
+                for v in functions[taglist[4]][1]:
+                    if v in LV:
+                        flag = True
+
+                buffer_dic = {}
+                i = 0
+                for index in range(constant_acc):
+                    buffer_dic[buffer_LV[index]] = float(constants[index])
+                    i = 1
+
+                if not flag:
+                    freeflow_cost = exp.evaluate(buffer_dic)
+                    cost_formula = str(freeflow_cost)
+
+                elif is_number(functions[taglist[4]][0]):
+                    freeflow_cost = float(functions[taglist[4]][0])
+                    cost_fomula = functions[taglist[4]][0]
+
+                else:
+                    exp = exp.simplify(buffer_dic)
+                    cost_formula = exp.toString()
+                    exp = Parser()
+                    cost_formula2 = "(" + cost_formula + ") + flow"
+                    exp = exp.parse(cost_formula2)
+                    freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # Hardcoded
+
+                edges.append(Edge(taglist[2], taglist[3],
+                                  freeflow_cost, cost_formula))
+                if taglist[0] == 'edge':
+                    edges.append(Edge(taglist[3], taglist[2],
+                                      freeflow_cost, cost_formula))
+
+            else:
+                cost_formula = ""
+                freeflow_cost = 0
+                parser = Parser()
+                if is_number(functions[taglist[4]][0]):
+                    cost_formula = functions[taglist[4]][0]
+                    freeflow_cost = float(functions[taglist[4]][0])
+
+                else:
+                    exp = parser.parse(functions[taglist[4]][0])
+                    cost_formula = exp.toString()
+                    cost_formula2 = "(" + cost_formula + ") + flow"
+                    exp = exp.parse(cost_formula2)
+                    freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # hardcoded
+
+                edges.append(Edge(taglist[2], taglist[3],
+                                  freeflow_cost, cost_formula))
+                edges.append(Edge(taglist[3], taglist[2],
+                                  freeflow_cost, cost_formula))
+
+        elif taglist[0] == 'od':
+            od_list.append((taglist[2], taglist[3], int(taglist[4])))
+    '''
+    Print edges and their costs but there are too many lines to be printed!!
+    '''
+    if print_edges:
+        for e in edges:
+            print("Edge " + str(e.start) + "-"
+                  + str(e.end) + " has length: " + str(e.length))
+
+
+    return vertices, edges, od_list
+
+def clean_od_table(ODL, k):
+    """
+    Zeroes the OD table.
+    """
+    TABLE_FILL = {}
+    for od_pair in ODL:
+        TABLE_FILL[str(od_pair)] = [0] * k
+
+    return TABLE_FILL
+
+def nodes_string(print_od_pair, print_travel_time, print_drivers_link, print_drivers_route,
+        od_list, edge_names, od_header):
+    """
+    String of edges of the graph that will be printed or stored in the file.
+    """
+    nodes_string = ''
+    if print_od_pair:
+        for od in od_list:
+            nodes_string += "tt_%s|%s " % (od.o, od.d)
+    if print_travel_time:
+        for edge in edge_names:
+            nodes_string += 'tt_' + edge + ' '
+    if print_drivers_link:
+        for edge in edge_names:
+            nodes_string += "nd_" + edge + ' '
+    if print_drivers_route:
+        nodes_string += od_header
+    nodes_string = nodes_string.strip()
+    return nodes_string
+
+def nd(drivers, group_size):
+    """
+    Number of drivers.
+    """
+    return len(drivers) * group_size
+
+
+
 
 class Experiment(object):
     '''
@@ -306,10 +464,10 @@ class Experiment(object):
     <class '__main__.Experiment'>
     '''
 
-    def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file='',
-                 flow=0, p_travel_time=False, p_drivers_link=False,
-                 p_od_pair=False, p_interval=1, epsilon=1,
-                 p_drivers_route=False, TABLE_INITIAL_STATE='zero', MINI=0.0, MAXI=0.0, fixed=0.0):
+    def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file=None,
+                 flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
+                 epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
+                 MINI=0.0, MAXI=0.0, fixed=0.0):
 
         """
         Construct the experiment.
@@ -352,146 +510,7 @@ class Experiment(object):
         self.fixed = fixed
         self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
         if TABLE_INITIAL_STATE == 'coupling':
-            self.TABLE_FILL = generate_table_fill(table_fill_file, self.k)
-
-    def generate_graph(self, graph_file, print_edges = False, flow = 0.0):
-        """
-        Reads the .net file and return it's infos.
-        The infos are:
-            function(s)
-            node(s)
-            arc(s)
-            edge(s)
-            od(s)
-
-        It should be following the specification from:
-            https://wiki.inf.ufrgs.br/Network_files_specification
-
-        It returns a list of vertices(V), a list of edges(E) and a list of OD(ODlist)
-
-        Tests:
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW').\
-                generate_graph('./networks/OW10_1/OW10_1.net') #doctest:+NORMALIZE_WHITESPACE
-        (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'], ['A-B', 'B-A', 'A-C', \
-         'C-A', 'A-D', 'D-A', 'B-D', 'D-B', 'B-E', 'E-B', 'C-D', 'D-C', 'C-F', 'F-C', 'C-G', 'G-C',\
-         'D-E', 'E-D', 'D-G', 'G-D', 'D-H', 'H-D', 'E-H', 'H-E', 'F-G', 'G-F', 'F-I', 'I-F', 'G-H',\
-         'H-G', 'G-J', 'J-G', 'G-K', 'K-G', 'H-K', 'K-H', 'I-J', 'J-I', 'I-L', 'L-I', 'J-K', 'K-J',\
-         'J-L', 'L-J', 'J-M', 'M-J', 'K-M', 'M-K'], [('A', 'L', 600), ('A', 'M', 400),\
-         ('B', 'L', 300), ('B', 'M', 400)])
-
-        In order: The vertice list, edge list and the OD list.
-        Vertices -> ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
-
-        Edges -> ['A-B', 'B-A', 'A-C', 'C-A', 'A-D', 'D-A', 'B-D', 'D-B', 'B-E', 'E-B', 'C-D',
-                  'D-C', 'C-F', 'F-C', 'C-G', 'G-C', 'D-E', 'E-D', 'D-G', 'G-D', 'D-H', 'H-D',
-                  'E-H', 'H-E', 'F-G', 'G-F', 'F-I', 'I-F', 'G-H', 'H-G', 'G-J', 'J-G', 'G-K',
-                  'K-G', 'H-K', 'K-H', 'I-J', 'J-I', 'I-L', 'L-I', 'J-K', 'K-J', 'J-L', 'L-J',
-                  'J-M', 'M-J', 'K-M', 'M-K']
-
-        OD -> [('A', 'L', 600), ('A', 'M', 400), ('B', 'L', 300), ('B', 'M', 400)]
-        """
-        vertices = []
-        edges = []
-        functions = {}
-        od_list = []
-        for line in open(graph_file, 'r'):
-            taglist = string.split(line)
-            if taglist[0] == 'function':
-                variables = []
-                variables = taglist[2].replace("(", "")
-                variables = variables.replace(")", "")
-                variables = variables.split(",")
-                functions[taglist[1]] = [taglist[3], variables]
-
-            elif taglist[0] == 'node':
-                vertices.append(Node(taglist[1]))
-
-            elif taglist[0] == 'dedge' or taglist[0] == 'edge':
-                constants = []
-                cost_formula = ""
-                freeflow_cost = 0
-                constant_acc = 0
-                if len(taglist) > 5:
-                    i = 5
-                    while i <= (len(taglist) - 1):
-                        constants.append(taglist[i])
-                        i += 1
-                    parser = Parser()
-                    ##[4] is function name.[0] is expression
-                    exp = parser.parse(functions[taglist[4]][0])
-                    LV = exp.variables()
-                    buffer_LV = []
-                    for l in LV:
-                        if l not in functions[taglist[4]][1]:
-                            constant_acc += 1
-                            buffer_LV.append(l)
-
-                    #check if the formula has any parameters(variables)
-                    flag = False
-                    for v in functions[taglist[4]][1]:
-                        if v in LV:
-                            flag = True
-
-                    buffer_dic = {}
-                    i = 0
-                    for index in range(constant_acc):
-                        buffer_dic[buffer_LV[index]] = float(constants[index])
-                        i = 1
-
-                    if not flag:
-                        freeflow_cost = exp.evaluate(buffer_dic)
-                        cost_formula = str(freeflow_cost)
-
-                    elif is_number(functions[taglist[4]][0]):
-                        freeflow_cost = float(functions[taglist[4]][0])
-                        cost_fomula = functions[taglist[4]][0]
-
-                    else:
-                        exp = exp.simplify(buffer_dic)
-                        cost_formula = exp.toString()
-                        exp = Parser()
-                        cost_formula2 = "(" + cost_formula + ") + flow"
-                        exp = exp.parse(cost_formula2)
-                        freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # Hardcoded
-
-                    edges.append(Edge(taglist[2], taglist[3],
-                                      freeflow_cost, cost_formula))
-                    if taglist[0] == 'edge':
-                        edges.append(Edge(taglist[3], taglist[2],
-                                          freeflow_cost, cost_formula))
-
-                else:
-                    cost_formula = ""
-                    freeflow_cost = 0
-                    parser = Parser()
-                    if is_number(functions[taglist[4]][0]):
-                        cost_formula = functions[taglist[4]][0]
-                        freeflow_cost = float(functions[taglist[4]][0])
-
-                    else:
-                        exp = parser.parse(functions[taglist[4]][0])
-                        cost_formula = exp.toString()
-                        cost_formula2 = "(" + cost_formula + ") + flow"
-                        exp = exp.parse(cost_formula2)
-                        freeflow_cost = exp.evaluate({'f': 0, 'flow': flow})  # hardcoded
-
-                    edges.append(Edge(taglist[2], taglist[3],
-                                      freeflow_cost, cost_formula))
-                    edges.append(Edge(taglist[3], taglist[2],
-                                      freeflow_cost, cost_formula))
-
-            elif taglist[0] == 'od':
-                od_list.append((taglist[2], taglist[3], int(taglist[4])))
-        '''
-        Print edges but there are too many lines to be printed!!
-        '''
-        if print_edges:
-            for e in edges:
-                print("Edge " + str(e.start) + "-"
-                      + str(e.end) + " has length: " + str(e.length))
-
-
-        return vertices, edges, od_list
+            self.TABLE_FILL = generate_table_fill(table_fill_file)
 
     def init_network_data(self, k, network_file, group_size, flow, print_edges):
         """
@@ -510,7 +529,7 @@ class Experiment(object):
         self.ODL = []
         self.ODheader = ""
 
-        self.Vo, self.Eo, odInputo = self.generate_graph(network_file, print_edges = print_edges, flow = flow)
+        self.Vo, self.Eo, odInputo = generate_graph(network_file, print_edges=print_edges)
 
         for tup_od in odInputo:
             if tup_od[2] % self.group_size != 0:
@@ -567,27 +586,6 @@ class Experiment(object):
         'Experiment: k = 8, net_name = OW10_1'
         """
         return repr(str('Experiment: k = ' + str(self.k) + ', net_name = ' + (self.network_name)))
-
-    def __clean_od_table(self):
-        """
-        Zeroes the OD table.
-        In the future, it needs to be changed when used in the program.
-
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1') \
-            .ODtable #doctest: +NORMALIZE_WHITESPACE
-        {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
-         'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'). \
-            _Experiment__clean_od_table() #doctest: +NORMALIZE_WHITESPACE
-        {'BL': [0, 0, 0, 0, 0, 0, 0, 0], 'BM': [0, 0, 0, 0, 0, 0, 0, 0], \
-         'AM': [0, 0, 0, 0, 0, 0, 0, 0], 'AL': [0, 0, 0, 0, 0, 0, 0, 0]}
-
-
-        """
-        for od_pair in self.ODL:
-            self.TABLE_FILL[str(od_pair)] = [0] * self.k
-
-        return self.TABLE_FILL
 
     def genCallBack(self, ga_engine):
         """
@@ -690,7 +688,7 @@ class Experiment(object):
                 self.outputFile.write(drivers.strip())
 
             if self.printDriversPerRoute:
-                self.__clean_od_table()
+                self.TABLE_FILL = clean_od_table(self.ODL, self.k)
                 for s in range(len(stepSolution)):
                     self.TABLE_FILL[str(self.drivers[s].od.o)
                                  + str(self.drivers[s].od.d)][stepSolution[s]] += 1
@@ -700,31 +698,6 @@ class Experiment(object):
                         self.outputFile.write(str(self.TABLE_FILL[keys][x]) + " ")
 
             self.outputFile.write("\n")
-
-    def nodes_string(self):
-        """
-            String of edges of the graph that will be printed or stored in the file.
-        """
-        nodes_string = ''
-        if self.printODpair:
-            for od in self.ODlist:
-                nodes_string += "tt_%s|%s " % (od.o, od.d)
-        if(self.printTravelTime):
-            for edgeN in self.edgeNames:
-                nodes_string += 'tt_' + edgeN + ' '
-        if(self.printDriversPerLink):
-            for edgeN in self.edgeNames:
-                nodes_string += "nd_" + edgeN + ' '
-        if(self.printDriversPerRoute):
-            nodes_string += self.ODheader
-        nodes_string = nodes_string.strip()
-        return nodes_string
-
-    def nd(self):
-        """
-        Number of drivers.
-        """
-        return len(self.drivers) * self.group_size
 
     def appendTag(self, filenamewithtag):
         """
@@ -757,75 +730,67 @@ class Experiment(object):
             + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
             + '_'+ str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = '#Parameters:' + 'k = ' + str(self.k) + ' Alpha = ' + str(self.alpha) \
-            + ' Decay = ' + str(self.decay) + ' Number of drivers = ' + str(nd) \
-            + ' Group size = ' + str(self.group_size) + ' QL Table init = ' \
-            + str(self.TABLE_INITIAL_STATE) + ' Epsilon = ' + str(self.epsilon) \
-            + '\n#Episode AVG_TT ' + self.nodes_string()
+        headerstr = "#Parameters:" + "\n#\tAlpha=" + str(self.alpha) + "\tEpsilon=" \
+                  + str(self.epsilon) + "\n#\tDecay=" + str(self.decay) + "\tNumber of drivers=" \
+                  + str(nd) + "\n#\tGroup size=" + str(self.group_size) + "\tQL Table init=" \
+                  + str(self.TABLE_INITIAL_STATE) +  "\n#\tk=" + str(self.k)
+
+        if self.TABLE_INITIAL_STATE == "fixed":
+            headerstr += "\t\tFixed value=" + str(self.fixed)
+
+        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
+                                                         self.printDriversPerLink,
+                                                         self.printDriversPerRoute, self.ODlist,
+                                                         self.edgeNames, self.ODheader)
 
         return filename, path2simulationfiles, headerstr
 
     def createStringArguments(self, useQL, useInt):
-        if(useQL and useInt):
-            fmt = "./results_gaql_grouped/net_%s/GA<->QL/" \
-                   + "pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s"
-            path2simulationfiles = fmt % (self.network_name, self.mutation,
-                                          self.decay, self.alpha, self.interval)
+        fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
+        path = fmt % (self.network_name, self.mutation)
 
-            filenamewithtag = path2simulationfiles + '/net' + self.network_name + '_pm'\
-                + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
-                + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay)\
-                + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.group_size) \
-                + '_interval'+ str(self.interval) + '_' + str(localtime()[3]) + 'h' \
-                + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
+        filename = '/net' + self.network_name + '_pm' + str(self.mutation) + '_c' \
+                 + str(self.crossover) + '_e' + str(self.elite) + '_k' + str(self.k) + '_nd' \
+                 + str(nd(self.drivers, self.group_size)) + '_groupsize' + str(self.group_size)
 
-            headerstr = "#Parameters:" " Gen. = " + str(self.generations) + " Pop. = " \
-                + str(self.population) + " Mutation = " + str(self.mutation) \
-                + " Crossover = " + str(self.crossover) + " Elite = " + str(self.elite) \
-                + " k = " + str(self.k) + " Alpha = " + str(self.alpha) + " Decay = " \
-                + str(self.decay) + " Number of drivers = " + str(self.nd()) + " Group size = "\
-                + str(self.group_size) + " GA->QL interval=" + str(self.interval) \
-                + " Epsilon = " + str(self.epsilon) + " QL Table init = " \
-                + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
-                + self.nodes_string()
 
-        elif(useQL):
+        headerstr = "#Parameters:" + "\n#\tGenerations=" + str(self.generations) + "\tPopulation=" \
+                  + str(self.population) + "\n#\tMutation=" + str(self.mutation) + "\tCrossover=" \
+                  + str(self.crossover) + "\n#\tElite=" + str(self.elite) + "\t\tGroup size=" \
+                  + str(self.group_size) + "\n#\tk=" + str(self.k) + "\t\tNumber of drivers=" \
+                  + str(nd(self.drivers, self.group_size))
+
+        headerstr_ext = "\n#Generations AVG_TT"
+
+        if useQL:
             fmt = "./results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f"
-            path2simulationfiles = fmt % (self.network_name, self.mutation,
-                                          self.decay, self.alpha)
+            path = fmt % (self.network_name, self.mutation, self.decay, self.alpha)
 
-            filenamewithtag = path2simulationfiles + '/net' + self.network_name + '_pm' \
-                + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
-                + '_k' + str(self.k) + '_a' + str(self.alpha) + '_d' + str(self.decay) \
-                + '_nd'+ str(self.nd()) + '_groupsize'+ str(self.group_size) + '_' \
-                + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' + str(localtime()[5]) +'s'
+            filename += '_a' + str(self.alpha) + '_d' + str(self.decay)
+            headerstr += "\n#\tAlpha=" + str(self.alpha) + "\tDecay=" + str(self.decay) \
+                      + "\n#\tEpsilon=" + str(self.epsilon) + "\tQL table init=" \
+                      + str(self.TABLE_INITIAL_STATE)
 
-            headerstr = "#Parameters:" + " Gen. = " + str(self.generations) + " Pop. = " \
-                + str(self.population) + " Mutation = " + str(self.mutation) \
-                + " Crossover = " + str(self.crossover) + " Elite = " + str(self.elite) \
-                + " k = " + str(self.k) + " Alpha = " + str(self.alpha) + " Decay = " \
-                + str(self.decay) + " Number of drivers = " + str(self.nd()) + " Group size = "\
-                + str(self.group_size) + " Epsilon = " + str(self.epsilon) + " Table init = "\
-                + str(self.TABLE_INITIAL_STATE) + "\n#Generation avg_tt ql_avg_tt " \
-                + self.nodes_string()
+            headerstr_ext += " QL_AVG_TT"
 
-        else:
-            fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
-            path2simulationfiles = fmt % (self.network_name, self.mutation)
+            if useInt:
+                fmt = "./results_gaql_grouped/net_%s/GA<->QL/" \
+                       + "pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s"
 
-            filenamewithtag = path2simulationfiles + '/net' + self.network_name + '_pm'\
-                + str(self.mutation) + '_c' + str(self.crossover) + '_e' + str(self.elite) \
-                + '_k' + str(self.k) + '_nd'+ str(self.nd()) + '_groupsize' \
-                + str(self.group_size) + '_' + str(localtime()[3]) + 'h' \
-                + str(localtime()[4]) + 'm' + str(localtime()[5]) + 's'
+                path = fmt % (self.network_name, self.mutation, self.decay, self.alpha, self.interval)
+                filename += '_interval'+ str(self.interval)
+                headerstr += "\n#\tGA->QL interval=" + str(self.interval)
 
-            headerstr = '#parameters: generations=' + str(self.generations) + ' pop.size='\
-                + str(self.population) + ' mutation=' + str(self.mutation)\
-                + ' crossover=' + str(self.crossover) \
-                + ' groupsize= '+ str(self.group_size) + " k= " + str(self.k) \
-                + '\n#generation avg_tt ' + self.nodes_string()
+        filename += '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' \
+                 + str(localtime()[5]) + 's'
 
-        return filenamewithtag, path2simulationfiles, headerstr
+        filename = path + filename
+
+        headerstr += headerstr_ext + nodes_string(self.printODpair, self.printTravelTime,
+                                  self.printDriversPerLink, self.printDriversPerRoute,
+                                  self.ODlist, self.edgeNames, self.ODheader)
+
+        return filename, path, headerstr
 
     def run_ql(self, num_episodes, alpha, decay):
         self.useGA = False
