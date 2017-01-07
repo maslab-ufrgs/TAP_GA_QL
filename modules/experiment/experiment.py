@@ -14,7 +14,6 @@ from modules.genetic_algorithm.genetic_algorithm import *
 from modules.q_learning.q_learning import *
 from modules.functions.functions import *
 from modules.experiment.classes import *
-import modules.ksp.function as KSP
 
 
 class Experiment(object):
@@ -124,8 +123,8 @@ class Experiment(object):
         #Get the k shortest routes
         #print "getKRoutes"
         for od_pair in self.ODlist:
-            od_pair.paths = KSP.getKRoutes(self.Vo, self.Eo, od_pair.o,
-                                           od_pair.d, od_pair.numPaths)
+            od_pair.paths = getKRoutes(self.Vo, self.Eo, od_pair.o,
+                                       od_pair.d, od_pair.numPaths)
 
         ##get the value of each link - free flow travel time
         self.freeFlow = {}
