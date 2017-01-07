@@ -79,6 +79,7 @@ def generate_graph(graph_file, print_edges=False, flow=0):
     edges = []
     functions = {}
     od_list = []
+
     for line in open(graph_file, 'r'):
         taglist = string.split(line)
         if taglist[0] == 'function':
