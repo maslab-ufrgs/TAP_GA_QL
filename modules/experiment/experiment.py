@@ -3,6 +3,7 @@
 Use spaces instead of tabs, or configure your editor to transform tab to 4
 spaces.
 """
+
 #Standard modules
 import os
 from time import localtime
@@ -10,7 +11,6 @@ import string
 #Third-party module
 from py_expression_eval import Parser
 #Local modules
-from modules.genetic_algorithm.genetic_algorithm import *
 from modules.q_learning.q_learning import *
 from modules.functions.functions import *
 from modules.experiment.classes import *
@@ -375,6 +375,7 @@ class Experiment(object):
 
     def run_ga_ql(self, useQL, useInt, generations, population, crossover, mutation, elite, alpha,
                   decay, interval):
+        from modules.genetic_algorithm.genetic_algorithm import *
         self.useGA = True
         self.useQL = useQL
         self.useInterval = useInt
