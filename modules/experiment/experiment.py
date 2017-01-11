@@ -321,6 +321,12 @@ class Experiment(object):
                       + "\n#\tEpsilon=" + str(self.epsilon) + "\tQL table init=" \
                       + str(self.TABLE_INITIAL_STATE)
 
+            if self.TABLE_INITIAL_STATE == "fixed":
+                headerstr += "\n#\tFixed value=" + str(self.fixed)
+            elif self.TABLE_INITIAL_STATE == "random":
+                headerstr += "\n#\tMax=" + str(self.maxi) + "\t\tMin=" + str(self.mini)
+
+
             headerstr_ext += " QL_AVG_TT"
 
             if useInt:
@@ -335,11 +341,6 @@ class Experiment(object):
                  + str(localtime()[5]) + 's'
 
         filename = path + filename
-
-        if self.TABLE_INITIAL_STATE == "fixed":
-            headerstr += "\t\tFixed value=" + str(self.fixed)
-        elif self.TABLE_INITIAL_STATE == "random":
-            headerstr += "\n#\tMax=" + str(self.maxi) + "\t\tMin=" + str(self.mini)
 
         headerstr += headerstr_ext + nodes_string(self.printODpair, self.printTravelTime,
                                                   self.printDriversPerLink, self.printDriversPerRoute,
