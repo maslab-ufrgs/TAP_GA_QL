@@ -285,6 +285,8 @@ class Experiment(object):
 
         if self.TABLE_INITIAL_STATE == "fixed":
             headerstr += "\t\tFixed value=" + str(self.fixed)
+        elif self.TABLE_INITIAL_STATE == "random":
+            headerstr += "\t\tMax=" + str(self.maxi) + "\n#\tMin=" + str(self.mini)
 
         headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
                                                          self.printDriversPerLink,
@@ -334,9 +336,14 @@ class Experiment(object):
 
         filename = path + filename
 
+        if self.TABLE_INITIAL_STATE == "fixed":
+            headerstr += "\t\tFixed value=" + str(self.fixed)
+        elif self.TABLE_INITIAL_STATE == "random":
+            headerstr += "\n#\tMax=" + str(self.maxi) + "\t\tMin=" + str(self.mini)
+
         headerstr += headerstr_ext + nodes_string(self.printODpair, self.printTravelTime,
-                                  self.printDriversPerLink, self.printDriversPerRoute,
-                                  self.ODlist, self.edgeNames, self.ODheader)
+                                                  self.printDriversPerLink, self.printDriversPerRoute,
+                                                  self.ODlist, self.edgeNames, self.ODheader)
 
         return filename, path, headerstr
 
