@@ -82,7 +82,7 @@ def run():
 if __name__ == "__main__":
     prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                   description="""
-                                  Traffic Assignment Problem v6.5.3
+                                  Traffic Assignment Problem v6.5.7
                                   Script to run the simulation of
                                   drivers going from different points in a given network""")
     prs.add_argument('-f', dest='file', required=True, help='The network file.\n')
