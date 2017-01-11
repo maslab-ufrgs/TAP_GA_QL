@@ -357,7 +357,7 @@ class Experiment(object):
                      self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi, fixed=self.fixed)  # Change for "coupling" to use TABLE_FILL
 
         filename, path, headerstr = self.createStringArgumentsQL(len(self.drivers))
-        filename = filename + ".txt"
+        filename = appendTag(filename)
 
         if os.path.isdir(path) is False:
             os.makedirs(path)
@@ -393,7 +393,7 @@ class Experiment(object):
                          MAX=self.maxi, fixed=self.fixed)
 
         filename, path, headerstr = self.createStringArguments(useQL, useInt)
-        filename = filename + ".txt"
+        filename = appendTag(filename)
 
         ##creates file
         if os.path.isdir(path) is False:

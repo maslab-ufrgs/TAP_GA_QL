@@ -1,4 +1,5 @@
 import string
+import os
 from modules.experiment.classes import *
 
 def is_number(arg):
@@ -214,6 +215,20 @@ def nd(drivers, group_size):
     Number of drivers.
     """
     return len(drivers) * group_size
+
+def appendTag(filenamewithtag):
+    """
+        Test if there isn't already a file with the desired name,
+        paralellization of experiments may result in filename conflict.
+    """
+    append_number = ''
+    while(os.path.isfile(filenamewithtag + append_number + ".txt")):
+        if(append_number == ''):
+            append_number = "-1"
+        else:
+            append_number = "-" + str(int(append_number[1:]) + 1)
+    filenamewithtag += append_number + ".txt"
+    return filenamewithtag
 
 # return a list with the K shortest paths for the given origin-destination pair,
 # given the lists of nodes and edges (this function was created to be called
