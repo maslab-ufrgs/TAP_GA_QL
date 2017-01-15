@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import random
+import math
 
 class QL():
     def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"
@@ -57,18 +58,30 @@ class QL():
                     for na in range(len(a)): #for each action
                         if a[na] == max_in_array:
                             array_of_pointers2max.append(na)
-                    if len(array_of_pointers2max) == 0:
-                        raise Exception("error: no max found in qtable for  " + str(a))
-                    else:
-                        if len(array_of_pointers2max) == 1:
-                            # this means only one action maximizes
-                            curaction = array_of_pointers2max[0]
-                        else:
-                            # more than one action with max value
-                            curaction = random.choice(array_of_pointers2max)
+
+                    #Chooses one of the actions with maximum value
+                    curaction = random.choice(array_of_pointers2max)
+
             elif self.action_selection == "boltzmann":
-                #TODO
-                continue
+                #Updates the probability of each action
+                list_prob = []
+                total = 0.0
+                for action in a:
+                    total += math.exp(action/self.temperature)
+                for action in a:
+                    list_prob.append(math.exp(action/self.temperature)/total)
+
+                #Selects the action
+                random_number = random.uniform(0, 1)
+                total = 0.0
+                index = 0
+                for prob in list_prob:
+                    total += prob
+                    if random_number <= total:
+                        curaction = index
+                        break
+                    else:
+                        index += 1
 
             actions.append(curaction)
 
@@ -94,7 +107,9 @@ class QL():
             #print 'reward: '+str(reward)+"\n"
             self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
 
-        #updates epsilon
-        self.epsilon = self.epsilon * self.decay
+        if self.action_selection == "epsilon":
+            #updates epsilon
+            self.epsilon = self.epsilon * self.decay
+
         average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions,average_tt_time)
