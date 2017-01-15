@@ -13,10 +13,12 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, e
     NETWORK_NAME = basename(FILE)
     NETWORK_NAME = splitext(NETWORK_NAME)[0]
 
-    ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow, p_travel_time=P_TRAVEL_TIME,
-                        table_fill_file=TABLE_FILL_FILE, p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
-                        p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE, TABLE_INITIAL_STATE=QL_TABLE_STATE,
-                        MAXI=MAXI, MINI=MINI, fixed=FIXED)
+    ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, PRINT_EDGES, flow=flow,
+                        p_travel_time=P_TRAVEL_TIME, table_fill_file=TABLE_FILL_FILE,
+                        p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
+                        p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
+                        TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE)
 
     if EXPERIMENT_TYPE == 1: # QL only
         print("Running QL Only")
@@ -86,6 +88,9 @@ if __name__ == "__main__":
                                   Script to run the simulation of
                                   drivers going from different points in a given network""")
     prs.add_argument('-f', dest='file', required=True, help='The network file.\n')
+
+    prs.add_argument("--action-selection", type=str, choices=["epsilon", "boltzmann"],
+                     default="epsilon", help="How the agents should select their actions.\n")
 
     prs.add_argument("--experimentType", type=int, choices=[1, 2, 3, 4], default=1,
                      help="""
@@ -168,10 +173,16 @@ if __name__ == "__main__":
                      help="List of decays in each configuration; this sets the value by which epsilon"
                      + " is multiplied at each QL episode.\n")
 
+    prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
+                     "Boltzmann action selection.\n")
+
     args = prs.parse_args()
 
     if(args.table_fill_file is None and 'coupling' == args.ql_table_initiation):
         prs.error("The 'coupling' argument requires a file to be read")
+
+    if(args.action_selection == "boltzmann" and args.temperature == None):
+        prs.error("The 'boltzmann' type of action selection requires a temperature.")
 
     MINI = args.min
     MAXI = args.max
@@ -202,5 +213,7 @@ if __name__ == "__main__":
     PRINT_EDGES = args.printEdges
     EPSILON = args.epsilon
     TABLE_FILL_FILE = args.table_fill_file
+    TEMPERATURE = args.temperature
+    ACTION_SELECTION = args.action_selection
 
     run()

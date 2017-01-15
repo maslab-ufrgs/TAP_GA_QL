@@ -29,7 +29,7 @@ class Experiment(object):
     def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
-                 MINI=0.0, MAXI=0.0, fixed=0.0):
+                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0):
 
         """
         Construct the experiment.
@@ -54,6 +54,8 @@ class Experiment(object):
         IOError: [Errno 2] No such file or directory: './networks/OW10_1/1.net'
         """
 
+        self.action_selection = action_selection
+        self.temperature = temperature
         self.k = k
         self.epsilon = epsilon
         self.group_size = group_size
@@ -278,8 +280,14 @@ class Experiment(object):
                  + '_d' + str(self.decay) + '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
                  + 'm' + str(localtime()[5]) + 's'
 
-        headerstr = "#Parameters:" + "\n#\tAlpha=" + str(self.alpha) + "\tEpsilon=" \
-                  + str(self.epsilon) + "\n#\tDecay=" + str(self.decay) + "\tNumber of drivers=" \
+        headerstr = "#Parameters:" + "\n#\tAlpha=" + str(self.alpha)
+
+        if self.action_selection == "epsilon":
+            headerstr += "\tEpsilon=" + str(self.epsilon)
+        elif self.action_selection == "boltzmann":
+            headerstr += "\tTemperature=" + str(self.temperature)
+
+        headerstr += "\n#\tDecay=" + str(self.decay) + "\tNumber of drivers=" \
                   + str(nd) + "\n#\tGroup size=" + str(self.group_size) + "\tQL Table init=" \
                   + str(self.TABLE_INITIAL_STATE) +  "\n#\tk=" + str(self.k)
 
@@ -318,8 +326,13 @@ class Experiment(object):
 
             filename += '_a' + str(self.alpha) + '_d' + str(self.decay)
             headerstr += "\n#\tAlpha=" + str(self.alpha) + "\tDecay=" + str(self.decay) \
-                      + "\n#\tEpsilon=" + str(self.epsilon) + "\tQL table init=" \
-                      + str(self.TABLE_INITIAL_STATE)
+
+            if self.action_selection == "epsilon":
+                headerstr += "\n#\tEpsilon=" + str(self.epsilon)
+            elif self.action_selection == "boltzmann":
+                headerstr += "\n#\tTemperature=" + str(self.temperature)
+
+            headerstr += "\tQL table init=" + str(self.TABLE_INITIAL_STATE)
 
             if self.TABLE_INITIAL_STATE == "fixed":
                 headerstr += "\n#\tFixed value=" + str(self.fixed)
@@ -353,8 +366,10 @@ class Experiment(object):
         self.useQL = True
         self.alpha = alpha
         self.decay = decay
-        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL, self.epsilon,
-                     self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi, fixed=self.fixed)  # Change for "coupling" to use TABLE_FILL
+        self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL,
+                     self.epsilon, self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi,
+                     fixed=self.fixed, action_selection=self.action_selection,
+                     temperature=self.temperature)
 
         filename, path, headerstr = self.createStringArgumentsQL(len(self.drivers))
         filename = appendTag(filename)
@@ -388,9 +403,10 @@ class Experiment(object):
         self.alpha = alpha
         self.decay = decay
         if(useQL):
-            self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha,
-                         self.TABLE_FILL, self.epsilon, self.TABLE_INITIAL_STATE, MINI=self.mini,
-                         MAX=self.maxi, fixed=self.fixed)
+            self.ql = QL(self, self.drivers, self.k, self.decay, self.alpha, self.TABLE_FILL,
+                         self.epsilon, self.TABLE_INITIAL_STATE, MINI=self.mini, MAX=self.maxi,
+                         fixed=self.fixed, action_selection=self.action_selection,
+                         temperature=self.temperature)
 
         filename, path, headerstr = self.createStringArguments(useQL, useInt)
         filename = appendTag(filename)

@@ -3,23 +3,20 @@ import random
 
 class QL():
     def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"
-                 , MINI=0.0, MAX=0.0, fixed=0.0):
+                 , MINI=0.0, MAX=0.0, fixed=0.0, action_selection="epsilon", temperature=None):
         self.experiment = experiment
         self.epsilon = epsilon
         self.alpha = alpha
         self.decay = decay
         self.k = k
-        ##init qtable
+        self.action_selection = action_selection
+        self.temperature = temperature
         self.qtable = []
         self.ODtable = {}
         self.drivers = drivers
         self.tableFill = tableFill
         self.numdrivers=len(drivers)
-        if iniTable == "zero":
-            print "Generating Q-Table with zeros."
-            for i in range(self.numdrivers):
-                self.qtable.append([0.0]*k)
-        elif iniTable == "coupling": #New way to fill the table
+        if iniTable == "coupling":
             print "Generating Q-Table with mean coupling."
             for d in drivers:
                 string = []
@@ -46,28 +43,33 @@ class QL():
         actions=[]
         #for each driver, select its list of actions in qtable
         for a in self.qtable:
-            #selection according to epsilon-greedy
-            randomnb = random.uniform(0,1)
-            if randomnb < self.epsilon:
-                # action is selected randomly
-                curaction = random.randint(0,self.k-1)
-            else:
-                # action is selected greedly
-                max_in_array = max(a)
-                #print max_in_array
-                array_of_pointers2max = []
-                for na in range(len(a)): #for each action
-                    if a[na] == max_in_array:
-                        array_of_pointers2max.append(na)
-                if len(array_of_pointers2max) == 0:##bloco estava identado
-                     raise Exception("error: no max found in qtable for  " + str(a))
+            if self.action_selection == "epsilon":
+                #selection according to epsilon-greedy
+                randomnb = random.uniform(0, 1)
+                if randomnb < self.epsilon:
+                    # action is selected randomly
+                    curaction = random.randint(0, self.k-1)
                 else:
-                     if len(array_of_pointers2max) == 1:
-                          # this means only one action maximizes
-                          curaction = array_of_pointers2max[0]
-                     else:
-                          # more than one action with max value
-                          curaction = random.choice(array_of_pointers2max)
+                    # action is selected greedly
+                    max_in_array = max(a)
+                    #print max_in_array
+                    array_of_pointers2max = []
+                    for na in range(len(a)): #for each action
+                        if a[na] == max_in_array:
+                            array_of_pointers2max.append(na)
+                    if len(array_of_pointers2max) == 0:
+                        raise Exception("error: no max found in qtable for  " + str(a))
+                    else:
+                        if len(array_of_pointers2max) == 1:
+                            # this means only one action maximizes
+                            curaction = array_of_pointers2max[0]
+                        else:
+                            # more than one action with max value
+                            curaction = random.choice(array_of_pointers2max)
+            elif self.action_selection == "boltzmann":
+                #TODO
+                continue
+
             actions.append(curaction)
 
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
