@@ -77,9 +77,11 @@ Options
 =======
 
 ```
-optional arguments:
-  -h, --help            show this help message and exit
+optional arguments:  -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
+  --action-selection {epsilon,boltzmann}
+                        How the agents should select their actions. (default:
+                        epsilon)
   --experimentType {1,2,3,4}
                         1 - QL only; 2 - GA only; 3 - QL builds solution for
                         GA; 4 - GA and QL exchange solutions. (default: 1)
@@ -145,4 +147,7 @@ optional arguments:
                         List of decays in each configuration; this sets the
                         value by which epsilon is multiplied at each QL
                         episode. (default: [0.99])
+  -t TEMPERATURE, --temperature TEMPERATURE
+                        Temperature for the Boltzmann action selection.
+                        (default: None)
 ```
