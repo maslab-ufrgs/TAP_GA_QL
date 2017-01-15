@@ -174,7 +174,7 @@ if __name__ == "__main__":
                      + " is multiplied at each QL episode.\n")
 
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
-                     "Boltzmann action selection.\n")
+                     " Boltzmann action selection.\n")
 
     args = prs.parse_args()
 
