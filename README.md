@@ -77,22 +77,24 @@ Options
 =======
 
 ```
-optional arguments:  -h, --help            show this help message and exit
+optional arguments:
+  -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
-  --action-selection {epsilon,boltzmann}
+  -as {epsilon,boltzmann}, --action-selection {epsilon,boltzmann}
                         How the agents should select their actions. (default:
                         epsilon)
-  --experimentType {1,2,3,4}
+  -et {1,2,3,4}, --experimentType {1,2,3,4}
                         1 - QL only; 2 - GA only; 3 - QL builds solution for
                         GA; 4 - GA and QL exchange solutions. (default: 1)
-  --repetitions REPETITIONS
+  -r REPETITIONS, --repetitions REPETITIONS
                         How many times it should be repeated. (default: 1)
-  --ks KS [KS ...]      List of the 'K' hyperparameters for the KSP
+  -k KS [KS ...], --ks KS [KS ...]
+                        List of the 'K' hyperparameters for the KSP
                         (K-ShortestPath) Algorithm. (default: [8])
   -g GENERATIONS, --generations GENERATIONS
                         Generations\episodes in each configuration. (default:
                         100)
-  --grouping GROUPING [GROUPING ...]
+  -group GROUPING [GROUPING ...], --grouping GROUPING [GROUPING ...]
                         List of group sizes for drivers in each configuration.
                         This parameter is useful when the number of
                         trips/drivers is huge; it sets how many drivers form a
@@ -105,13 +107,13 @@ optional arguments:  -h, --help            show this help message and exit
                         Print the amount of drivers per route for each OD
                         pair(Warning:QL only! Also, note that the number of OD
                         pairs can be very large!). (default: False)
-  -d, --printDriversPerLink
+  --printDriversPerLink
                         Print the number of drivers in each link in the output
                         file. (default: False)
   --printEdges          Print the travel time per edge. (default: False)
-  -o, --printODpair     Print the average travel time in the header in the
+  --printODpair         Print the average travel time in the header in the
                         output file. (default: False)
-  -i PRINTINTERVAL, --printInterval PRINTINTERVAL
+  --printInterval PRINTINTERVAL
                         Interval by which the messages are written in the
                         output file. (default: 1)
   -e ELITE_SIZE, --elite_size ELITE_SIZE
@@ -126,11 +128,11 @@ optional arguments:  -h, --help            show this help message and exit
   -m MUTATIONS [MUTATIONS ...], --mutations MUTATIONS [MUTATIONS ...]
                         List of rate of mutations in each configuration.
                         (default: [0.001])
-  --exchangeGAQL EXCHANGEGAQL [EXCHANGEGAQL ...]
-                        Frequency with which the GA sends its best solution to
-                        the QL. (default: [10])
+  -i EXCHANGEGAQL [EXCHANGEGAQL ...], --exchangeGAQL EXCHANGEGAQL [EXCHANGEGAQL ...]
+                        Interval of generations in which the GA sends its best
+                        solution to the QL. (default: [10])
   -tff TABLE_FILL_FILE  Table fill file. (default: None)
-  --ql-table-initiation {coupling,random,fixed}
+  -qti {coupling,random,fixed}, --ql-table-initiation {coupling,random,fixed}
                         How to initiate the Q-Table. (default: fixed)
   --max MAX             Maximum value for the random initiation. Note that the
                         random value(x) will be x <= max ! (default: 0.0)
@@ -143,7 +145,7 @@ optional arguments:  -h, --help            show this help message and exit
   -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
                         List of learning rates in each configuration.
                         (default: [0.5])
-  --decays DECAYS [DECAYS ...]
+  -d DECAYS [DECAYS ...], --decays DECAYS [DECAYS ...]
                         List of decays in each configuration; this sets the
                         value by which epsilon is multiplied at each QL
                         episode. (default: [0.99])
