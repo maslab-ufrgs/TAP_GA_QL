@@ -84,15 +84,16 @@ def run():
 if __name__ == "__main__":
     prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                   description="""
-                                  Traffic Assignment Problem
+                                  Traffic Assignment Problem or
+                                  Route Choice Problem.
                                   Script to run the simulation of
                                   drivers going from different points in a given network""")
-    prs.add_argument('-f', dest='file', required=True, help='The network file.\n')
+    prs.add_argument("-f", dest="file", required=True, help="The network file.\n")
 
-    prs.add_argument("--action-selection", type=str, choices=["epsilon", "boltzmann"],
+    prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("--experimentType", type=int, choices=[1, 2, 3, 4], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
@@ -100,16 +101,16 @@ if __name__ == "__main__":
                      4 - GA and QL exchange solutions.\n
                      """)
 
-    prs.add_argument("--repetitions", type=int, default=1,
+    prs.add_argument("-r", "--repetitions", type=int, default=1,
                      help="How many times it should be repeated.\n")
 
-    prs.add_argument("--ks", nargs="+", type=int, default=[8],
+    prs.add_argument("-k", "--ks", nargs="+", type=int, default=[8],
                      help="List of the 'K' hyperparameters for the KSP (K-ShortestPath) Algorithm.\n")
 
     prs.add_argument("-g", "--generations", type=int, default=100,
                      help="Generations\episodes in each configuration.\n")
 
-    prs.add_argument("--grouping", nargs="+", type=int, default=[1],
+    prs.add_argument("-group", "--grouping", nargs="+", type=int, default=[1],
                      help="List of group sizes for drivers in each configuration. This parameter is"
                      + " useful when the number of trips/drivers is huge; it sets how many drivers"
                      + " form a group; in a group all drivers/trips use the same OD pair, i.e., the"
@@ -122,16 +123,16 @@ if __name__ == "__main__":
                      help="Print the amount of drivers per route for each OD pair(Warning:QL only!"
                      + " Also, note that the number of OD pairs can be very large!).\n")
 
-    prs.add_argument("-d", "--printDriversPerLink", action="store_true", default=False,
+    prs.add_argument("--printDriversPerLink", action="store_true", default=False,
                      help="Print the number of drivers in each link in the output file.\n")
 
     prs.add_argument("--printEdges", action="store_true", default=False,
                      help="Print the travel time per edge.\n")
 
-    prs.add_argument("-o", "--printODpair", action="store_true", default=False,
+    prs.add_argument("--printODpair", action="store_true", default=False,
                      help="Print the average travel time in the header in the output file.\n")
 
-    prs.add_argument("-i", "--printInterval", type=int, default=1,
+    prs.add_argument("--printInterval", type=int, default=1,
                      help="Interval by which the messages are written in the output file.\n")
 
     prs.add_argument("-e", "--elite_size", type=int, default=5,
@@ -146,12 +147,12 @@ if __name__ == "__main__":
     prs.add_argument("-m", "--mutations", nargs="+", type=float, default=[0.001],
                      help="List of rate of mutations in each configuration.\n")
 
-    prs.add_argument("--exchangeGAQL", nargs="+", type=int, default=[10],
-                     help="Frequency with which the GA sends its best solution to the QL.\n")
+    prs.add_argument("-i", "--exchangeGAQL", nargs="+", type=int, default=[10],
+                     help="Interval of generations in which the GA sends its best solution to the QL.\n")
 
-    prs.add_argument('-tff', dest='table_fill_file', help="Table fill file.\n")
+    prs.add_argument("-tff", dest="table_fill_file", help="Table fill file.\n")
 
-    prs.add_argument("--ql-table-initiation", type=str, choices=['coupling', 'random', 'fixed'], \
+    prs.add_argument("-qti", "--ql-table-initiation", type=str, choices=['coupling', 'random', 'fixed'], \
                      default='fixed', help="How to initiate the Q-Table.\n")
 
     prs.add_argument("--max", type=float, default=0.0, help="Maximum value for the random" \
@@ -169,7 +170,7 @@ if __name__ == "__main__":
     prs.add_argument("-a", "--alphas", nargs="+", type=float, default=[0.5],
                      help="List of learning rates in each configuration.\n")
 
-    prs.add_argument("--decays", nargs="+", type=float, default=[0.99],
+    prs.add_argument("-d", "--decays", nargs="+", type=float, default=[0.99],
                      help="List of decays in each configuration; this sets the value by which epsilon"
                      + " is multiplied at each QL episode.\n")
 
@@ -178,10 +179,10 @@ if __name__ == "__main__":
 
     args = prs.parse_args()
 
-    if(args.table_fill_file is None and 'coupling' == args.ql_table_initiation):
+    if args.table_fill_file is None and args.ql_table_initiation == "coupling":
         prs.error("The 'coupling' argument requires a file to be read")
 
-    if(args.action_selection == "boltzmann" and args.temperature == None):
+    if args.action_selection == "boltzmann" and args.temperature is None:
         prs.error("The 'boltzmann' type of action selection requires a temperature.")
 
     MINI = args.min

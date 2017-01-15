@@ -443,12 +443,12 @@ class Experiment(object):
             path = self.drivers[inx].od.paths[dr]
             for edge in path[0]:
                 if edge in dicti.keys():
-                    dicti[edge] +=self.group_size
+                    dicti[edge] += self.group_size
                 else:
                     dicti[edge] = self.group_size
         for link in self.freeFlow.keys():
             if link not in dicti.keys():
-                dicti[link]=0
+                dicti[link] = 0
         return dicti
 
     def evaluateActionTravelTime(self, driverIndex, action, edgesTravelTimes):
