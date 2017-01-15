@@ -111,5 +111,8 @@ class QL():
             #updates epsilon
             self.epsilon = self.epsilon * self.decay
 
+        if self.action_selection == "boltzmann":
+            self.temperature = self.temperature * self.decay
+
         average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions,average_tt_time)
