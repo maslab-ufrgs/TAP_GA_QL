@@ -75,13 +75,12 @@ class QL():
                 random_number = random.uniform(0, 1)
                 total = 0.0
                 index = 0
-                for prob in list_prob:
-                    total += prob
+
+                while total < random_number:
+                    total += list_prob[index]
                     if random_number <= total:
                         curaction = index
-                        break
-                    else:
-                        index += 1
+                    index += 1
 
             actions.append(curaction)
 
@@ -93,12 +92,18 @@ class QL():
             #print 'reward: '+str(reward)+"\n"
             self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
 
-        #updates epsilon
-        self.epsilon = self.epsilon * self.decay
-        average_tt_time = sum(traveltimes)/self.numdrivers
-        return (actions,average_tt_time)
+        if self.action_selection == "epsilon":
+            #updates epsilon
+            self.epsilon = self.epsilon * self.decay
 
-    def runEpisodeWithAction(self,actions):
+        if self.action_selection == "boltzmann":
+            print self.temperature
+            self.temperature = self.temperature * self.decay
+
+        average_tt_time = sum(traveltimes)/self.numdrivers
+        return (actions, average_tt_time)
+
+    def runEpisodeWithAction(self, actions):
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
 
         #updates qtable. reward is the negative of the travel time
@@ -115,4 +120,4 @@ class QL():
             self.temperature = self.temperature * self.decay
 
         average_tt_time = sum(traveltimes)/self.numdrivers
-        return (actions,average_tt_time)
+        return (actions, average_tt_time)
