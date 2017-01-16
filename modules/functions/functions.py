@@ -168,7 +168,7 @@ def generate_graph(graph_file, print_edges=False, flow=0):
                                   freeflow_cost, cost_formula))
 
         elif taglist[0] == 'od':
-            od_list.append((taglist[2], taglist[3], int(taglist[4])))
+            od_list.append((taglist[2], taglist[3], float(taglist[4])))
     '''
     Print edges and their costs but there are too many lines to be printed!!
     '''
