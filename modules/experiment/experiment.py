@@ -256,7 +256,7 @@ class Experiment(object):
                 self.TABLE_FILL = clean_od_table(self.ODL, self.k)
                 for s in range(len(stepSolution)):
                     self.TABLE_FILL[str(self.drivers[s].od.o)
-                                 + str(self.drivers[s].od.d)][stepSolution[s]] += 1
+                                    + str(self.drivers[s].od.d)][stepSolution[s]] += 1
                 self.outputFile.write(" ")
                 for keys in self.ODL:  # Now it prints in the correct order
                     for x in range(len(self.TABLE_FILL[keys])):
