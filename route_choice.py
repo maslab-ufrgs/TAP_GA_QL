@@ -196,6 +196,10 @@ if __name__ == "__main__":
     P_INTERVAL = args.printInterval
     P_DRIVERS_ROUTE = args.printDriversPerRoute
 
+    if(args.experimentType == 3 or args.experimentType == 4) and (P_DRIVERS_ROUTE or P_OD_PAIR
+       or P_DRIVERS_LINK or P_TRAVEL_TIME):
+        prs.error("You can't use print-outs with experiment type 3 or 4.")
+
     GENERATIONS = args.generations
     POPULATION = args.population
     REPETITIONS = args.repetitions
