@@ -8,7 +8,6 @@ spaces.
 import os
 from time import localtime
 import string
-import math
 #Third-party module
 from py_expression_eval import Parser
 #Local modules
@@ -140,7 +139,7 @@ class Experiment(object):
         #instance
         self.drivers = []
         for od_pair in self.ODlist:
-            for i in range(int(math.ceil(od_pair.numTravels))):
+            for i in range(int(round(od_pair.numTravels))):
                 self.drivers.append(Driver(od_pair))
 
     def __repr__(self):
