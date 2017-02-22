@@ -230,6 +230,15 @@ def appendTag(filenamewithtag):
     filenamewithtag += append_number + ".txt"
     return filenamewithtag
 
+def eval_cost(edge, var_value):
+    """
+    In:
+        edge:Edge = Instance of the Edge class.
+        var_value:float = Variable value.
+
+
+    """
+
 # return a list with the K shortest paths for the given origin-destination pair,
 # given the lists of nodes and edges (this function was created to be called
 # externally by another applications)

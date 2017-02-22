@@ -96,7 +96,7 @@ class Experiment(object):
         self.Vo, self.Eo, odInputo = generate_graph(network_file, print_edges=print_edges)
 
         for tup_od in odInputo:
-            if tup_od[2] % self.group_size != 0:
+            if round(tup_od[2]) % self.group_size != 0:
                 print tup_od[2]
                 raise Exception("Error: number of travels is not a multiple \
                                  of the group size origin: " + str(tup_od[0])
@@ -493,7 +493,7 @@ class Experiment(object):
             exp = p.parse(edge.cost_formula)
             #Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
             edges_travel_times[edge.start + "|" + edge.end] = \
-                edge.eval_cost(link_occupancy[edge.start + "|" + edge.end])
+                eval_cost(edge, link_occupancy[edge.start + "|" + edge.end])
         return edges_travel_times
 
     def calculateAverageTravelTime(self, stringOfActions):
