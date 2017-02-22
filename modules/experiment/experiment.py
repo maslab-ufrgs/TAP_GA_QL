@@ -14,6 +14,7 @@ from py_expression_eval import Parser
 from modules.q_learning.q_learning import *
 from modules.functions.functions import *
 from modules.experiment.classes import *
+from ksp.KSP import *
 
 
 class Experiment(object):
@@ -93,27 +94,27 @@ class Experiment(object):
         self.ODL = []
         self.ODheader = ""
 
-        self.Vo, self.Eo, odInputo = generate_graph(network_file, print_edges=print_edges)
+        self.Vo, self.Eo, odInputo = generateGraph(network_file, print_edges=print_edges)
 
         for tup_od in odInputo:
-            if round(tup_od[2]) % self.group_size != 0:
-                print tup_od[2]
+            if round(tup_od[3]) % self.group_size != 0:
+                print tup_od[3]
                 raise Exception("Error: number of travels is not a multiple \
                                  of the group size origin: " + str(tup_od[0])
                                 + " destination: " + str(tup_od[1]))
             else:
                 #Origin, destination, number of paths, number of travels
-                self.ODlist.append(OD(tup_od[0], tup_od[1],
-                                      k, tup_od[2] / self.group_size))
-                self.ODL.append(str(tup_od[0]) + str(tup_od[1]))
+                self.ODlist.append(OD(tup_od[1], tup_od[2],
+                                      k, tup_od[3] / self.group_size))
+                self.ODL.append(str(tup_od[1]) + str(tup_od[2]))
                 for i in range(k):
                     if len(self.ODheader) == 0:
                         self.ODheader = self.ODheader \
-                            + str(tup_od[0]) + "to" + str(tup_od[1]) \
+                            + str(tup_od[1]) + "to" + str(tup_od[2]) \
                             + "_" + str(i + 1)
                     else:
-                        self.ODheader = self.ODheader + " " + str(tup_od[0]) \
-                            + "to" + str(tup_od[1]) + "_" + str(i + 1)
+                        self.ODheader = self.ODheader + " " + str(tup_od[1]) \
+                            + "to" + str(tup_od[2]) + "_" + str(i + 1)
 
         if self.TABLE_INITIAL_STATE == 'zero':
             for od_pair in self.ODL:
@@ -131,7 +132,7 @@ class Experiment(object):
         ##get the value of each link - free flow travel time
         self.freeFlow = {}
         for edge in self.Eo:
-            self.freeFlow[edge.start + "|" + edge.end] = edge.length
+            self.freeFlow[edge.start + "|" + edge.end] = edge.cost
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
@@ -489,8 +490,6 @@ class Experiment(object):
         link_occupancy = self.driversPerLink(string_actions)
         #For each edge
         for edge in self.Eo:
-            p = Parser()
-            exp = p.parse(edge.cost_formula)
             #Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
             edges_travel_times[edge.start + "|" + edge.end] = \
                 eval_cost(edge, link_occupancy[edge.start + "|" + edge.end])
