@@ -96,7 +96,6 @@ class Experiment(object):
 
         self.Vo, self.Eo, _ = generateGraph(network_file, flow=flow)
         self.Eo, odInputo = read_infos(network_file, self.Eo)
-        print len(self.Eo)
 
         for tup_od in odInputo:
             if round(tup_od[2]) % self.group_size != 0:
