@@ -1,3 +1,35 @@
+from ksp.KSP import Edge
+from py_expression_eval import Parser
+
+
+class EdgeRC(Edge):
+    """
+    Represents an edge for the route_choice program.
+    Inherits from the Edge class from the KSP code.
+    In:
+        function:String = The cost function.
+    """
+    def __init__(self, name, start, end, cost, function):
+        Edge.__init__(self, name, start, end, cost)
+        self.function = function
+
+    def __repr__(self):
+        return repr(self.name)
+
+    def eval_cost(self, var_value):
+        """
+        Calculates the value of the cost formula at a given value.
+        In:
+            var_value:Float = Variable value.
+
+        Out:
+            value:Float = result of the calculation.
+        """
+        parser = Parser()
+        expression = parser.parse(self.function)
+        return expression.evaluate({'f':var_value})
+
+
 class Driver(object):
     '''
     Represents a driver in the network.

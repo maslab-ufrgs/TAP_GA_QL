@@ -27,7 +27,7 @@ class Experiment(object):
     <class '__main__.Experiment'>
     '''
 
-    def __init__(self, k, net_file, group_size, net_name, print_edges, table_fill_file=None,
+    def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
                  MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0):
@@ -73,11 +73,11 @@ class Experiment(object):
         self.mini = MINI
         self.maxi = MAXI
         self.fixed = fixed
-        self.init_network_data(self.k, net_file, self.group_size, self.flow, print_edges)
+        self.init_network_data(self.k, net_file, self.group_size, self.flow)
         if TABLE_INITIAL_STATE == 'coupling':
             self.TABLE_FILL = generate_table_fill(table_fill_file)
 
-    def init_network_data(self, k, network_file, group_size, flow, print_edges):
+    def init_network_data(self, k, network_file, group_size, flow):
         """
         Initialize the network data.
 
@@ -94,27 +94,28 @@ class Experiment(object):
         self.ODL = []
         self.ODheader = ""
 
-        self.Vo, self.Eo, odInputo = generateGraph(network_file, print_edges=print_edges)
+        self.Vo, self.Eo, _ = generateGraph(network_file, flow=flow)
+        self.Eo, odInputo = read_infos(network_file, self.Eo)
+        print len(self.Eo)
 
         for tup_od in odInputo:
-            if round(tup_od[3]) % self.group_size != 0:
-                print tup_od[3]
+            if round(tup_od[2]) % self.group_size != 0:
+                print tup_od[2]
                 raise Exception("Error: number of travels is not a multiple \
                                  of the group size origin: " + str(tup_od[0])
                                 + " destination: " + str(tup_od[1]))
             else:
                 #Origin, destination, number of paths, number of travels
-                self.ODlist.append(OD(tup_od[1], tup_od[2],
-                                      k, tup_od[3] / self.group_size))
-                self.ODL.append(str(tup_od[1]) + str(tup_od[2]))
+                self.ODlist.append(OD(tup_od[0], tup_od[1],
+                                      k, tup_od[2] / self.group_size))
+                self.ODL.append(str(tup_od[0]) + str(tup_od[1]))
                 for i in range(k):
                     if len(self.ODheader) == 0:
-                        self.ODheader = self.ODheader \
-                            + str(tup_od[1]) + "to" + str(tup_od[2]) \
-                            + "_" + str(i + 1)
+                        self.ODheader = self.ODheader + str(tup_od[0]) + "to" + str(tup_od[1]) \
+                                      + "_" + str(i + 1)
                     else:
-                        self.ODheader = self.ODheader + " " + str(tup_od[1]) \
-                            + "to" + str(tup_od[2]) + "_" + str(i + 1)
+                        self.ODheader = self.ODheader + " " + str(tup_od[0]) + "to" \
+                                      + str(tup_od[1]) + "_" + str(i + 1)
 
         if self.TABLE_INITIAL_STATE == 'zero':
             for od_pair in self.ODL:
@@ -126,13 +127,12 @@ class Experiment(object):
         #Get the k shortest routes
         #print "getKRoutes"
         for od_pair in self.ODlist:
-            od_pair.paths = getKRoutes(self.Vo, self.Eo, od_pair.o,
-                                       od_pair.d, od_pair.numPaths)
+            od_pair.paths = runRC(network_file, self.k, flow=self.flow)
 
         ##get the value of each link - free flow travel time
         self.freeFlow = {}
         for edge in self.Eo:
-            self.freeFlow[edge.start + "|" + edge.end] = edge.cost
+            self.freeFlow[edge.name] = edge.cost
 
         self.edgeNames = sorted(self.freeFlow.keys())
 
@@ -432,9 +432,6 @@ class Experiment(object):
         returns a dicionary where the keys are edges and the values are the
         amount of drivers on the edge
         """
-        global drivers
-        global freeFlow
-        global group_size
         dicti = {}
         for inx, dr in enumerate(driverString):
             if(type(dr) != int):
@@ -491,8 +488,7 @@ class Experiment(object):
         #For each edge
         for edge in self.Eo:
             #Evaluates the cost of that edge with a given flow (i.e. edge.eval_cost(flow))
-            edges_travel_times[edge.start + "|" + edge.end] = \
-                eval_cost(edge, link_occupancy[edge.start + "|" + edge.end])
+            edges_travel_times[edge.name] = edge.eval_cost(link_occupancy[edge.name])
         return edges_travel_times
 
     def calculateAverageTravelTime(self, stringOfActions):
