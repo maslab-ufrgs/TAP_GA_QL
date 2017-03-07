@@ -19,12 +19,7 @@ from ksp.KSP import *
 
 class Experiment(object):
     '''
-    Sets up an experiment.
-
-    >>> isinstance(Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'), Experiment)
-    True
-    >>> type(Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1'))
-    <class '__main__.Experiment'>
+        Sets up an experiment.
     '''
 
     def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
@@ -32,28 +27,9 @@ class Experiment(object):
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
                  MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0):
 
-        """
-        Construct the experiment.
-
-        Inputs:
-        k: integer =  List of the 'K' hyperparameters for the KSP (default: [8])
-        net_file: file = .net file in the ./networks/ folder
-        group_size: integer = List of group sizes for drivers in each configuration (default: [1])
-        net_name: string = The name of the network to be used (default: OW10_1)
-        p_travel_time: boolean = Print link's travel time of the iteration on the file
-        p_drivers_link: boolean = Print the number of drivers in each link in the output file
-        p_od_pair: boolean = Print the average travel time for in the header in the output file
-        p_interval: integer = Interval by which the messages are written in the output file
-        p_drivers_route: boolean = Print the amount of drivers per route of each OD pair
-        TABLE_INITIAL_STATE: string = Table initial states can be 'zero', 'coupling' and 'random'
-
-        >>> Experiment(8, './networks/OW10_1/OW10_1.net', 1, 'OW10_1').group_size
-        1
-        >>> Experiment(8, './networks/OW10_1/1.net', 1, 'OW10_1')
-        Traceback (most recent call last):
-        ...
-        IOError: [Errno 2] No such file or directory: './networks/OW10_1/1.net'
-        """
+        '''
+            Construct the experiment.
+        '''
 
         self.action_selection = action_selection
         self.temperature = temperature
@@ -67,36 +43,36 @@ class Experiment(object):
         self.printDriversPerRoute = p_drivers_route
         self.TABLE_INITIAL_STATE = TABLE_INITIAL_STATE
         self.network_name = net_name
-        self.edges = {}
         self.flow = flow
         self.TABLE_FILL = {}
         self.mini = MINI
         self.maxi = MAXI
         self.fixed = fixed
+        #Init_network_data is to be erased
         self.init_network_data(self.k, net_file, self.group_size, self.flow)
+
         if TABLE_INITIAL_STATE == 'coupling':
             self.TABLE_FILL = generate_table_fill(table_fill_file)
 
     def init_network_data(self, k, network_file, group_size, flow):
-        """
+        '''
         Initialize the network data.
 
         Inputs:
-        k: integer = Number of KSP routes to generate
-        network_file: file = .net file
-        group_size: integer = Size of the grouping
+            k: integer = Number of KSP routes to generate
+            network_file: file = .net file
+            group_size: integer = Size of the grouping
 
         This method set some of the attributes of the experiment but doesn't help much because
         there are some attributes being set ''outside'' the class contructor method.
         Needs to be changed in the future.
-        """
+        '''
         self.ODlist = []
         self.ODL = []
         self.ODheader = ""
 
-        self.Vo, self.Eo, _ = generateGraph(network_file, flow=flow)
-        self.Eo, odInputo = read_infos(network_file, self.Eo)
-
+        funtest = dec_test(generateGraph)
+        self.Vo, self.Eo, odInputo = funtest(network_file, flow=flow)
         for tup_od in odInputo:
             if round(tup_od[2]) % self.group_size != 0:
                 print tup_od[2]
@@ -116,17 +92,9 @@ class Experiment(object):
                         self.ODheader = self.ODheader + " " + str(tup_od[0]) + "to" \
                                       + str(tup_od[1]) + "_" + str(i + 1)
 
-        if self.TABLE_INITIAL_STATE == 'zero':
-            for od_pair in self.ODL:
-                list_routes = []
-                for i in range(self.k):
-                    list_routes.append(0)
-                self.TABLE_FILL[str(od_pair)] = list_routes
-
         #Get the k shortest routes
-        #print "getKRoutes"
         for od_pair in self.ODlist:
-            od_pair.paths = runRC(network_file, self.k, flow=self.flow)
+            od_pair.paths = getKRoutes(self.Vo, self.Eo, od_pair.o, od_pair.d, od_pair.numPaths)
 
         ##get the value of each link - free flow travel time
         self.freeFlow = {}

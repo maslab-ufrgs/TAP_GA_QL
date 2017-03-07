@@ -6,14 +6,14 @@ import argparse
 from os.path import basename, splitext
 import modules.experiment.experiment as exp
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, epsilon):
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
     NETWORK_NAME = basename(FILE)
     NETWORK_NAME = splitext(NETWORK_NAME)[0]
 
-    ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, flow=flow,
+    ex = exp.Experiment(k, FILE, group_size, NETWORK_NAME, flow=FLOW,
                         p_travel_time=P_TRAVEL_TIME, table_fill_file=TABLE_FILL_FILE,
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
@@ -54,9 +54,8 @@ def build_args():
                     for m in MUTATIONS:
                         for k in KS:
                             for i in GA_QL_INTERVAL:
-                                for flw in FLOW:
-                                    for en in EPSILON:
-                                        args.append([g,a,d,c,m,k,i,flw,en])
+                                for en in EPSILON:
+                                    args.append([g,a,d,c,m,k,i,en])
     return args
 
 def run_arg(args):
@@ -64,14 +63,14 @@ def run_arg(args):
     args: list of arguments
     """
     for arg in args:
-        assert len(arg) == 9
-        group_size, alpha, decay, crossover, mutation, k, interval, flow, epsilon = arg
+        assert len(arg) == 8
+        group_size, alpha, decay, crossover, mutation, k, interval, epsilon = arg
         print(("Running the configuration:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s"
-               + "\n\tMutation: %s\tk: %s\n\tInterval: %s\tFlow: %s\n\tEpsilon: %s") % tuple(arg))
+               + "\n\tMutation: %s\tk: %s\n\tInterval: %s\tEpsilon: %s") % tuple(arg))
         for repetition in range(REPETITIONS):
-            run_type(k, group_size, alpha, decay, crossover, mutation, interval, flow, epsilon)
+            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon)
             print(("Configuration complete:\n\tGrouping: %s\tAlpha: %s\n\tDecay: %s\tCrossover: %s"
-                   + "\n\tMutation: %s\tk: %s\n\tInterval: %s\tFlow: %s\n\tEpsilon: %s") % tuple(arg))
+                   + "\n\tMutation: %s\tk: %s\n\tInterval: %s\tEpsilon: %s") % tuple(arg))
             print("Repetition %s/%s" % (repetition+1, REPETITIONS))
 
 def run():
@@ -109,6 +108,8 @@ if __name__ == "__main__":
 
     prs.add_argument("-g", "--generations", type=int, default=100,
                      help="Generations\episodes in each configuration.\n")
+
+    prs.add_argument("-n", "--flow", type=int, default=0, help="Base flow in the network.\n")
 
     prs.add_argument("-group", "--grouping", nargs="+", type=int, default=[1],
                      help="List of group sizes for drivers in each configuration. This parameter is"
@@ -214,7 +215,7 @@ if __name__ == "__main__":
     KS = args.ks
     GA_QL_INTERVAL = args.exchangeGAQL
     QL_TABLE_STATE = args.ql_table_initiation
-    FLOW = [0] #args.flow
+    FLOW = args.flow
     EPSILON = args.epsilon
     TABLE_FILL_FILE = args.table_fill_file
     TEMPERATURE = args.temperature
