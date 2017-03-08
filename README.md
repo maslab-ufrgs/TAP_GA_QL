@@ -1,3 +1,10 @@
+IMPORTANT
+=========
+Need to initualize the KSP submodule, to do so use the following command:
+```sh
+git sobmodule init
+```
+
 Can get other networks from
 ===========================
  * [Networks](https://github.com/maslab-ufrgs/network-files)
@@ -94,6 +101,7 @@ optional arguments:
   -g GENERATIONS, --generations GENERATIONS
                         Generations\episodes in each configuration. (default:
                         100)
+  -n FLOW, --flow FLOW  Base flow in the network. (default: 0)
   -group GROUPING [GROUPING ...], --grouping GROUPING [GROUPING ...]
                         List of group sizes for drivers in each configuration.
                         This parameter is useful when the number of
