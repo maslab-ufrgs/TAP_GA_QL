@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 """
-Use spaces instead of tabs, or configure your editor to transform tab to 4
-spaces.
+Changelog:
+    v1.0 - Changelog created. <08/03/2017>
+
+Maintainer: Arthur Zachow Coelho (arthur.zachow@gmail.com)
+Created (changelog): 08/03/2017
+
+This module contains the Experiment class, which is the experiment or simulation itself.
+
+Warning: Use spaces instead of tabs, or configure your editor to transform tab to 4 spaces.
 """
 
 #Standard modules
@@ -21,7 +28,6 @@ class Experiment(object):
     '''
         Sets up an experiment.
     '''
-
     def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
@@ -48,31 +54,13 @@ class Experiment(object):
         self.mini = MINI
         self.maxi = MAXI
         self.fixed = fixed
-        #Init_network_data is to be erased
-        self.init_network_data(self.k, net_file, self.group_size, self.flow)
 
-        if TABLE_INITIAL_STATE == 'coupling':
-            self.TABLE_FILL = generate_table_fill(table_fill_file)
-
-    def init_network_data(self, k, network_file, group_size, flow):
-        '''
-        Initialize the network data.
-
-        Inputs:
-            k: integer = Number of KSP routes to generate
-            network_file: file = .net file
-            group_size: integer = Size of the grouping
-
-        This method set some of the attributes of the experiment but doesn't help much because
-        there are some attributes being set ''outside'' the class contructor method.
-        Needs to be changed in the future.
-        '''
         self.ODlist = []
         self.ODL = []
         self.ODheader = ""
 
-        funtest = dec_test(generateGraph)
-        self.Vo, self.Eo, odInputo = funtest(network_file, flow=flow)
+        self.Vo, self.Eo, odInputo = read_infos(net_file, flow=flow)
+
         for tup_od in odInputo:
             if round(tup_od[2]) % self.group_size != 0:
                 print tup_od[2]
@@ -109,6 +97,9 @@ class Experiment(object):
         for od_pair in self.ODlist:
             for i in range(int(round(od_pair.numTravels))):
                 self.drivers.append(Driver(od_pair))
+
+        if TABLE_INITIAL_STATE == 'coupling':
+            self.TABLE_FILL = generate_table_fill(table_fill_file)
 
     def __repr__(self):
         """
@@ -347,6 +338,7 @@ class Experiment(object):
         self.outputFile.write(headerstr + '\n')
 
         for episode in range(num_episodes):
+            print_progress(episode+1, num_episodes)
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode, instance, qlTT=value)
 
@@ -437,6 +429,7 @@ class Experiment(object):
             for edge in path:
                 traveltime += edgesTravelTimes[edge]
             odTravelTimeDict[self.drivers[driverIdx].od_s()].append(traveltime)
+
         return odTravelTimeDict
 
     def calculateIndividualTravelTime(self, string_actions):

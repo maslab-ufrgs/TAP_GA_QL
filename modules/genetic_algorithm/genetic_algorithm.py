@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 18 19:50:56 2015
+Changelog:
+    v1.0 - Changelog created. <08/03/2017>
 
-@author: thiago
+Created on Thu Jun 18 19:50:56 2015
+Author: Thiago
+Maintainer: Arthur Zachow Coelho (arthur.zachow@gmail.com)
+
+This module run the GA experimets.
 """
 
 from pyevolve import G1DList, GSimpleGA, Selectors

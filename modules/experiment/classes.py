@@ -1,5 +1,14 @@
-from ksp.KSP import Edge
+"""
+Changelog:
+    v1.0 - Created. <08/03/2017>
+
+Author: Arthur Zachow Coelho (arthur.zachow@gmail.com)
+Created: 08/03/2017
+
+This module has the classes used in the simulation.
+"""
 from py_expression_eval import Parser
+from ksp.KSP import Edge
 
 
 class EdgeRC(Edge):

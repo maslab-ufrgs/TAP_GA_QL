@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+Changelog:
+    v1.0 - Changelog created. <08/03/2017>
+
+Maintainer: Arthur Zachow Coelho (arthur.zachow@gmail.com)
+
+This module contains the QL class which runs the QL experiments.
+"""
 import random
 import math
 
