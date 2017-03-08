@@ -1,6 +1,6 @@
 IMPORTANT
 =========
-Need to initualize the KSP submodule, to do so use the following command:
+Need to initialize the KSP submodule, to do so use the following command:
 ```sh
 git sobmodule init
 ```
