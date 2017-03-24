@@ -2,7 +2,7 @@ IMPORTANT
 =========
 Need to initialize the KSP submodule, to do so use the following command:
 ```sh
-git sobmodule init
+git submodule init && git submodule update
 ```
 
 Can get other networks from
