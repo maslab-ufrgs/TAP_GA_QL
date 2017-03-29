@@ -2,6 +2,7 @@
 """
 Changelog:
     v1.0 - Changelog created. <08/03/2017>
+    v1.1 - Corrections in the action selection for the Boltzmann method. <29/03/2017>
 
 Maintainer: Arthur Zachow Coelho (arthur.zachow@gmail.com)
 
@@ -92,6 +93,7 @@ class QL():
                     total += list_tup[index][1]
                     if random_number <= total:
                         curaction = list_tup[index][0]
+                        break
                     index += 1
 
             actions.append(curaction)
@@ -109,7 +111,6 @@ class QL():
             self.epsilon = self.epsilon * self.decay
 
         if self.action_selection == "boltzmann":
-            print self.temperature
             self.temperature = self.temperature * self.decay
 
         average_tt_time = sum(traveltimes)/self.numdrivers
