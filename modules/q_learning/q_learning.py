@@ -72,20 +72,25 @@ class QL():
 
             elif self.action_selection == "boltzmann":
                 #Updates the probability of each action
-                list_prob = []
+                list_tup = []
                 total = 0.0
+                index = 0
                 for action in a:
                     total += math.exp(action/self.temperature)
                 for action in a:
-                    list_prob.append(math.exp(action/self.temperature)/total)
+                    list_tup.append((index, math.exp(action/self.temperature)/total))
+                    index += 1
 
                 #Selects the action
                 random_number = random.uniform(0, 1)
                 total = 0.0
                 index = 0
 
+                list_tup = sorted(list_tup, key=lambda prob: prob[1])
+                print list_tup
+
                 while total < random_number:
-                    total += list_prob[index]
+                    total += list_tup[index][1]
                     if random_number <= total:
                         curaction = index
                     index += 1
