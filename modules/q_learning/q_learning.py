@@ -87,12 +87,11 @@ class QL():
                 index = 0
 
                 list_tup = sorted(list_tup, key=lambda prob: prob[1])
-                print list_tup
 
                 while total < random_number:
                     total += list_tup[index][1]
                     if random_number <= total:
-                        curaction = index
+                        curaction = list_tup[index][0]
                     index += 1
 
             actions.append(curaction)
