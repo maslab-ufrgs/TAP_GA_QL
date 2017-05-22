@@ -53,6 +53,18 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         ex.run_ga_ql(True, True, GENERATIONS, POPULATION, crossover,
                      mutation, ELITE_SIZE, alpha, decay, interval)
 
+    elif EXPERIMENT_TYPE == 5:#UCB1
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running UCB1 Only")
+        ex.run_UCB1(GENERATIONS)
+
+    elif EXPERIMENT_TYPE == 6:#Thompson
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running UCB1 Only")
+        ex.run_Thompson(GENERATIONS)
+
 def build_args():
     """
     returns: list with all the possible parameter configuration.
@@ -102,12 +114,14 @@ if __name__ == "__main__":
     prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
                      3 - QL builds solution for GA;
-                     4 - GA and QL exchange solutions.\n
+                     4 - GA and QL exchange solutions.
+                     5 - UCB1 only
+                     6 - Thompson only\n
                      """)
 
     prs.add_argument("-r", "--repetitions", type=int, default=1,

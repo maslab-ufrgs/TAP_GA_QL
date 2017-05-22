@@ -19,6 +19,10 @@ import string
 from py_expression_eval import Parser
 #Local modules
 from modules.q_learning.q_learning import *
+
+from modules.ucb1.ucb1 import *
+from modules.thompson.thompson import *
+
 from modules.functions.functions import *
 from modules.experiment.classes import *
 from ksp.KSP import *
@@ -190,7 +194,7 @@ class Experiment(object):
                 else:
                     self.outputFile.write(str(step_number) + " " + str(avgTT))
             else:
-                self.outputFile.write(str(step_number) + " " + str(qlTT))
+                self.outputFile.write(str(step_number) + " " + str(qlTT)+" ")
 
             if self.printODpair:
                 ttByOD = self.travelTimeByOD(stepSolution)
@@ -262,6 +266,65 @@ class Experiment(object):
 
         return filename, path, headerstr
 
+    def createStringArgumentsUCB(self, nd):
+        """
+        Generate filename, generate the path to the file and generate the header infos for the file
+        In:
+            nd:int = number of drivers without groupsize
+        Out:
+            filename:string = filename
+            path:string = path to file
+            headerstr:string = parameters used in the experiment
+        """
+        fmt = "./results_UCB_grouped/net_%s/UCB/"
+        path = fmt % (self.network_name)
+
+        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
+                 +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + 'm' + str(localtime()[5]) + 's'
+
+        headerstr = "#Parameters:"
+
+        headerstr += "\tNumber of drivers=" \
+                  + str(nd) + "\n#\tk=" + str(self.k)
+
+        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
+                                                         self.printDriversPerLink,
+                                                         self.printDriversPerRoute, self.ODlist,
+                                                         self.edgeNames, self.ODheader)
+
+        return filename, path, headerstr
+
+
+    def createStringArgumentsThompson(self, nd):
+        """
+        Generate filename, generate the path to the file and generate the header infos for the file
+        In:
+            nd:int = number of drivers without groupsize
+        Out:
+            filename:string = filename
+            path:string = path to file
+            headerstr:string = parameters used in the experiment
+        """
+        fmt = "./results_Thompson_grouped/net_%s/Thompson/"
+        path = fmt % (self.network_name)
+
+        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
+                 +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + 'm' + str(localtime()[5]) + 's'
+
+        headerstr = "#Parameters:"
+
+        headerstr += "\tNumber of drivers=" \
+                  + str(nd) + "\n#\tk=" + str(self.k)
+
+        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
+                                                         self.printDriversPerLink,
+                                                         self.printDriversPerRoute, self.ODlist,
+                                                         self.edgeNames, self.ODheader)
+
+        return filename, path, headerstr
+
     def createStringArguments(self, useQL, useInt):
         fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
         path = fmt % (self.network_name, self.mutation)
@@ -317,6 +380,47 @@ class Experiment(object):
                                                   self.ODlist, self.edgeNames, self.ODheader)
 
         return filename, path, headerstr
+
+    def run_UCB1(self, num_episodes):
+        ucb1 = UCB1(self, self.drivers, self.k)
+        self.useGA = False
+        self.useQL = True
+
+        filename, path, headerstr = self.createStringArgumentsUCB(len(self.drivers))
+        filename = appendTag(filename)
+
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
+
+        self.outputFile = open(filename, 'w')
+        self.outputFile.write(headerstr + '\n')
+
+        for episode in range(num_episodes):
+            print_progress(episode+1, num_episodes)
+            (instance, value) = ucb1.runEpisode()
+            self.__print_step(episode, instance, qlTT=value)
+        print("Output file location: %s" % filename)
+        self.outputFile.close()
+
+    def run_Thompson(self, num_episodes):
+        th = Thompson(self, self.drivers, self.k)
+        self.useGA = False
+        self.useQL = True
+        filename, path, headerstr = self.createStringArgumentsThompson(len(self.drivers))
+        filename = appendTag(filename)
+
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
+
+        self.outputFile = open(filename, 'w')
+        self.outputFile.write(headerstr + '\n')
+
+        for episode in range(num_episodes):
+            print_progress(episode + 1, num_episodes)
+            (instance, value) = th.runEpisode()
+            self.__print_step(episode, instance, qlTT=value)
+        print("Output file location: %s" % filename)
+        self.outputFile.close()
 
     def run_ql(self, num_episodes, alpha, decay):
         self.useGA = False
