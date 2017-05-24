@@ -58,22 +58,3 @@ class UCB1():
         average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions, average_tt_time)
 
-    def runEpisodeWithAction(self, actions):
-        traveltimes = self.experiment.calculateIndividualTravelTime(actions)
-
-        #updates qtable. reward is the negative of the travel time
-        for drIndex in range(self.numdrivers):
-            #reward = -traveltimes[drIndex]
-            reward = 100.0/traveltime
-            #print 'reward: '+str(reward)+"\n"
-            self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
-
-        if self.action_selection == "epsilon":
-            #updates epsilon
-            self.epsilon = self.epsilon * self.decay
-
-        if self.action_selection == "boltzmann":
-            self.temperature = self.temperature * self.decay
-
-        average_tt_time = sum(traveltimes)/self.numdrivers
-        return (actions, average_tt_time)
