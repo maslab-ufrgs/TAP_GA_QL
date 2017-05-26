@@ -21,6 +21,8 @@ from py_expression_eval import Parser
 from modules.q_learning.q_learning import *
 
 from modules.ucb1.ucb1 import *
+from modules.ucb1discounted.ucb1discounted import *
+
 from modules.thompson.thompson import *
 
 from modules.functions.functions import *
@@ -382,7 +384,7 @@ class Experiment(object):
         return filename, path, headerstr
 
     def run_UCB1(self, num_episodes):
-        ucb1 = UCB1(self, self.drivers, self.k)
+        ucb1 = UCB1Discounted(self, self.drivers, self.k)
         self.useGA = False
         self.useQL = True
 
