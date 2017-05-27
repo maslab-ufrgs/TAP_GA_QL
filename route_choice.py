@@ -23,7 +23,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
-                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE)
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, discount_factor=DISCOUNT_FACTOR)
 
     if EXPERIMENT_TYPE == 1: # QL only
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
@@ -64,6 +64,12 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Only")
         ex.run_Thompson(GENERATIONS)
+
+    elif EXPERIMENT_TYPE == 7:#UCB1
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running UCB1Discounted Only")
+        ex.run_UCB1Discounted(GENERATIONS)
 
 def build_args():
     """
@@ -114,14 +120,15 @@ if __name__ == "__main__":
     prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
                      3 - QL builds solution for GA;
                      4 - GA and QL exchange solutions.
                      5 - UCB1 only
-                     6 - Thompson only\n
+                     6 - Thompson only
+                     7 - UCB1 Discounted only\n
                      """)
 
     prs.add_argument("-r", "--repetitions", type=int, default=1,
@@ -202,6 +209,8 @@ if __name__ == "__main__":
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
                      " Boltzmann action selection.\n")
 
+    prs.add_argument("-df","--discountfactor", type=float, default=[0.01], help="Discount factor for Discounted UCB1 ")
+
     args = prs.parse_args()
 
     if args.table_fill_file is None and args.ql_table_initiation == "coupling":
@@ -244,5 +253,5 @@ if __name__ == "__main__":
     TABLE_FILL_FILE = args.table_fill_file
     TEMPERATURE = args.temperature
     ACTION_SELECTION = args.action_selection
-
+    DISCOUNT_FACTOR = args.discountfactor
     run()

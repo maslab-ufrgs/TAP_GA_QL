@@ -5,6 +5,8 @@ This module implements the UCB class implementing the UCB1 algorithm.
 
 import math
 import operator
+
+import random
 class UCB1():
     def __init__(self, experiment, drivers, k):
         self.experiment = experiment
@@ -16,12 +18,11 @@ class UCB1():
         self.means = [[0.0]*k]*self.numdrivers
         self.round = [0]*self.numdrivers
 
-
     ##returns the route id the driver choosed
     def __choseActionDriver(self, dInx):
         self.round[dInx] += 1
         if (self.round[dInx] <= self.k):
-            ##plays one 'arm' once at the beginning
+            ###plays one 'arm' once at the beginning
             self.number_plays[dInx][self.round[dInx]-1] += 1
             return self.round[dInx]-1
         else:  # regular case
@@ -44,9 +45,10 @@ class UCB1():
     def runEpisode(self):
         actions=[]
         #for each driver, select its list of actions in qtable
+
         for inx, driver in enumerate(self.drivers):
             actions.append(self.__choseActionDriver(inx))
-
+        #print actions
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
 
         #updates the means. reward is the negative of the travel time

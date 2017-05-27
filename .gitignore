@@ -1,6 +1,9 @@
+.idea/
 *.pyc
 Pyevolve
 results_gaql_grouped
+results_UCB1Discounted_grouped
+results_UCB_grouped
 .cache
 tarefa.py
 *.swp
