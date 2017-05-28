@@ -46,10 +46,7 @@ class UCB1Discounted():
             ##calculate X and N for every action by iterating over previous rewards
             for i in range(1, self.episode):
                 discountedFactor = math.pow(self.discount_factor, self.episode - i)
-
                 Ns[self.actions[dInx][i-1]] += discountedFactor
-
-
                 Xs[self.actions[dInx][i-1]] += discountedFactor * self.rewards[dInx][i-1]
 
             for kinx in range(self.k):
