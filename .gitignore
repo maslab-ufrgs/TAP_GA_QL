@@ -4,8 +4,10 @@ Pyevolve
 results_gaql_grouped
 results_UCB1Discounted_grouped
 results_UCB_grouped
+results_Rexp3_grouped
 .cache
 tarefa.py
 *.swp
 *.py~
 networks
+results_UCB1Window_grouped/

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+    #!/usr/bin/env python
 """
 Changelog:
     v1.0 - Changelog created. <08/03/2017>
@@ -23,7 +23,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
-                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, discount_factor=DISCOUNT_FACTOR)
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, discount_factor=DISCOUNT_FACTOR, window_size=WINDOW_SIZE, rexp3gamma = REXP3GAMMA)
 
     if EXPERIMENT_TYPE == 1: # QL only
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
@@ -65,12 +65,22 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         print("Running UCB1 Only")
         ex.run_Thompson(GENERATIONS)
 
-    elif EXPERIMENT_TYPE == 7:#UCB1
+    elif EXPERIMENT_TYPE == 7:#UCB1 Discount
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1Discounted Only")
         ex.run_UCB1Discounted(GENERATIONS)
 
+    elif EXPERIMENT_TYPE == 8:  # UCB1 Sliding Window
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running UCB1 Sliding Window only")
+        ex.run_UCB1Window(GENERATIONS)
+    elif EXPERIMENT_TYPE == 9:  # Rexp3
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running Rexp3 only")
+        ex.run_Rexp3(GENERATIONS)
 def build_args():
     """
     returns: list with all the possible parameter configuration.
@@ -120,7 +130,7 @@ if __name__ == "__main__":
     prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
@@ -128,7 +138,9 @@ if __name__ == "__main__":
                      4 - GA and QL exchange solutions.
                      5 - UCB1 only
                      6 - Thompson only
-                     7 - UCB1 Discounted only\n
+                     7 - UCB1 Discounted only
+                     8 - UCB1 Sliding Window only
+                     9 - Rexp3\n
                      """)
 
     prs.add_argument("-r", "--repetitions", type=int, default=1,
@@ -209,7 +221,9 @@ if __name__ == "__main__":
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
                      " Boltzmann action selection.\n")
 
-    prs.add_argument("-df","--discountfactor", type=float, default=[0.01], help="Discount factor for Discounted UCB1 ")
+    prs.add_argument("-df","--discountfactor", type=float, default=[0.01], help="Discount factor for Discounted UCB1\n")
+    prs.add_argument("-ws", "--windowsize", type=int, default=[20], help="Window size for Sliding Window UCB1\n")
+    prs.add_argument("-rexp3gamma", "--rexp3gamma", type=float, default=[0.5], help="gamma [0,1] for the Rexp3 algorithm\n")
 
     args = prs.parse_args()
 
@@ -254,4 +268,6 @@ if __name__ == "__main__":
     TEMPERATURE = args.temperature
     ACTION_SELECTION = args.action_selection
     DISCOUNT_FACTOR = args.discountfactor
+    WINDOW_SIZE = args.windowsize
+    REXP3GAMMA = args.rexp3gamma
     run()

@@ -22,9 +22,9 @@ from modules.q_learning.q_learning import *
 
 from modules.ucb1.ucb1 import *
 from modules.ucb1discounted.ucb1discounted import *
-
+from modules.ucb1window.ucb1window import *
 from modules.thompson.thompson import *
-
+from modules.rexp3.rexp3 import *
 from modules.functions.functions import *
 from modules.experiment.classes import *
 from ksp.KSP import *
@@ -37,7 +37,8 @@ class Experiment(object):
     def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
-                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0,discount_factor=0.1):
+                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0,discount_factor=0.1,
+                 window_size=20, rexp3gamma = 0.5):
 
         '''
             Construct the experiment.
@@ -61,6 +62,8 @@ class Experiment(object):
         self.maxi = MAXI
         self.fixed = fixed
         self.discount_factor = discount_factor
+        self.window_size = window_size
+        self.rexp3gamma = rexp3gamma
         self.ODlist = []
         self.ODL = []
         self.ODheader = ""
@@ -328,6 +331,69 @@ class Experiment(object):
 
         return filename, path, headerstr
 
+
+    def createStringArgumentsUCB1Window(self, nd):
+        """
+        Generate filename, generate the path to the file and generate the header infos for the file
+        In:
+            nd:int = number of drivers without groupsize
+        Out:
+            filename:string = filename
+            path:string = path to file
+            headerstr:string = parameters used in the experiment
+        """
+        fmt = "./results_UCB1Window_grouped/net_%s/UCB1Windows/"
+        path = fmt % (self.network_name)
+
+        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
+                 + '_discount' + str(self.discount_factor) + '_window' + str(self.window_size) \
+                 + '_'  \
+                 + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + 'm' + str(localtime()[5]) + 's'
+
+        headerstr = "#Parameters:"
+
+        headerstr += "\tNumber of drivers=" \
+                  + str(nd) + "\n#\tk=" + str(self.k)
+
+        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
+                                                         self.printDriversPerLink,
+                                                         self.printDriversPerRoute, self.ODlist,
+                                                         self.edgeNames, self.ODheader)
+
+        return filename, path, headerstr
+
+    def createStringArgumentsRexp3(self, nd):
+        """
+        Generate filename, generate the path to the file and generate the header infos for the file
+        In:
+            nd:int = number of drivers without groupsize
+        Out:
+            filename:string = filename
+            path:string = path to file
+            headerstr:string = parameters used in the experiment
+        """
+        fmt = "./results_Rexp3_grouped/net_%s/Rexp3/"
+        path = fmt % (self.network_name)
+
+        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
+                 + '_epochsize' + str(self.window_size) + '_gamma'+ str(self.rexp3gamma) \
+                 +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + 'm' + str(localtime()[5]) + 's'
+
+        headerstr = "#Parameters:"
+
+        headerstr += "\tNumber of drivers=" \
+                  + str(nd) + "\n#\tk=" + str(self.k)
+
+        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
+                                                         self.printDriversPerLink,
+                                                         self.printDriversPerRoute, self.ODlist,
+                                                         self.edgeNames, self.ODheader)
+
+        return filename, path, headerstr
+
+
     def createStringArgumentsThompson(self, nd):
         """
         Generate filename, generate the path to the file and generate the header infos for the file
@@ -435,6 +501,29 @@ class Experiment(object):
         print("Output file location: %s" % filename)
         self.outputFile.close()
 
+    def run_UCB1Window(self, num_episodes):
+        assert(type(self.discount_factor)== float )
+        ucb1 = UCB1Window(self, self.drivers, self.k,self.discount_factor, self.window_size)
+        self.useGA = False
+        self.useQL = True
+
+        filename, path, headerstr = self.createStringArgumentsUCB1Window(len(self.drivers))
+        filename = appendTag(filename)
+
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
+
+        self.outputFile = open(filename, 'w')
+        self.outputFile.write(headerstr + '\n')
+        print "num episodes %d", num_episodes
+        for episode in range(num_episodes):
+            print_progress(episode+1, num_episodes)
+            (instance, value) = ucb1.runEpisode()
+            self.__print_step(episode, instance, qlTT=value)
+        print("Output file location: %s" % filename)
+        self.outputFile.close()
+
+
     def run_UCB1(self, num_episodes):
         ucb1 = UCB1(self, self.drivers, self.k)
         self.useGA = False
@@ -452,6 +541,28 @@ class Experiment(object):
         for episode in range(num_episodes):
             print_progress(episode+1, num_episodes)
             (instance, value) = ucb1.runEpisode()
+            self.__print_step(episode, instance, qlTT=value)
+        print("Output file location: %s" % filename)
+        self.outputFile.close()
+
+    def run_Rexp3(self, num_episodes):
+        ucb1 = Rexp3(self, self.drivers, self.k, self.window_size, self.rexp3gamma)
+
+        self.useGA = False
+        self.useQL = True
+
+        filename, path, headerstr = self.createStringArgumentsRexp3(len(self.drivers))
+        filename = appendTag(filename)
+
+        if os.path.isdir(path) is False:
+            os.makedirs(path)
+
+        self.outputFile = open(filename, 'w')
+        self.outputFile.write(headerstr + '\n')
+        print "num episodes %d", num_episodes
+        for episode in range(num_episodes):
+            print_progress(episode+1, num_episodes)
+            (instance, value) = ucb1.runEpisode(num_episodes)
             self.__print_step(episode, instance, qlTT=value)
         print("Output file location: %s" % filename)
         self.outputFile.close()
@@ -554,6 +665,7 @@ class Experiment(object):
         for inx, dr in enumerate(driverString):
             if(type(dr) != int):
                 print('problema!', driverString, '\n')
+                print type(dr)
             path = self.drivers[inx].od.paths[dr]
             for edge in path[0]:
                 if edge in dicti.keys():
