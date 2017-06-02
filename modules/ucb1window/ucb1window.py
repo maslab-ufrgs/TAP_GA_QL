@@ -64,7 +64,7 @@ class UCB1Window():
             for kinx in range(self.k):
                 if Ns[kinx] > 0:
                     c = self.rewardUpperBound
-                    c *= math.sqrt((self.xi * math.log(n))/Ns[kinx])
+                    c *= math.sqrt((self.xi * math.log(min(self.window_size,self.episode)))/Ns[kinx])
                     Cs[kinx] = c
 
             choice_value = [f + l for f,l in zip(Cs,Xs)]
