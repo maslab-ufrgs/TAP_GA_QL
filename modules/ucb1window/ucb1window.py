@@ -19,6 +19,7 @@ class UCB1Window():
         self.window_size = window_size
         self.rewards = []
         self.rewardUpperBound = 1##upper bound on rewards. needed for algorithm
+        self.xi = 2.0
         self.episode = 0
         self.rewards ={} #indexed by driver id. value is list of rewards ordered in chronological order
         self.actions = {} #same as above for actions taken
@@ -62,8 +63,8 @@ class UCB1Window():
 
             for kinx in range(self.k):
                 if Ns[kinx] > 0:
-                    c = 2.0*self.rewardUpperBound
-                    c *= math.log(n)/Ns[kinx]
+                    c = self.rewardUpperBound
+                    c *= math.sqrt((self.xi * math.log(n))/Ns[kinx])
                     Cs[kinx] = c
 
             choice_value = [f + l for f,l in zip(Cs,Xs)]

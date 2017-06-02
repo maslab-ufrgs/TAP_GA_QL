@@ -19,7 +19,7 @@ class UCB1Discounted():
         self.rewards = []
         self.rewardUpperBound = 1##upper bound on rewards. needed for algorithm
         self.episode = 0
-
+        self.xi = 2.0
         self.rewards ={} #indexed by driver id. value is list of rewards ordered in chronological order
         self.actions = {} #same as above for actions taken
 
@@ -57,7 +57,7 @@ class UCB1Discounted():
 
             for kinx in range(self.k):
                 c = 2.0*self.rewardUpperBound
-                c *= math.log(n)/Ns[kinx]
+                c *= math.sqrt(self.xi*math.log(n)/Ns[kinx])
                 Cs[kinx] = c
 
             choice_value = [f + l for f,l in zip(Cs,Xs)]
