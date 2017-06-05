@@ -64,7 +64,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
     elif EXPERIMENT_TYPE == 6:  # Thompson
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
-        print("Running UCB1 Only")
+        print("Running Thompson  Only")
         ex.run_Thompson(GENERATIONS)
 
     elif EXPERIMENT_TYPE == 7:  # UCB1 Discount
