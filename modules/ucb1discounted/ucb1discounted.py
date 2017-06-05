@@ -92,11 +92,11 @@ class UCB1Discounted():
             if not actionstaken.has_key(odname):
                 actionstaken[odname] = [0]*self.k
             actionstaken[odname][actions[inx]] += 1
-        for odname in actionstaken.keys():
-            sys.stderr.write("for od %s:   " % odname)
-            for k in range(self.k):
-                sys.stderr.write("%d: %f%% | " % (k, 100*float(actionstaken[odname][k])/sum(actionstaken[odname])))
-            sys.stderr.write("\n")
+        #for odname in actionstaken.keys():
+        #    sys.stderr.write("for od %s:   " % odname)
+        #    for k in range(self.k):
+        #        sys.stderr.write("%d: %f%% | " % (k, 100*float(actionstaken[odname][k])/sum(actionstaken[odname])))
+        #    sys.stderr.write("\n")
 
         #to print actions taken by each user to stderr
         #if self.episode == 100:

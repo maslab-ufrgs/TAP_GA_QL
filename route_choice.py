@@ -1,4 +1,4 @@
-    #!/usr/bin/env python
+# !/usr/bin/env python
 """
 Changelog:
     v1.0 - Changelog created. <08/03/2017>
@@ -11,7 +11,8 @@ import argparse
 from os.path import basename, splitext
 import modules.experiment.experiment as exp
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon):
+
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
@@ -23,15 +24,14 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
-                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, discount_factor=DISCOUNT_FACTOR, window_size=WINDOW_SIZE, rexp3gamma = REXP3GAMMA)
-
-    if EXPERIMENT_TYPE == 1: # QL only
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE)
+    if EXPERIMENT_TYPE == 1:  # QL only
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running QL Only")
         ex.run_ql(GENERATIONS, alpha, decay)
 
-    elif EXPERIMENT_TYPE == 2: #GA only
+    elif EXPERIMENT_TYPE == 2:  # GA only
         print("Parameters:\n\tPop.: {0}\tGenerations: {1}".format(POPULATION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k)
               + "\n\tMutation: {0}\tCrossover: {1}".format(mutation, crossover))
@@ -39,48 +39,52 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         ex.run_ga_ql(False, False, GENERATIONS, POPULATION, crossover,
                      mutation, ELITE_SIZE, None, None, None)
 
-    elif EXPERIMENT_TYPE == 3:#GA<-QL
-        print("Parameters:\n\tAc. sel.: {0}\tGenerations: {1}\tPop.: {2}".format(ACTION_SELECTION, GENERATIONS, POPULATION)
-              + "\n\tBase flow: {0}\tk: {1}\tMutation: {2}".format(FLOW, k, mutation))
+    elif EXPERIMENT_TYPE == 3:  # GA<-QL
+        print(
+        "Parameters:\n\tAc. sel.: {0}\tGenerations: {1}\tPop.: {2}".format(ACTION_SELECTION, GENERATIONS, POPULATION)
+        + "\n\tBase flow: {0}\tk: {1}\tMutation: {2}".format(FLOW, k, mutation))
         print("Running GA<-QL")
         ex.run_ga_ql(True, False, GENERATIONS, POPULATION, crossover,
                      mutation, ELITE_SIZE, alpha, decay, None)
 
-    elif EXPERIMENT_TYPE == 4:#GA<->QL
-        print("Parameters:\n\tAc. sel.: {0}\tGenerations: {1}\tPop.: {2}".format(ACTION_SELECTION, GENERATIONS, POPULATION)
-              + "\n\tBase flow: {0}\tk: {1}\tMutation: {2}".format(FLOW, k, mutation))
+    elif EXPERIMENT_TYPE == 4:  # GA<->QL
+        print(
+        "Parameters:\n\tAc. sel.: {0}\tGenerations: {1}\tPop.: {2}".format(ACTION_SELECTION, GENERATIONS, POPULATION)
+        + "\n\tBase flow: {0}\tk: {1}\tMutation: {2}".format(FLOW, k, mutation))
         print("Running GA<->QL")
         ex.run_ga_ql(True, True, GENERATIONS, POPULATION, crossover,
                      mutation, ELITE_SIZE, alpha, decay, interval)
 
-    elif EXPERIMENT_TYPE == 5:#UCB1
+    elif EXPERIMENT_TYPE == 5:  # UCB1
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Only")
         ex.run_UCB1(GENERATIONS)
 
-    elif EXPERIMENT_TYPE == 6:#Thompson
+    elif EXPERIMENT_TYPE == 6:  # Thompson
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Only")
         ex.run_Thompson(GENERATIONS)
 
-    elif EXPERIMENT_TYPE == 7:#UCB1 Discount
+    elif EXPERIMENT_TYPE == 7:  # UCB1 Discount
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1Discounted Only")
-        ex.run_UCB1Discounted(GENERATIONS)
+        ex.run_UCB1Discounted(GENERATIONS, decay)
 
     elif EXPERIMENT_TYPE == 8:  # UCB1 Sliding Window
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Sliding Window only")
-        ex.run_UCB1Window(GENERATIONS)
+        ex.run_UCB1Window(GENERATIONS, decay, window_size)
     elif EXPERIMENT_TYPE == 9:  # Rexp3
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running Rexp3 only")
-        ex.run_Rexp3(GENERATIONS)
+        ex.run_Rexp3(GENERATIONS, window_size, decay)
+
+
 def build_args():
     """
     returns: list with all the possible parameter configuration.
@@ -96,20 +100,23 @@ def build_args():
                         for k in KS:
                             for interval in GA_QL_INTERVAL:
                                 for epsilon in EPSILON:
-                                    args.append([g_size, alpha, decay, crossover, mutation, k,
-                                                 interval, epsilon])
+                                    for window_size in WINDOW_SIZE:
+                                        args.append([g_size, alpha, decay, crossover, mutation, k,
+                                                     interval, epsilon, window_size])
     return args
+
 
 def run_arg(args):
     """
     args: list of arguments
     """
     for arg in args:
-        assert len(arg) == 8
-        group_size, alpha, decay, crossover, mutation, k, interval, epsilon = arg
+        assert len(arg) == 9
+        group_size, alpha, decay, crossover, mutation, k, interval, epsilon, window_size = arg
         for repetition in range(REPETITIONS):
-            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon)
-            print("Repetition %s/%s\n" % (repetition+1, REPETITIONS))
+            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size)
+            print("Repetition %s/%s\n" % (repetition + 1, REPETITIONS))
+
 
 def run():
     """
@@ -117,6 +124,7 @@ def run():
     """
     args = build_args()
     run_arg(args)
+
 
 if __name__ == "__main__":
     prs = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -156,16 +164,16 @@ if __name__ == "__main__":
 
     prs.add_argument("-group", "--grouping", nargs="+", type=int, default=[1],
                      help="List of group sizes for drivers in each configuration. This parameter is"
-                     + " useful when the number of trips/drivers is huge; it sets how many drivers"
-                     + " form a group; in a group all drivers/trips use the same OD pair, i.e., the"
-                     + " granularity of the route choice can be individual based or group based.\n")
+                          + " useful when the number of trips/drivers is huge; it sets how many drivers"
+                          + " form a group; in a group all drivers/trips use the same OD pair, i.e., the"
+                          + " granularity of the route choice can be individual based or group based.\n")
 
     prs.add_argument("--printTravelTime", action="store_true", default=False,
                      help="Print link's travel time at each iteration in the output file.\n")
 
     prs.add_argument("--printDriversPerRoute", action="store_true", default=False,
                      help="Print the amount of drivers per route for each OD pair(Warning:QL only!"
-                     + " Also, note that the number of OD pairs can be very large!).\n")
+                          + " Also, note that the number of OD pairs can be very large!).\n")
 
     prs.add_argument("--printDriversPerLink", action="store_true", default=False,
                      help="Print the number of drivers in each link in the output file.\n")
@@ -200,13 +208,13 @@ if __name__ == "__main__":
                      default='fixed', help="How to initiate the Q-Table.\n")
 
     prs.add_argument("--max", type=float, default=0.0, help="Maximum value for the random" \
-                     + " initiation. Note that the random value(x) will be x <= max !\n")
+                                                            + " initiation. Note that the random value(x) will be x <= max !\n")
 
     prs.add_argument("--min", type=float, default=0.0, help="Maximum value for the random" \
-                     + " initiation. Note that the random value(x) will be min <= x !\n")
+                                                            + " initiation. Note that the random value(x) will be min <= x !\n")
 
     prs.add_argument("--fixed", type=float, default=0.0, help="Fixed value for generating the" \
-                     + " Q table.\n")
+                                                              + " Q table.\n")
 
     prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1.0], \
                      help="List of epsilons(exploration/exploitation rate) for Q-Learning.\n")
@@ -216,14 +224,13 @@ if __name__ == "__main__":
 
     prs.add_argument("-d", "--decays", nargs="+", type=float, default=[0.99],
                      help="List of decays in each configuration; this sets the value by which epsilon"
-                     + " is multiplied at each QL episode.\n")
+                          + " is multiplied at each QL episode. Also used as the discount factor on Discounted UCB and Sliding window UCB, "
+                          +  "and gamma for the Rexp3 algorithm\n")
 
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
-                     " Boltzmann action selection.\n")
-
-    prs.add_argument("-df","--discountfactor", type=float, default=[0.01], help="Discount factor for Discounted UCB1\n")
-    prs.add_argument("-ws", "--windowsize", type=int, default=[20], help="Window size for Sliding Window UCB1\n")
-    prs.add_argument("-rexp3gamma", "--rexp3gamma", type=float, default=[0.5], help="gamma [0,1] for the Rexp3 algorithm\n")
+                                                             " Boltzmann action selection.\n")
+    prs.add_argument("-ws", "--windowsize", nargs="+", type=int, default=[20],
+                     help="Window size for Sliding Window UCB1\n")
 
     args = prs.parse_args()
 
@@ -244,8 +251,8 @@ if __name__ == "__main__":
     P_INTERVAL = args.printInterval
     P_DRIVERS_ROUTE = args.printDriversPerRoute
 
-    if(args.experimentType == 3 or args.experimentType == 4) and (P_DRIVERS_ROUTE or P_OD_PAIR
-       or P_DRIVERS_LINK or P_TRAVEL_TIME):
+    if (args.experimentType == 3 or args.experimentType == 4) and (P_DRIVERS_ROUTE or P_OD_PAIR
+                                                                   or P_DRIVERS_LINK or P_TRAVEL_TIME):
         prs.error("You can't use print-outs with experiment type 3 or 4.")
 
     GENERATIONS = args.generations
@@ -267,7 +274,5 @@ if __name__ == "__main__":
     TABLE_FILL_FILE = args.table_fill_file
     TEMPERATURE = args.temperature
     ACTION_SELECTION = args.action_selection
-    DISCOUNT_FACTOR = args.discountfactor
     WINDOW_SIZE = args.windowsize
-    REXP3GAMMA = args.rexp3gamma
     run()

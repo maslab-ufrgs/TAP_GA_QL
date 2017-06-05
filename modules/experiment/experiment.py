@@ -37,8 +37,7 @@ class Experiment(object):
     def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
-                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0,discount_factor=0.1,
-                 window_size=20, rexp3gamma = 0.5):
+                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0):
 
         '''
             Construct the experiment.
@@ -61,9 +60,6 @@ class Experiment(object):
         self.mini = MINI
         self.maxi = MAXI
         self.fixed = fixed
-        self.discount_factor = discount_factor
-        self.window_size = window_size
-        self.rexp3gamma = rexp3gamma
         self.ODlist = []
         self.ODL = []
         self.ODheader = ""
@@ -479,11 +475,13 @@ class Experiment(object):
 
         return filename, path, headerstr
 
-    def run_UCB1Discounted(self, num_episodes):
-        assert(type(self.discount_factor)== float )
-        ucb1 = UCB1Discounted(self, self.drivers, self.k,self.discount_factor)
+    def run_UCB1Discounted(self, num_episodes, discount_factor):
+        assert(type(discount_factor)== float )
+        ucb1 = UCB1Discounted(self, self.drivers, self.k,discount_factor)
         self.useGA = False
         self.useQL = True
+        self.discount_factor = discount_factor
+
 
         filename, path, headerstr = self.createStringArgumentsUCB1Discounted(len(self.drivers))
         filename = appendTag(filename)
@@ -501,11 +499,13 @@ class Experiment(object):
         print("Output file location: %s" % filename)
         self.outputFile.close()
 
-    def run_UCB1Window(self, num_episodes):
-        assert(type(self.discount_factor)== float )
-        ucb1 = UCB1Window(self, self.drivers, self.k,self.discount_factor, self.window_size)
+    def run_UCB1Window(self, num_episodes,discount_factor, window_size):
+        assert(type(discount_factor)== float )
+        ucb1 = UCB1Window(self, self.drivers, self.k,discount_factor, window_size)
         self.useGA = False
         self.useQL = True
+        self.discount_factor = discount_factor
+        self.window_size = window_size
 
         filename, path, headerstr = self.createStringArgumentsUCB1Window(len(self.drivers))
         filename = appendTag(filename)
@@ -545,12 +545,13 @@ class Experiment(object):
         print("Output file location: %s" % filename)
         self.outputFile.close()
 
-    def run_Rexp3(self, num_episodes):
-        ucb1 = Rexp3(self, self.drivers, self.k, self.window_size, self.rexp3gamma)
+    def run_Rexp3(self, num_episodes,window_size,gamma):
+        ucb1 = Rexp3(self, self.drivers, self.k, window_size,gamma)
 
         self.useGA = False
         self.useQL = True
-
+        self.rexp3gamma = gamma
+        self.window_size = window_size
         filename, path, headerstr = self.createStringArgumentsRexp3(len(self.drivers))
         filename = appendTag(filename)
 
