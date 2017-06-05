@@ -30,7 +30,7 @@ class UCB1Window():
 
 
     ##returns the route id the driver chose
-    def __choseActionDriver(self, dInx):
+    def __choseActionDriver(self, dInx, log_size):
         if (len(self.actions[dInx]) < self.k):
             ##plays each arm once in a random order
             possible_actions = []
@@ -46,28 +46,25 @@ class UCB1Window():
 
             begin_window = self.episode - min(self.window_size, self.episode-1)
             itercount = 0
+            n = 0.0
             ##calculate X and N for every action by iterating over previous rewards
             for i in range(begin_window, self.episode):
                 discountedFactor = math.pow(self.discount_factor, self.episode - i)
                 Ns[self.actions[dInx][i-1]] += discountedFactor
                 Xs[self.actions[dInx][i-1]] += discountedFactor * self.rewards[dInx][i-1]
                 itercount += 1
-            assert(itercount == min(self.window_size, self.episode-1))
+                n += Ns[self.actions[dInx][i-1]]
+            #n = sum(Ns)
 
+            Cs = [0.0]*self.k
+            choice_value = []
             for kinx in range(self.k):
                 if Ns[kinx] > 0:
                     Xs[kinx] = Xs[kinx] / Ns[kinx]
-            n = sum(Ns)
-
-            Cs = [0.0]*self.k
-
-            for kinx in range(self.k):
-                if Ns[kinx] > 0:
                     c = self.rewardUpperBound
-                    c *= math.sqrt((self.xi * math.log(min(self.window_size,self.episode)))/Ns[kinx])
+                    c *= math.sqrt(log_size/Ns[kinx])
                     Cs[kinx] = c
-
-            choice_value = [f + l for f,l in zip(Cs,Xs)]
+                choice_value.append(Cs[kinx]+Xs[kinx])
 
             ##chooses action with highest value
             index, v = max(enumerate(choice_value), key=operator.itemgetter(1))
@@ -89,22 +86,24 @@ class UCB1Window():
         actions=[]
         self.episode += 1
         #for each driver, select its list of actions in qtable
+        log_size = self.xi * math.log(min(self.window_size,self.episode))
+
         for inx, driver in enumerate(self.drivers):
-            actions.append(self.__choseActionDriver(inx))
-
-        actionstaken = {}
-        for inx in range(self.numdrivers):
+            actions.append(self.__choseActionDriver(inx,log_size))
+	
+        #actionstaken = {}
+        #for inx in range(self.numdrivers):
             #sys.stderr.write(self.drivers[inx].od_s() + ':' + str(actions[inx]))
-            odname = self.drivers[inx].od_s()
-            if not actionstaken.has_key(odname):
-                actionstaken[odname] = [0]*self.k
-            actionstaken[odname][actions[inx]] += 1
-        for odname in actionstaken.keys():
-            sys.stderr.write("for od %s:   " % odname)
-            for k in range(self.k):
-                sys.stderr.write("%d: %f%% | " % (k, 100*float(actionstaken[odname][k])/sum(actionstaken[odname])))
-            sys.stderr.write("\n")
-
+        #    odname = self.drivers[inx].od_s()
+        #    if not actionstaken.has_key(odname):
+        #        actionstaken[odname] = [0]*self.k
+        #    actionstaken[odname][actions[inx]] += 1
+        #for odname in actionstaken.keys():
+        #    sys.stderr.write("for od %s:   " % odname)
+        #    for k in range(self.k):
+        #        sys.stderr.write("%d: %f%% | " % (k, 100*float(actionstaken[odname][k])/sum(actionstaken[odname])))
+        #    sys.stderr.write("\n")
+	
         #to print actions taken by each user to stderr
         #if self.episode == 100:
         #    for inx in range(self.numdrivers):
@@ -119,5 +118,6 @@ class UCB1Window():
             self.__set_reward(drIndex, actions[drIndex], reward)
 
         average_tt_time = sum(traveltimes)/self.numdrivers
+        print "avgtt=%f\n" % average_tt_time
         return (actions, average_tt_time)
 

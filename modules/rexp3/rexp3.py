@@ -67,7 +67,7 @@ class Rexp3():
             actions.append(self.__choseActionDriver(inx))
 
 
-
+        '''
         actionstaken = {}
         for inx in range(self.numdrivers):
             #sys.stderr.write(self.drivers[inx].od_s() + ':' + str(actions[inx]))
@@ -80,7 +80,7 @@ class Rexp3():
             for k in range(self.k):
                 sys.stderr.write("%d: %f%% | " % (k, 100*float(actionstaken[odname][k])/sum(actionstaken[odname])))
             sys.stderr.write("\n")
-
+        '''
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
 
         #updates the means. reward is the negative of the travel time
@@ -90,5 +90,6 @@ class Rexp3():
             self.__set_reward(drIndex, actions[drIndex], reward)
 
         average_tt_time = sum(traveltimes)/self.numdrivers
+        print "avgtt=%f\n" % average_tt_time
         return (actions, average_tt_time)
 
