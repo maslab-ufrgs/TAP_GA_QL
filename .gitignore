@@ -3,6 +3,7 @@
 Pyevolve
 results_gaql_grouped
 results_UCB1Discounted_grouped
+results_Thompson_grouped
 results_UCB_grouped
 results_Rexp3_grouped
 .cache
