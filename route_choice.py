@@ -12,7 +12,7 @@ from os.path import basename, splitext
 import modules.experiment.experiment as exp
 
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size):
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
@@ -59,7 +59,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Only")
-        ex.run_UCB1(GENERATIONS)
+        ex.run_UCB1(GENERATIONS, init_order)
 
     elif EXPERIMENT_TYPE == 6:  # Thompson
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
@@ -71,13 +71,13 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1Discounted Only")
-        ex.run_UCB1Discounted(GENERATIONS, decay)
+        ex.run_UCB1Discounted(GENERATIONS, decay,init_order)
 
     elif EXPERIMENT_TYPE == 8:  # UCB1 Sliding Window
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Sliding Window only")
-        ex.run_UCB1Window(GENERATIONS, decay, window_size)
+        ex.run_UCB1Window(GENERATIONS, decay, window_size, init_order)
     elif EXPERIMENT_TYPE == 9:  # Rexp3
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
@@ -101,8 +101,9 @@ def build_args():
                             for interval in GA_QL_INTERVAL:
                                 for epsilon in EPSILON:
                                     for window_size in WINDOW_SIZE:
-                                        args.append([g_size, alpha, decay, crossover, mutation, k,
-                                                     interval, epsilon, window_size])
+                                        for init_order in INIT_ORDER:
+                                            args.append([g_size, alpha, decay, crossover, mutation, k,
+                                                     interval, epsilon, window_size, init_order])
     return args
 
 
@@ -111,10 +112,10 @@ def run_arg(args):
     args: list of arguments
     """
     for arg in args:
-        assert len(arg) == 9
-        group_size, alpha, decay, crossover, mutation, k, interval, epsilon, window_size = arg
+        assert len(arg) == 10
+        group_size, alpha, decay, crossover, mutation, k, interval, epsilon, window_size, init_order = arg
         for repetition in range(REPETITIONS):
-            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size)
+            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order)
             print("Repetition %s/%s\n" % (repetition + 1, REPETITIONS))
 
 
@@ -231,6 +232,8 @@ if __name__ == "__main__":
                                                              " Boltzmann action selection.\n")
     prs.add_argument("-ws", "--windowsize", nargs="+", type=int, default=[20],
                      help="Window size for Sliding Window UCB1\n")
+    prs.add_argument("-io", "--initorder", nargs="+", type=int, default=[1],choices=[1, 2],
+                     help="How UCB-based algorithms should be initiaded: 1-random order, 2-sequential order\n")
 
     args = prs.parse_args()
 
@@ -275,4 +278,5 @@ if __name__ == "__main__":
     TEMPERATURE = args.temperature
     ACTION_SELECTION = args.action_selection
     WINDOW_SIZE = args.windowsize
+    INIT_ORDER = args.initorder
     run()

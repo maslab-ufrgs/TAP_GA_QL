@@ -25,12 +25,11 @@ class Thompson:
         thetas = []
         epsilon = 0.0001
 
-
+        ##plays each 'arm' twice at the beginning
         if self.round[dInx] < self.num_actions * 2:
             inx = self.round[dInx] % self.num_actions
             self.round[dInx] += 1
             return inx
-            ##plays one 'arm' twice at the beginning
 
 
         for i in range(self.num_actions):

@@ -280,8 +280,14 @@ class Experiment(object):
         fmt = "./results_UCB_grouped/net_%s/UCB/"
         path = fmt % (self.network_name)
 
-        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
-                 +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+        filename = path + '/' + self.network_name + '_k' + str(self.k)
+
+        if self.init_order == 1: #random order init
+            filename += '_randomInit_'
+        elif self.init_order == 2: #sequential
+            filename += '_sequentialInit_'
+
+        filename += str(localtime()[3]) + 'h' + str(localtime()[4]) \
                  + 'm' + str(localtime()[5]) + 's'
 
         headerstr = "#Parameters:"
@@ -311,8 +317,14 @@ class Experiment(object):
         path = fmt % (self.network_name)
 
         filename = path + '/' + self.network_name + '_k' + str(self.k)  \
-                 + '_discount' + str(self.discount_factor) + '_'  \
-                 +  str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + '_discount' + str(self.discount_factor)
+
+        if self.init_order == 1: #random order init
+            filename += '_randomInit_'
+        elif self.init_order == 2: #sequential
+            filename += '_sequentialInit_'
+
+        filename +=  str(localtime()[3]) + 'h' + str(localtime()[4]) \
                  + 'm' + str(localtime()[5]) + 's'
 
         headerstr = "#Parameters:"
@@ -342,9 +354,15 @@ class Experiment(object):
         path = fmt % (self.network_name)
 
         filename = path + '/' + self.network_name + '_k' + str(self.k)  \
-                 + '_discount' + str(self.discount_factor) + '_window' + str(self.window_size) \
-                 + '_'  \
-                 + str(localtime()[3]) + 'h' + str(localtime()[4]) \
+                 + '_discount' + str(self.discount_factor) + '_window' + str(self.window_size)
+
+        if self.init_order == 1: #random order init
+            filename += '_randomInit_'
+        elif self.init_order == 2: #sequential
+            filename += '_sequentialInit_'
+
+
+        filename += str(localtime()[3]) + 'h' + str(localtime()[4]) \
                  + 'm' + str(localtime()[5]) + 's'
 
         headerstr = "#Parameters:"
@@ -475,13 +493,13 @@ class Experiment(object):
 
         return filename, path, headerstr
 
-    def run_UCB1Discounted(self, num_episodes, discount_factor):
+    def run_UCB1Discounted(self, num_episodes, discount_factor,init_order):
         assert(type(discount_factor)== float )
-        ucb1 = UCB1Discounted(self, self.drivers, self.k,discount_factor)
+        ucb1 = UCB1Discounted(self, self.drivers, self.k,discount_factor,init_order)
         self.useGA = False
         self.useQL = True
         self.discount_factor = discount_factor
-
+        self.init_order = init_order
 
         filename, path, headerstr = self.createStringArgumentsUCB1Discounted(len(self.drivers))
         filename = appendTag(filename)
@@ -499,14 +517,14 @@ class Experiment(object):
         print("Output file location: %s" % filename)
         self.outputFile.close()
 
-    def run_UCB1Window(self, num_episodes,discount_factor, window_size):
+    def run_UCB1Window(self, num_episodes,discount_factor, window_size,init_order):
         assert(type(discount_factor)== float )
-        ucb1 = UCB1Window(self, self.drivers, self.k,discount_factor, window_size)
+        ucb1 = UCB1Window(self, self.drivers, self.k,discount_factor, window_size,init_order)
         self.useGA = False
         self.useQL = True
         self.discount_factor = discount_factor
         self.window_size = window_size
-
+        self.init_order = init_order
         filename, path, headerstr = self.createStringArgumentsUCB1Window(len(self.drivers))
         filename = appendTag(filename)
 
@@ -524,11 +542,11 @@ class Experiment(object):
         self.outputFile.close()
 
 
-    def run_UCB1(self, num_episodes):
-        ucb1 = UCB1(self, self.drivers, self.k)
+    def run_UCB1(self, num_episodes,init_order):
+        ucb1 = UCB1(self, self.drivers, self.k,init_order)
         self.useGA = False
         self.useQL = True
-
+        self.init_order = init_order
         filename, path, headerstr = self.createStringArgumentsUCB1(len(self.drivers))
         filename = appendTag(filename)
 

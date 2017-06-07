@@ -9,9 +9,10 @@ import operator
 import random
 import sys
 class UCB1Window():
-    def __init__(self, experiment, drivers, k, discount_factor, window_size):
+    def __init__(self, experiment, drivers, k, discount_factor, window_size,init_order):
         self.experiment = experiment
         self.k = k
+        self.init_order = init_order
         self.ODtable = {}
         self.drivers = drivers
         self.numdrivers=len(drivers)
@@ -32,13 +33,17 @@ class UCB1Window():
     ##returns the route id the driver chose
     def __choseActionDriver(self, dInx, log_size):
         if (len(self.actions[dInx]) < self.k):
-            ##plays each arm once in a random order
-            possible_actions = []
-            for k in range(self.k):
-                if k not in self.actions[dInx]:
-                    possible_actions.append(k)
-            return random.choice(possible_actions)
-            #return len(self.actions[dInx])
+            if self.init_order == 1:
+                ##plays each arm once in a random order
+                possible_actions = []
+                for k in range(self.k):
+                    if k not in self.actions[dInx]:
+                        possible_actions.append(k)
+                return random.choice(possible_actions)
+            elif self.init_order == 2: #play arm sequentially
+                return len(self.actions[dInx])
+            else:
+                raise "invalid init order"
         else:  # regular case
 
             Xs = [0.0]*self.k
