@@ -29,7 +29,7 @@ class Rexp3():
             self.w[i] = [1.0]*self.k
             self.p[i] = [0.0]*self.k
     ##returns the route id the driver chose
-    def __choseActionDriver(self, dInx):
+    def __chooseActionDriver(self, dInx):
 
         wsum = sum(self.w[dInx])
 
@@ -64,7 +64,7 @@ class Rexp3():
         actions=[]
         #for each driver, select its list of actions in qtable
         for inx, driver in enumerate(self.drivers):
-            actions.append(self.__choseActionDriver(inx))
+            actions.append(self.__chooseActionDriver(inx))
 
 
         '''
