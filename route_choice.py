@@ -12,7 +12,7 @@ from os.path import basename, splitext
 import modules.experiment.experiment as exp
 
 
-def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order):
+def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order,p_forget):
     """
     Call the apropriate script to run the experiment based on experiment type
     """
@@ -24,7 +24,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
-                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE)
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, p_forget = p_forget)
     if EXPERIMENT_TYPE == 1:  # QL only
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
@@ -82,7 +82,12 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running Rexp3 only")
-        ex.run_Rexp3(GENERATIONS, window_size, decay)
+        ex.run_Rexp3(GENERATIONS, window_size, epsilon)
+    elif EXPERIMENT_TYPE == 10:  # Rexp3
+        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
+              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
+        print("Running Rexp3MA only")
+        ex.run_Rexp3MA(GENERATIONS,epsilon,p_forget,decay)
 
 
 def build_args():
@@ -102,8 +107,9 @@ def build_args():
                                 for epsilon in EPSILON:
                                     for window_size in WINDOW_SIZE:
                                         for init_order in INIT_ORDER:
-                                            args.append([g_size, alpha, decay, crossover, mutation, k,
-                                                     interval, epsilon, window_size, init_order])
+                                            for pf in P_FORGET:
+                                                args.append([g_size, alpha, decay, crossover, mutation, k,
+                                                     interval, epsilon, window_size, init_order,pf])
     return args
 
 
@@ -112,10 +118,10 @@ def run_arg(args):
     args: list of arguments
     """
     for arg in args:
-        assert len(arg) == 10
-        group_size, alpha, decay, crossover, mutation, k, interval, epsilon, window_size, init_order = arg
+        assert len(arg) == 11
+        group_size, alpha, decay, crossover, mutation, k, interval, epsilon, window_size, init_order,pf = arg
         for repetition in range(REPETITIONS):
-            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order)
+            run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon, window_size,init_order,pf)
             print("Repetition %s/%s\n" % (repetition + 1, REPETITIONS))
 
 
@@ -139,7 +145,7 @@ if __name__ == "__main__":
     prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
@@ -149,7 +155,8 @@ if __name__ == "__main__":
                      6 - Thompson only
                      7 - UCB1 Discounted only
                      8 - UCB1 Sliding Window only
-                     9 - Rexp3\n
+                     9 - Rexp3
+                     10- Rexp3MA\n
                      """)
 
     prs.add_argument("-r", "--repetitions", type=int, default=1,
@@ -218,7 +225,7 @@ if __name__ == "__main__":
                                                               + " Q table.\n")
 
     prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1.0], \
-                     help="List of epsilons(exploration/exploitation rate) for Q-Learning.\n")
+                     help="List of epsilons(exploration rate) for Q-Learning, Rexp3 and Rexp3MA.\n")
 
     prs.add_argument("-a", "--alphas", nargs="+", type=float, default=[0.5],
                      help="List of learning rates in each configuration.\n")
@@ -226,7 +233,7 @@ if __name__ == "__main__":
     prs.add_argument("-d", "--decays", nargs="+", type=float, default=[0.99],
                      help="List of decays in each configuration; this sets the value by which epsilon"
                           + " is multiplied at each QL episode. Also used as the discount factor on Discounted UCB and Sliding window UCB, "
-                          +  "and gamma for the Rexp3 algorithm\n")
+                          +  "and the decay rate for the probability of forgetinf of the Rexp3MA algorithm\n")
 
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
                                                              " Boltzmann action selection.\n")
@@ -234,6 +241,9 @@ if __name__ == "__main__":
                      help="Window size for Sliding Window UCB1\n")
     prs.add_argument("-io", "--initorder", nargs="+", type=int, default=[1],choices=[1, 2],
                      help="How UCB-based algorithms should be initiaded: 1-random order, 2-sequential order\n")
+    prs.add_argument("-pf", "--probabilityforget", nargs="+", type=float, default=[1.0], \
+                     help="List of probabilities of forgetting for the Rexp3MA algorithms.\n")
+
 
     args = prs.parse_args()
 
@@ -279,4 +289,5 @@ if __name__ == "__main__":
     ACTION_SELECTION = args.action_selection
     WINDOW_SIZE = args.windowsize
     INIT_ORDER = args.initorder
+    P_FORGET = args.probabilityforget
     run()
