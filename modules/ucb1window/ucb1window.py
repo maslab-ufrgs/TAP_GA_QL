@@ -50,25 +50,23 @@ class UCB1Window():
             Ns = [0.0]*self.k
 
             begin_window = self.episode - min(self.window_size, self.episode-1)
-            itercount = 0
             n = 0.0
             ##calculate X and N for every action by iterating over previous rewards
             for i in range(begin_window, self.episode):
                 discountedFactor = math.pow(self.discount_factor, self.episode - i)
                 Ns[self.actions[dInx][i-1]] += discountedFactor
                 Xs[self.actions[dInx][i-1]] += discountedFactor * self.rewards[dInx][i-1]
-                itercount += 1
                 n += Ns[self.actions[dInx][i-1]]
-            #n = sum(Ns)
 
             Cs = [0.0]*self.k
             choice_value = []
             for kinx in range(self.k):
-                if Ns[kinx] > 0:
-                    Xs[kinx] = Xs[kinx] / Ns[kinx]
-                    c = self.rewardUpperBound
-                    c *= math.sqrt(log_size/Ns[kinx])
-                    Cs[kinx] = c
+                if Ns[kinx] <= 0:
+                    Ns[kinx] += 0.001
+                Xs[kinx] = Xs[kinx] / Ns[kinx]
+                c = self.rewardUpperBound
+                c *= math.sqrt(log_size/Ns[kinx])
+                Cs[kinx] = c
                 choice_value.append(Cs[kinx]+Xs[kinx])
 
             ##chooses action with highest value
