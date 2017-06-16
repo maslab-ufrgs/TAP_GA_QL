@@ -24,7 +24,7 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
                         p_drivers_link=P_DRIVERS_LINK, p_od_pair=P_OD_PAIR, epsilon=epsilon,
                         p_interval=P_INTERVAL, p_drivers_route=P_DRIVERS_ROUTE,
                         TABLE_INITIAL_STATE=QL_TABLE_STATE, MAXI=MAXI, MINI=MINI, fixed=FIXED,
-                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE, p_forget = p_forget)
+                        action_selection=ACTION_SELECTION, temperature=TEMPERATURE)
     if EXPERIMENT_TYPE == 1:  # QL only
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
