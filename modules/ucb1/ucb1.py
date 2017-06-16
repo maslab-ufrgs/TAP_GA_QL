@@ -74,7 +74,6 @@ class UCB1():
         #updates the means. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
-            #reward = 1.0/traveltimes[drIndex]
             self.__set_reward(drIndex, actions[drIndex], reward)
 
         average_tt_time = sum(traveltimes)/self.numdrivers
