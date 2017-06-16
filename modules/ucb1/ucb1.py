@@ -45,7 +45,10 @@ class UCB1():
         else:  # regular case
             choice_value = [0.0] * self.k
             for i, u in enumerate(self.means[dInx]):
-                choice_value[i] = u + math.sqrt((2.0 * math.log(self.round[dInx])) / self.number_plays[dInx][i])
+                bonus =  math.sqrt((2.0 * math.log(self.round[dInx])) / float(self.number_plays[dInx][i]))
+                if(dInx== 0):
+                    print bonus, u
+                choice_value[i] = u + bonus
             ##chooses action with highest value
             index, v = max(enumerate(choice_value), key=operator.itemgetter(1))
             self.number_plays[dInx][index] += 1  ## does not update mean

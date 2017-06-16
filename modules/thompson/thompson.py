@@ -88,5 +88,5 @@ class Thompson:
         print average_tt_time,'\n'
         return (actions, average_tt_time)
 
-    def __set_reward(self, dInx, action, value):
+    def __set_reward(self, dInx, action, value):i
         self.observations[dInx][action].append(value)
