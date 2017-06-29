@@ -38,7 +38,8 @@ class Experiment(object):
     def __init__(self, k, net_file, group_size, net_name, table_fill_file=None,
                  flow=0, p_travel_time=False, p_drivers_link=False, p_od_pair=False, p_interval=1,
                  epsilon=1.0, p_drivers_route=False, TABLE_INITIAL_STATE='fixed',
-                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0, p_forget = 0.0):
+                 MINI=0.0, MAXI=0.0, fixed=0.0, action_selection="epsilon", temperature=0.0,
+                 ):
 
         '''
             Construct the experiment.

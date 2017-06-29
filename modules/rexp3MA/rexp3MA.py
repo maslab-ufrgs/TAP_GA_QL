@@ -69,6 +69,7 @@ class Rexp3MA():
         #updates the means. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
+            assert(type(reward) == float)
             self.__set_reward(drIndex, actions[drIndex], reward)
 
         #updates p_forget with its decay rate

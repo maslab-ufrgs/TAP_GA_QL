@@ -43,6 +43,19 @@ class UCB1():
                 raise "invalid init order"
 
         else:  # regular case
+
+            ##forcing to play each arm a given % of episodes
+            #if(self.round[dInx] > 20):
+            #    not_played = []
+            #    if random.uniform(0,1) < 0.01:
+            #        for k in range(self.k):
+            #            if(self.number_plays[dInx][k] < 0.03*self.round[dInx]):
+            #                not_played.append(k)
+            #        if len(not_played)> 0:
+            #            choice =random.choice(not_played)
+            #            self.number_plays[dInx][choice] +=1
+            #            return choice
+
             choice_value = [0.0] * self.k
             for i, u in enumerate(self.means[dInx]):
                 bonus =  math.sqrt((2 * math.log(self.round[dInx])) / float(self.number_plays[dInx][i]))
@@ -52,6 +65,8 @@ class UCB1():
             ##chooses action with highest value
             index, v = max(enumerate(choice_value), key=operator.itemgetter(1))
             self.number_plays[dInx][index] += 1  ## does not update mean
+            if(self.round[dInx] ==100):
+                print "min: ", min(self.number_plays[dInx])
             return index
 
     ##updates the means os the specified agent with the reward of the last round
@@ -77,5 +92,7 @@ class UCB1():
             self.__set_reward(drIndex, actions[drIndex], reward)
 
         average_tt_time = sum(traveltimes)/self.numdrivers
+        if self.round[0] == 100:
+            print average_tt_time
         return (actions, average_tt_time)
 
