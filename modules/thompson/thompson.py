@@ -30,7 +30,7 @@ class Thompson:
                 self.observations[i].append([[],[]])# rewards
 
         self.episode = 0
-        self.parameter_update_interval = 10 ## interval between updates on the parameters for the distributions
+        self.parameter_update_interval = 20 ## interval between updates on the parameters for the distributions
 
         self.sd = [] #std deviation values for each agent's observations of each route
         self.av = [] #avg values for each agent's observations of each route
