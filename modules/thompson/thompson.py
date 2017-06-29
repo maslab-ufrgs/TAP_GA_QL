@@ -67,11 +67,11 @@ class Thompson:
             if (self.episode % self.parameter_update_interval == 0) or (self.episode == self.num_actions * 2):
                 for dInx in range(self.num_drivers):
                     for i in range(self.num_actions):
-                        self.sd[dInx][i] = np.std(self.observations[dInx][i],ddof=1) + epsilon
-                        self.av[dInx][i] = np.average(self.observations[dInx][i])
-                        if(dInx == 900):
-                            print "sd",self.sd[dInx][i], " av",self.av[dInx][i]
-                            print self.observations[dInx][i]
+                        self.sd[dInx][i] = np.std(self.observations[dInx][i][0],ddof=1) + epsilon
+                        self.av[dInx][i] = np.average(self.observations[dInx][i][0])
+                        #if(dInx == 900):
+                            #print "sd",self.sd[dInx][i], " av",self.av[dInx][i]
+                            #print self.observations[dInx][i]
 
 
 
