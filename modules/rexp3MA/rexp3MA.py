@@ -34,8 +34,7 @@ class Rexp3MA():
     def __chooseActionDriver(self, dInx):
 
         ##agent forgets with probability p_forget
-        #if random.uniform(0, 1) < self.p_forget and\
-        if int(self.episode/10)==dInx%10 and self.episode%10 ==0:
+        if random.uniform(0, 1) < self.p_forget:
             self.w[dInx] = [1.0]*self.k
             self.forgets[dInx] +=1
 

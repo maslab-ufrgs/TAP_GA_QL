@@ -45,7 +45,7 @@ class UCB1():
         else:  # regular case
             choice_value = [0.0] * self.k
             for i, u in enumerate(self.means[dInx]):
-                bonus =  math.sqrt((2.0 * math.log(self.round[dInx])) / float(self.number_plays[dInx][i]))
+                bonus =  math.sqrt((2 * math.log(self.round[dInx])) / float(self.number_plays[dInx][i]))
                 if(dInx== 0):
                     print bonus, u
                 choice_value[i] = u + bonus

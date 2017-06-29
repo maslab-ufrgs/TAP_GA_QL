@@ -11,7 +11,7 @@ def get_files_in_subtree(path):
 
 
 ## filepaths: list of files to be used as input
-def consolidate(filepaths, outpath):
+def consolidate(filepaths):
     results = {}
     num_episodes = None
     for fn,fp in filepaths:
@@ -29,13 +29,42 @@ def consolidate(filepaths, outpath):
         f.close()
     print "done reading\n"
     #writing output
+    return results
+
+def averageResults(results):
+    headers = {}
+    averagedresults = {}
+    for fi in results.keys():
+        header = "_".join(fi.split('_')[:-1])
+        if header not in headers.keys():
+            headers[header]=[ fi]
+        else:
+            headers[header].append(fi)
+
+    for header in headers.keys():
+        avgval = []
+        acc = 0.0
+        for episode in range(len(results[headers[header][0]])):
+            for fi in headers[header]:
+                acc += float(results[fi][episode])
+            acc = acc / len(headers[header])
+            avgval.append(str(acc))
+            acc = 0.0
+        averagedresults[header] = avgval
+    return averagedresults
+
+def writeResults(outpath, results):
     episode = 0
+    num_episodes = len(results[results.keys()[0]])
     outf = open(outpath, 'w')
-    line = ';'.join(zip(*filepaths)[0])+'\n'
+
+
+    line = ';'.join(results.keys())+'\n'
     outf.write(line)
     while episode < num_episodes:
+
         values = []
-        for fn,_ in filepaths:
+        for fn in results:
             values.append(results[fn][episode])
         line = ";".join(values)+'\n'
         outf.write(line)
@@ -46,4 +75,6 @@ if __name__=="__main__":
     if len(sys.argv) < 3:
         print "consolidateresutls.py subtreeroot outfile"
         sys.exit(1)
-    consolidate(get_files_in_subtree(sys.argv[1]), sys.argv[2])
+    results = consolidate(get_files_in_subtree(sys.argv[1]))
+    avgres = averageResults(results)
+    writeResults(sys.argv[2], avgres)

@@ -22,18 +22,26 @@ class Thompson:
                 self.observations[i].append([])
 
         self.episode = 0
-        self.parameter_update_interval = 20 ## interval between updates on the parameters for the distributions
+        self.parameter_update_interval = 10 ## interval between updates on the parameters for the distributions
         self.sd = [] #std deviation values for each agent's observations of each route
         self.av = [] #avg values for each agent's observations of each route
-
+        #self.initial_actions = []
         for dInx in range(self.num_drivers):
             self.sd.append([0.0]*k)
+        #   act = list(range(k)) + list(range(k))
+        #  random.shuffle(act)
+            #print act
+
+        #    self.initial_actions.append(act)
             self.av.append([0.0]*k)
 
     def __chooseActionDrivers(self):
         warnings.simplefilter("error")
         if self.episode < self.num_actions * 2:
             actions = [ self.episode % self.num_actions]*self.num_drivers
+            #actions = []
+            #for dInx in range(self.num_drivers):
+            #    actions.append(self.initial_actions[dInx][self.episode])
             return actions
 
         else:
@@ -45,6 +53,9 @@ class Thompson:
                     for i in range(self.num_actions):
                         self.sd[dInx][i] = np.std(self.observations[dInx][i],ddof=1) + epsilon
                         self.av[dInx][i] = np.average(self.observations[dInx][i])
+                        if(dInx == 900):
+                            print "sd",self.sd[dInx][i], " av",self.av[dInx][i]
+                            print self.observations[dInx][i]
 
 
             for dInx in range(self.num_drivers):
@@ -88,5 +99,5 @@ class Thompson:
         print average_tt_time,'\n'
         return (actions, average_tt_time)
 
-    def __set_reward(self, dInx, action, value):i
+    def __set_reward(self, dInx, action, value):
         self.observations[dInx][action].append(value)
