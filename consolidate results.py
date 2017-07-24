@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy
 #gets all files in the subtree with path as root
 def get_files_in_subtree(path):
     children = os.listdir(path)
@@ -31,6 +32,7 @@ def consolidate(filepaths):
     #writing output
     return results
 
+####calculates average and standard deviation
 def averageResults(results):
     headers = {}
     averagedresults = {}
@@ -43,29 +45,39 @@ def averageResults(results):
 
     for header in headers.keys():
         avgval = []
-        acc = 0.0
+        stdval = []
+
         for episode in range(len(results[headers[header][0]])):
-            for fi in headers[header]:
-                acc += float(results[fi][episode])
-            acc = acc / len(headers[header])
-            avgval.append(str(acc))
-            acc = 0.0
-        averagedresults[header] = avgval
+            values = []
+            for fi in headers[header]: ##for each repetition
+                values.append(float(results[fi][episode]))
+            avg = numpy.mean(values)
+            std = numpy.std(values, ddof=1)
+
+            avgval.append(str(avg))
+            stdval.append(str(std))
+
+        averagedresults[header] = (avgval, stdval)
     return averagedresults
 
 def writeResults(outpath, results):
     episode = 0
-    num_episodes = len(results[results.keys()[0]])
+    num_episodes = len(results[results.keys()[0]][0])
     outf = open(outpath, 'w')
 
+    file_headers = []
+    for hd in results.keys():
+        file_headers.append(hd + "_avg")
+        file_headers.append(hd + "_std")
 
-    line = ';'.join(results.keys())+'\n'
+    line = ';'.join(file_headers)+'\n'
     outf.write(line)
     while episode < num_episodes:
 
         values = []
         for fn in results:
-            values.append(results[fn][episode])
+            values.append(results[fn][0][episode])##avg
+            values.append(results[fn][1][episode])#stddev
         line = ";".join(values)+'\n'
         outf.write(line)
         episode+=1
