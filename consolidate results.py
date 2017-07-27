@@ -51,8 +51,12 @@ def averageResults(results):
             values = []
             for fi in headers[header]: ##for each repetition
                 values.append(float(results[fi][episode]))
-            avg = numpy.mean(values)
-            std = numpy.std(values, ddof=1)
+            if(len(headers[header]) > 1):
+                avg = numpy.mean(values)
+                std = numpy.std(values, ddof=1)
+            else:
+                avg = values[0]
+                std = 0.0
 
             avgval.append(str(avg))
             stdval.append(str(std))
