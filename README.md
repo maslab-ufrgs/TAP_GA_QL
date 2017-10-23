@@ -84,15 +84,17 @@ Options
 =======
 
 ```
-optional arguments:
+arguments:
   -h, --help            show this help message and exit
   -f FILE               The network file. (default: None)
   -as {epsilon,boltzmann}, --action-selection {epsilon,boltzmann}
                         How the agents should select their actions. (default:
                         epsilon)
-  -et {1,2,3,4}, --experimentType {1,2,3,4}
+  -et {1,2,3,4,5,6,7,8,9,10}, --experimentType {1,2,3,4,5,6,7,8,9,10}
                         1 - QL only; 2 - GA only; 3 - QL builds solution for
-                        GA; 4 - GA and QL exchange solutions. (default: 1)
+                        GA; 4 - GA and QL exchange solutions. 5 - UCB1 only 6
+                        - Thompson only 7 - UCB1 Discounted only 8 - UCB1
+                        Sliding Window only 9 - Rexp3 10- Rexp3MA (default: 1)
   -r REPETITIONS, --repetitions REPETITIONS
                         How many times it should be repeated. (default: 1)
   -k KS [KS ...], --ks KS [KS ...]
@@ -148,16 +150,28 @@ optional arguments:
                         random value(x) will be min <= x ! (default: 0.0)
   --fixed FIXED         Fixed value for generating the Q table. (default: 0.0)
   -epl EPSILON [EPSILON ...], --epsilon EPSILON [EPSILON ...]
-                        List of epsilons(exploration/exploitation rate) for
-                        Q-Learning. (default: [1.0])
+                        List of epsilons(exploration rate) for Q-Learning,
+                        Rexp3 and Rexp3MA. (default: [1.0])
   -a ALPHAS [ALPHAS ...], --alphas ALPHAS [ALPHAS ...]
                         List of learning rates in each configuration.
                         (default: [0.5])
   -d DECAYS [DECAYS ...], --decays DECAYS [DECAYS ...]
                         List of decays in each configuration; this sets the
                         value by which epsilon is multiplied at each QL
-                        episode. (default: [0.99])
+                        episode. Also used as the discount factor on
+                        Discounted UCB and Sliding window UCB, and the decay
+                        rate for the probability of forgetinf of the Rexp3MA
+                        algorithm (default: [0.99])
   -t TEMPERATURE, --temperature TEMPERATURE
                         Temperature for the Boltzmann action selection.
                         (default: None)
+  -ws WINDOWSIZE [WINDOWSIZE ...], --windowsize WINDOWSIZE [WINDOWSIZE ...]
+                        Window size for Sliding Window UCB1 (default: [20])
+  -io {1,2} [{1,2} ...], --initorder {1,2} [{1,2} ...]
+                        How UCB-based algorithms should be initiaded: 1-random
+                        order, 2-sequential order (default: [1])
+  -pf PROBABILITYFORGET [PROBABILITYFORGET ...], --probabilityforget PROBABILITYFORGET [PROBABILITYFORGET ...]
+                        List of probabilities of forgetting for the Rexp3MA
+                        algorithms. (default: [1.0])
+
 ```
