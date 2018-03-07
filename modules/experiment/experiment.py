@@ -743,7 +743,11 @@ class Experiment(object):
             if(type(dr) != int):
                 print('problema!', driverString, '\n')
                 print type(dr)
-            path = self.drivers[inx].od.paths[dr]
+            #chinelagem
+            if dr <= self.drivers[inx].od.numPaths - 1:
+                path = self.drivers[inx].od.paths[dr]
+            else:
+                continue
             for edge in path[0]:
                 if edge in dicti.keys():
                     dicti[edge] += self.group_size
@@ -757,10 +761,14 @@ class Experiment(object):
     def evaluateActionTravelTime(self, driverIndex, action, edgesTravelTimes):
         #calculates travel times for a driver
         traveltime = 0.0
-        path = self.drivers[driverIndex].od.paths[action][0]  # list of nodes of path
-        for edge in path:
-            traveltime += edgesTravelTimes[edge]
-        return traveltime
+        #chinelagem
+        if action <= self.drivers[driverIndex].od.numPaths - 1:
+            path = self.drivers[driverIndex].od.paths[action][0]  # list of nodes of path
+            for edge in path:
+                traveltime += edgesTravelTimes[edge]
+            return traveltime
+        else:
+            return float("inf")
 
     def initTravelTimeByODDict(self):
         d = {}
