@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 """
 Changelog:
     v1.0 - Changelog created. <08/03/2017>

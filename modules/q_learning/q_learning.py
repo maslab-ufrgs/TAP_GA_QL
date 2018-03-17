@@ -58,10 +58,7 @@ class QL():
                 randomnb = random.uniform(0, 1)
                 if randomnb < self.epsilon:
                     # action is selected randomly
-                    if float('-inf') in a:
-                        curaction = random.randint(0, self.k-2)
-                    else:
-                        curaction = random.randint(0, self.k-1)
+                    curaction = random.randint(0, self.k-1)
                 else:
                     # action is selected greedly
                     max_in_array = max(a)
@@ -116,15 +113,7 @@ class QL():
         if self.action_selection == "boltzmann":
             self.temperature = self.temperature * self.decay
 
-        #chinelagem
-        def c_sum(l):
-            r = 0
-            for i in l:
-                if i != float('inf'):
-                    r += i
-            return r
-
-        average_tt_time = c_sum(traveltimes)/self.numdrivers
+        average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions, average_tt_time)
 
     def runEpisodeWithAction(self, actions):

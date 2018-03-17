@@ -132,8 +132,6 @@ class OD(object):
         self.o = origin
         self.d = destiny
         self.numPaths = num_paths
-        if self.o == "s2" and self.d == "t2":
-            self.numPaths = 3
         self.numTravels = num_travels
         self.paths = None
 
