@@ -471,8 +471,8 @@ class Experiment(object):
         return filename, path, headerstr
 
     def createStringArguments(self, useQL, useInt):
-        fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f"
-        path = fmt % (self.network_name, self.mutation)
+        fmt = "./results_gaql_grouped/net_%s/GA/pm%4.4f/crossover_%.2f"
+        path = fmt % (self.network_name, self.mutation, self.crossover)
 
         filename = '/net' + self.network_name + '_pm' + str(self.mutation) + '_c' \
                  + str(self.crossover) + '_e' + str(self.elite) + '_k' + str(self.k)
@@ -486,8 +486,8 @@ class Experiment(object):
         headerstr_ext = "\n#Generations AVG_TT"
 
         if useQL:
-            fmt = "./results_gaql_grouped/net_%s/GA<-QL/pm%4.4f/decay%4.3f/alpha%3.2f"
-            path = fmt % (self.network_name, self.mutation, self.decay, self.alpha)
+            fmt = "./results_gaql_grouped/net_%s/GAQL/pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
+            path = fmt % (self.network_name, self.mutation, self.crossover, self.decay, self.alpha)
 
             filename += '_a' + str(self.alpha) + '_d' + str(self.decay)
             headerstr += "\n#\tAlpha=" + str(self.alpha) + "\tDecay=" + str(self.decay) \
@@ -508,12 +508,12 @@ class Experiment(object):
             headerstr_ext += " QL_AVG_TT"
 
             if useInt:
-                fmt = "./results_gaql_grouped/net_%s/GA<->QL/" \
-                       + "pm%4.4f/decay%4.3f/alpha%3.2f/QL<-GA_Interval%s"
+                fmt = "./results_gaql_grouped/net_%s/GAQL/" \
+                       + "pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
 
-                path = fmt % (self.network_name, self.mutation, self.decay, self.alpha, self.interval)
+                path = fmt % (self.network_name, self.mutation, self.crossover, self.decay, self.alpha)
                 filename += '_interval'+ str(self.interval)
-                headerstr += "\n#\tGA->QL interval=" + str(self.interval)
+                headerstr += "\n#\tGA<->QL interval=" + str(self.interval)
 
         filename += '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) + 'm' \
                  + str(localtime()[5]) + 's'
@@ -684,10 +684,12 @@ class Experiment(object):
         self.outputFile = open(filename, 'w')
         self.outputFile.write(headerstr + '\n')
 
+        ''' To print progress bar, uncomment this line.
         for episode in range(num_episodes):
             print_progress(episode+1, num_episodes)
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode, instance, qlTT=value)
+        '''
 
         print("Output file location: %s" % filename)
 
