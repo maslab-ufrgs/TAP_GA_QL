@@ -485,8 +485,8 @@ class Experiment(object):
 
         headerstr_ext = "\n#Generations AVG_TT"
 
-        if useQL:
-            fmt = "./results_gaql_grouped/net_%s/GAQL/pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
+        if useQL: #Experiment type 3
+            fmt = "./results_gaql_grouped/net_%s/QLGA/pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
             path = fmt % (self.network_name, self.mutation, self.crossover, self.decay, self.alpha)
 
             filename += '_a' + str(self.alpha) + '_d' + str(self.decay)
@@ -507,7 +507,7 @@ class Experiment(object):
 
             headerstr_ext += " QL_AVG_TT"
 
-            if useInt:
+            if useInt: #Experiment type 4
                 fmt = "./results_gaql_grouped/net_%s/GAQL/" \
                        + "pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
 
