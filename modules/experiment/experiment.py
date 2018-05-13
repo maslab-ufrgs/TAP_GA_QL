@@ -684,11 +684,11 @@ class Experiment(object):
         self.outputFile = open(filename, 'w')
         self.outputFile.write(headerstr + '\n')
 
-        ''' To print progress bar, uncomment this line.
         for episode in range(num_episodes):
-            print_progress(episode+1, num_episodes)
             (instance, value) = self.ql.runEpisode()
             self.__print_step(episode, instance, qlTT=value)
+        ''' To print progress bar, uncomment this line.
+            print_progress(episode+1, num_episodes)
         '''
 
         print("Output file location: %s" % filename)
