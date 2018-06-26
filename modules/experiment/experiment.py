@@ -195,7 +195,7 @@ class Experiment(object):
                 if self.useQL:
                     self.outputFile.write(str(step_number) + " " + str(avgTT) +" "+ str(qlTT))
                 else:
-                    self.outputFile.write(str(step_number) + " " + str(avgTT))
+                    self.outputFile.write(str(step_number) + " " + str(avgTT) + " ")
             else:
                 self.outputFile.write(str(step_number) + " " + str(qlTT)+" ")
 
@@ -483,7 +483,7 @@ class Experiment(object):
                   + str(self.group_size) + "\n#\tk=" + str(self.k) + "\t\tNumber of drivers=" \
                   + str(nd(self.drivers, self.group_size))
 
-        headerstr_ext = "\n#Generations AVG_TT"
+        headerstr_ext = "\n#Generations AVG_TT "
 
         if useQL: #Experiment type 3
             fmt = "./results_gaql_grouped/net_%s/QLGA/pm%4.4f/crossover_%.2f/decay%4.3f/alpha%3.2f"
