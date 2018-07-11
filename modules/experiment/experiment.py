@@ -24,8 +24,7 @@ from modules.ucb1.ucb1 import *
 from modules.ucb1discounted.ucb1discounted import *
 from modules.ucb1window.ucb1window import *
 from modules.thompson.thompson import *
-from modules.rexp3.rexp3 import *
-from modules.rexp3MA.rexp3MA import *
+from modules.exp3.exp3 import *
 from modules.functions.functions import *
 from modules.experiment.classes import *
 from ksp.KSP import *
@@ -379,7 +378,7 @@ class Experiment(object):
 
         return filename, path, headerstr
 
-    def createStringArgumentsRexp3(self, nd):
+    def createStringArgumentsExp3(self, nd):
         """
         Generate filename, generate the path to the file and generate the header infos for the file
         In:
@@ -389,42 +388,11 @@ class Experiment(object):
             path:string = path to file
             headerstr:string = parameters used in the experiment
         """
-        fmt = "./results_Rexp3_grouped/net_%s/Rexp3/"
+        fmt = "./results_Exp3_grouped/net_%s/Exp3/"
         path = fmt % (self.network_name)
 
         filename = path + '/' + self.network_name + '_k' + str(self.k)  \
-                 + '_epochsize' + str(self.window_size) + '_gamma'+ str(self.rexp3gamma) \
-                 +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
-                 + 'm' + str(localtime()[5]) + 's'
-
-        headerstr = "#Parameters:"
-
-        headerstr += "\tNumber of drivers=" \
-                  + str(nd) + "\n#\tk=" + str(self.k)
-
-        headerstr += "\n#Episode AVG_TT " + nodes_string(self.printODpair, self.printTravelTime,
-                                                         self.printDriversPerLink,
-                                                         self.printDriversPerRoute, self.ODlist,
-                                                         self.edgeNames, self.ODheader)
-
-        return filename, path, headerstr
-
-    def createStringArgumentsRexp3MA(self, nd):
-        """
-        Generate filename, generate the path to the file and generate the header infos for the file
-        In:
-            nd:int = number of drivers without groupsize
-        Out:
-            filename:string = filename
-            path:string = path to file
-            headerstr:string = parameters used in the experiment
-        """
-        fmt = "./results_Rexp3MA_grouped/net_%s/"
-        path = fmt % (self.network_name)
-
-        filename = path + '/' + self.network_name + '_k' + str(self.k)  \
-                 + '_epsilon'+ str(self.p_exploration) + '_p_forget' +str(self.p_forget)\
-                 + '_decay' + str(self.p_forget_decay) \
+                 +  '_gamma'+ str(self.exp3gamma) \
                  +  '_' + str(localtime()[3]) + 'h' + str(localtime()[4]) \
                  + 'm' + str(localtime()[5]) + 's'
 
@@ -596,14 +564,13 @@ class Experiment(object):
         print("Output file location: %s" % filename)
         self.outputFile.close()
 
-    def run_Rexp3(self, num_episodes,window_size,gamma):
-        ucb1 = Rexp3(self, self.drivers, self.k, window_size,gamma)
+    def run_Exp3(self, num_episodes,gamma):
+        exp3 = Exp3(self, self.drivers, self.k, gamma)
 
         self.useGA = False
         self.useQL = True
-        self.rexp3gamma = gamma
-        self.window_size = window_size
-        filename, path, headerstr = self.createStringArgumentsRexp3(len(self.drivers))
+        self.exp3gamma = gamma
+        filename, path, headerstr = self.createStringArgumentsExp3(len(self.drivers))
         filename = appendTag(filename)
 
         if os.path.isdir(path) is False:
@@ -614,32 +581,7 @@ class Experiment(object):
         print "num episodes %d", num_episodes
         for episode in range(num_episodes):
             print_progress(episode+1, num_episodes)
-            (instance, value) = ucb1.runEpisode(num_episodes)
-            self.__print_step(episode, instance, qlTT=value)
-        print("Output file location: %s" % filename)
-        self.outputFile.close()
-
-
-    def run_Rexp3MA(self, num_episodes,p_exploration,p_forget, p_forget_decay):
-        rxp = Rexp3MA(self, self.drivers, self.k, p_exploration, p_forget, p_forget_decay)
-
-        self.useGA = False
-        self.useQL = True
-        self.p_exploration = p_exploration
-        self.p_forget = p_forget
-        self.p_forget_decay = p_forget_decay
-        filename, path, headerstr = self.createStringArgumentsRexp3MA(len(self.drivers))
-        filename = appendTag(filename)
-
-        if os.path.isdir(path) is False:
-            os.makedirs(path)
-
-        self.outputFile = open(filename, 'w')
-        self.outputFile.write(headerstr + '\n')
-        print "num episodes %d", num_episodes
-        for episode in range(num_episodes):
-            print_progress(episode+1, num_episodes)
-            (instance, value) = rxp.runEpisode(num_episodes)
+            (instance, value) = exp3.runEpisode(num_episodes)
             self.__print_step(episode, instance, qlTT=value)
         print("Output file location: %s" % filename)
         self.outputFile.close()
@@ -660,7 +602,7 @@ class Experiment(object):
         for episode in range(num_episodes):
             print_progress(episode + 1, num_episodes)
             (instance, value) = th.runEpisode()
-            
+
             self.__print_step(episode, instance, qlTT=value)
         print("Output file location: %s" % filename)
         self.outputFile.close()

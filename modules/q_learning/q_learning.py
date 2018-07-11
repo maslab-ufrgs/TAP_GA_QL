@@ -11,6 +11,9 @@ This module contains the QL class which runs the QL experiments.
 import random
 import math
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 class QL():
     def __init__(self, experiment, drivers, k, decay, alpha, tableFill, epsilon=1, iniTable="zero"
                  , MINI=0.0, MAX=0.0, fixed=0.0, action_selection="epsilon", temperature=None):
@@ -45,7 +48,12 @@ class QL():
             for i in range(self.numdrivers):
                 self.qtable.append([fixed]*k)
         #print self.qtable
-
+        self.all_rewards_values = []
+        self.all_rewards_rounds = []
+        self.all_rewards_colors = []
+        self.color_mapping_od ={}
+        self.traveltimes = []
+        self.episode = 0
     ##runs one episode of ql
     ##returns (instance,averagefitnessvalue)
     ##list of routes (one for each driver)
@@ -99,12 +107,15 @@ class QL():
             actions.append(curaction)
 
         traveltimes = self.experiment.calculateIndividualTravelTime(actions)
-
+        self.episode += 1
         #updates qtable. reward is the negative of the travel time
         for drIndex in range(self.numdrivers):
             reward = -traveltimes[drIndex]
             #print 'reward: '+str(reward)+"\n"
             self.qtable[drIndex][actions[drIndex]] = self.qtable[drIndex][actions[drIndex]] * (1-self.alpha) + self.alpha*reward
+            self.all_rewards_values.append(reward)
+            self.all_rewards_rounds.append(self.episode)
+            self.all_rewards_colors.append(self.color_od(self.drivers[drIndex]))
 
         if self.action_selection == "epsilon":
             #updates epsilon
@@ -114,6 +125,12 @@ class QL():
             self.temperature = self.temperature * self.decay
 
         average_tt_time = sum(traveltimes)/self.numdrivers
+        if(self.episode == 100):
+            plt.figure(1)
+            plt.scatter(self.all_rewards_rounds, self.all_rewards_values, c= self.all_rewards_colors)
+            plt.figure(2)
+            plt.plot(self.traveltimes)
+            plt.show()
         return (actions, average_tt_time)
 
     def runEpisodeWithAction(self, actions):
@@ -134,3 +151,11 @@ class QL():
 
         average_tt_time = sum(traveltimes)/self.numdrivers
         return (actions, average_tt_time)
+    def color_od(self,driver):
+        origin = driver.od.o
+        destination = driver.od.d
+        if(origin not in self.color_mapping_od.keys()):
+            self.color_mapping_od[origin] = {}
+        if(destination not in self.color_mapping_od[origin].keys()):
+            self.color_mapping_od[origin][destination] = np.random.rand()
+        return self.color_mapping_od[origin][destination]
