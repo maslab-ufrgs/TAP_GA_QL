@@ -7,6 +7,7 @@ results_Thompson_grouped
 results_UCB_grouped
 results_Rexp3_grouped
 results_Rexp3MA_grouped
+results_Exp3_grouped
 .cache
 tarefa.py
 *.swp

@@ -78,16 +78,12 @@ def run_type(k, group_size, alpha, decay, crossover, mutation, interval, epsilon
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running UCB1 Sliding Window only")
         ex.run_UCB1Window(GENERATIONS, decay, window_size, init_order)
-    elif EXPERIMENT_TYPE == 9:  # Rexp3
+    elif EXPERIMENT_TYPE == 9:  # Exp3
         print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
               + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
         print("Running Rexp3 only")
-        ex.run_Rexp3(GENERATIONS, window_size, epsilon)
-    elif EXPERIMENT_TYPE == 10:  # Rexp3
-        print("Parameters:\n\tAction sel.: {0}\tGenerations: {1}".format(ACTION_SELECTION, GENERATIONS)
-              + "\n\tBase flow: {0}\tk: {1}".format(FLOW, k))
-        print("Running Rexp3MA only")
-        ex.run_Rexp3MA(GENERATIONS,epsilon,p_forget,decay)
+        ex.run_Exp3(GENERATIONS, epsilon)
+
 
 
 def build_args():
@@ -145,7 +141,7 @@ if __name__ == "__main__":
     prs.add_argument("-as", "--action-selection", type=str, choices=["epsilon", "boltzmann"],
                      default="epsilon", help="How the agents should select their actions.\n")
 
-    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], default=1,
+    prs.add_argument("-et", "--experimentType", type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=1,
                      help="""
                      1 - QL only;
                      2 - GA only;
@@ -155,8 +151,7 @@ if __name__ == "__main__":
                      6 - Thompson only
                      7 - UCB1 Discounted only
                      8 - UCB1 Sliding Window only
-                     9 - Rexp3
-                     10- Rexp3MA\n
+                     9 - Rexp3\n
                      """)
 
     prs.add_argument("-r", "--repetitions", type=int, default=1,
@@ -225,15 +220,15 @@ if __name__ == "__main__":
                                                               + " Q table.\n")
 
     prs.add_argument("-epl", "--epsilon", nargs="+", type=float, default=[1.0], \
-                     help="List of epsilons(exploration rate) for Q-Learning, Rexp3 and Rexp3MA.\n")
+                     help="List of epsilons(exploration rate) for Q-Learning and Exp3.\n")
 
     prs.add_argument("-a", "--alphas", nargs="+", type=float, default=[0.5],
                      help="List of learning rates in each configuration.\n")
 
     prs.add_argument("-d", "--decays", nargs="+", type=float, default=[0.99],
                      help="List of decays in each configuration; this sets the value by which epsilon"
-                          + " is multiplied at each QL episode. Also used as the discount factor on Discounted UCB and Sliding window UCB, "
-                          +  "and the decay rate for the probability of forgetinf of the Rexp3MA algorithm\n")
+                          + " is multiplied at each QL episode. Also used as the discount factor on Discounted UCB and Sliding window UCB."
+                          +  "\n")
 
     prs.add_argument("-t", "--temperature", type=float, help="Temperature for the" \
                                                              " Boltzmann action selection.\n")
