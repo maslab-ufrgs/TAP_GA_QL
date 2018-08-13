@@ -7,7 +7,7 @@ git submodule init && git submodule update
 
 Can get other networks from
 ===========================
- * [Networks](https://github.com/maslab-ufrgs/network-files)
+ * [Networks](https://github.com/maslab-ufrgs/transportation_networks)
 
 Dependencies
 ============
